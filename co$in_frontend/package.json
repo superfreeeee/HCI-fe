@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "element-ui": "^2.15.1",
+    "three": "^0.126.1",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1",
     "vuex": "^3.6.2"
