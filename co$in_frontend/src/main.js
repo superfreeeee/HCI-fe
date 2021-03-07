@@ -6,9 +6,13 @@ import router from './router'
 import vuex from 'vuex'
 import elementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+import HighchartsVue from 'highcharts-vue'
+import Highcharts from 'highcharts'
 
 Vue.use(vuex)
 Vue.use(elementUI)
+Vue.use(HighchartsVue)
+Vue.use(Highcharts)
 
 Vue.config.productionTip = false
 
