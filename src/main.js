@@ -6,16 +6,14 @@ import router from './router'
 import vuex from 'vuex'
 import elementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import HighchartsVue from 'highcharts-vue'
-import Highcharts from 'highcharts'
 import store from './store';
+import * as d3 from 'd3'
 
 Vue.use(vuex)
 Vue.use(elementUI)
-Vue.use(HighchartsVue)
-Vue.use(Highcharts)
 
 Vue.config.productionTip = false
+Vue.prototype.$d3 = d3
 
 /* eslint-disable no-new */
 new Vue({
