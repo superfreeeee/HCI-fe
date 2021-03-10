@@ -26,8 +26,11 @@ export default {
     mounted() {
         Highcharts.chart(this.id, this.option)
     },
+	methods: {
+
+	},
     created() {
-			Highcharts.addEvent(
+		Highcharts.addEvent(
 			Highcharts.seriesTypes.networkgraph,
 			'afterSetOptions',
 			function (e) {

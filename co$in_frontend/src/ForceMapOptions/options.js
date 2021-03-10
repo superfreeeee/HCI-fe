@@ -2,7 +2,10 @@ module.exports = {
     force: {
         chart: {
             type: 'networkgraph',
-            height: '100%'
+            height: '100%',
+            events: {
+                
+            }
         },
         title: {
             text: 'The Indo-European Laungauge Tree'

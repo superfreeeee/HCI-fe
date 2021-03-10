@@ -8,6 +8,7 @@ import elementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 import HighchartsVue from 'highcharts-vue'
 import Highcharts from 'highcharts'
+import store from './store';
 
 Vue.use(vuex)
 Vue.use(elementUI)
@@ -20,6 +21,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

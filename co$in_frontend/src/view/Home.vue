@@ -1,12 +1,17 @@
 <template>
-  <div id="test">
-    <ForceMap :id="id" :option="option"></ForceMap>
+  <div class="home">
+    <div class="test">
+      <ForceMap :id="id" :option="option"></ForceMap>
+    </div>
+    <OperationPanel />
   </div>
 </template>
 
 <script>
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import ForceMap from '../components/ForceMap';
 import options from '../ForceMapOptions/options';
+import OperationPanel from '../components/OperationPanel';
 
 export default {
   name: 'Home',
@@ -19,14 +24,38 @@ export default {
   },
   components: {
     ForceMap,
+    OperationPanel,
+  },
+  methods: {
+    ...mapMutations([
+			'set_showPanel'
+		]),
+		...mapActions([
+			
+		]),
+		set_showPanel_visible() {
+			this.set_showPanel(true);
+		},
   }
 }
 </script>
 
 <style>
-#test {
+.home {
+  width: 100%;
+  height: 100%;
+}
+
+.test {
 	min-width: 350px;
 	max-width: 530px;
-	margin: 0 auto;
+  margin-left: 30px;
+}
+
+#select-btn {
+  position: absolute;
+  left: 45%;
+  bottom: 5%;
+  width: 70px;
 }
 </style>
