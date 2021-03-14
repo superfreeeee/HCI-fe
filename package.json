@@ -12,6 +12,7 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "d3": "^6.5.0",
     "element-ui": "^2.15.1",
     "vue": "^2.5.2",
