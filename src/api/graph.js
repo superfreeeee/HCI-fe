@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://39.97.124.144:9001';
+axios.defaults.baseURL = 'http://39.97.124.144:8001';
 
 const api = {
     graphPre: '/graph'
@@ -8,10 +8,7 @@ const api = {
 
 export function getGraphByProjectIdAPI(projectId) {
     return axios({
-        url: `${api.graphPre}`,
+        url: `${api.graphPre}/${projectId}`,
         method: 'GET',
-        params: {
-            projectId: projectId,
-        }
     })
 }

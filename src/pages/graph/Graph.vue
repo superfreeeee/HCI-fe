@@ -6,7 +6,7 @@
     <div class="panel" :style="{ width: showPanel ? '300px' : '0' }">
       <!-- <div class="arrow" @click="showPanel = !showPanel"></div> -->
     </div>
-    <button @click="showPanel = !showPanel">toggle</button>
+    <el-button @click="showPanel = !showPanel" icon="el-icon-arrow-left"></el-button>
   </div>
 </template>
 
@@ -19,7 +19,7 @@ export default {
   },
   data () {
     return {
-      showPanel: false
+      showPanel: false,
     }
   },
   methods: {
