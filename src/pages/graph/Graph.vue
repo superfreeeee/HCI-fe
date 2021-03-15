@@ -1,51 +1,64 @@
 <template>
   <div class="home">
     <div class="graph">
-      <d-3-sample/>
+      <d-3-sample />
     </div>
-    <div class="panel" :style="{width : showPanel ? '300px' : '0'}">
+    <div class="panel" :style="{ width: showPanel ? '300px' : '0' }">
       <div class="upper">
-        <div class="quarter">
-          <el-button type="primary" round size="mini" @click="setInsertDialogVisible(true)">增加实体</el-button>
-          <el-button type="primary" round size="mini">增加关系</el-button>
-        </div>
-        <div class="quarter">
-          <el-button type="danger" round size="mini" @click="setDeleteDialogVisible(true)">删除实体</el-button>
-          <el-button type="danger" round size="mini">删除关系</el-button>
-        </div>
-        <div class="quarter">
-          <el-button type="success" round size="mini" @click="setModifyDialogVisible(true)">修改实体</el-button>
-          <el-button type="success" round size="mini">修改关系</el-button>
-        </div>
-        <div class="quarter">
-          <el-button type="warning" round size="mini" @click="setSearchDialogVisible(true)">查询实体</el-button>
-          <el-button type="warning" round size="mini">查询关系</el-button>
-        </div>
+        <el-button
+          type="primary"
+          round
+          size="medium"
+          @click="panel = 'panel-new-node'"
+          >新增实体</el-button
+        >
+        <el-button
+          type="primary"
+          round
+          size="medium"
+          @click="panel = 'panel-new-relation'"
+          >新增关系</el-button
+        >
       </div>
       <div class="lower">
         <el-input
-            placeholder="请输入 projectID"
-            prefix-icon="el-icon-search"
-            v-model="projectID"
-            change="getGraph()">
+          placeholder="请输入 projectId"
+          prefix-icon="el-icon-search"
+          v-model="projectId"
+          change="getGraph()"
+        >
         </el-input>
+        <h4 v-if="panel === ''">点击实体/关系查看细节</h4>
+        <component :is="panel" @back="panel = ''"></component>
+        <div>
+          <el-button @click="setInsertDialogVisible(true)">A</el-button>
+          <el-button @click="setDeleteDialogVisible(true)">B</el-button>
+          <el-button @click="setModifyDialogVisible(true)">C</el-button>
+          <el-button @click="setSearchDialogVisible(true)">D</el-button>
+        </div>
       </div>
     </div>
-    <el-button @click="/* showPanel = !showPanel */" icon="el-icon-arrow-left"></el-button>
-    <InsertEntityDialog />
-    <DeleteEntityDialog />
-    <ModifyEntityDialog />
-    <SearchEntityDialog />
+    <insert-entity-dialog></insert-entity-dialog>
+    <delete-entity-dialog></delete-entity-dialog>
+    <modify-entity-dialog></modify-entity-dialog>
+    <search-entity-dialog></search-entity-dialog>
+    <!-- <el-button @click="showPanel = !showPanel" icon="el-icon-arrow-left"></el-button> -->
+    <el-button
+      @click="showPanel = !showPanel"
+      :icon="`el-icon-arrow-${showPanel ? 'right' : 'left'}`"
+    ></el-button>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import D3Sample from './components/D3Sample'
 import InsertEntityDialog from './components/InsertEntityDialog'
 import DeleteEntityDialog from './components/DeleteEntityDialog'
 import ModifyEntityDialog from './components/ModifyEntityDialog'
 import SearchEntityDialog from './components/SearchEntityDialog'
+import PanelNewNode from './components/PanelNewNode'
+import PanelNewRelation from './components/PanelNewRelation'
 
 export default {
   components: {
@@ -53,12 +66,15 @@ export default {
     InsertEntityDialog,
     DeleteEntityDialog,
     ModifyEntityDialog,
-    SearchEntityDialog
+    SearchEntityDialog,
+    PanelNewNode,
+    PanelNewRelation
   },
-  data () {
+  data() {
     return {
       showPanel: true,
-      projectID: '',
+      projectId: '',
+      panel: 'panel-new-node'
     }
   },
   methods: {
@@ -67,10 +83,10 @@ export default {
       'setDeleteDialogVisible',
       'setModifyDialogVisible',
       'setSearchDialogVisible',
-      'setProjectID',
+      'setProjectId'
     ]),
     getGraph() {
-      setProjectID(this.projectID)
+      setProjectId(this.projectId)
     }
   }
 }
@@ -91,12 +107,15 @@ export default {
 .home > .panel {
   border-left: 2px solid #bbbbbb;
   width: 0;
-  position: relative;
   box-sizing: border-box;
   transition: width 1s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  align-content: stretch;
+  overflow: hidden;
 }
 
-.panel > .arrow{
+.panel > .arrow {
   height: 30px;
   width: 10px;
   display: grid;
@@ -109,30 +128,27 @@ export default {
   top: calc(50vh - 15px);
 }
 
-.panel > .arrow::after {
-  content: "<";
-  font-weight: 600;
-  transform: scaleY(2);
-  top: 0;
-}
-
 .home > .panel > .upper {
-  height: 250px;
+  padding: 16px;
   display: flex;
-  flex-wrap: wrap;
+  justify-content: space-evenly;
   border-bottom: 1px groove;
 }
 
-.home > .panel > .upper >.quarter {
+/* .home > .panel > .upper >.quarter {
   width: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-wrap: wrap;
-}
+} */
 
 .home > .panel > .lower {
-  height: calc(100vh - 251px);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow: auto;
 }
 
 .el-button {
