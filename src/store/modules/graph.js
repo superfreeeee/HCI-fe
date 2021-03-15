@@ -3,11 +3,32 @@ import { getGraphByProjectIdAPI } from '../../api/graph';
 const graph = {
     state: {
         graphData: [],
+        insertDialogVisible: false,
+        deleteDialogVisible: false,
+        modifyDialogVisible: false,
+        searchDialogVisible: false,
+        projectID: 0,
     },
     mutations: {
         setGraphData: function(state, data) {
             state.graphData = data;
         },
+        setInsertDialogVisible: function(state, data) {
+            state.insertDialogVisible = data;
+        },
+        setDeleteDialogVisible: function(state, data) {
+            state.deleteDialogVisible = data;
+        },
+        setModifyDialogVisible: function(state, data) {
+            state.modifyDialogVisible = data;
+        },
+        setSearchDialogVisible: function(state, data) {
+            state.searchDialogVisible = data;
+        },
+        setProjectID: function(state, data) {
+            state.projectID = data;
+            console.log("state.projectID ", state.projectID)
+        }
     },
     actions: {
         getGraphData: async({ commit }) => {
