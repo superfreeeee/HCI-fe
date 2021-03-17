@@ -127,6 +127,7 @@ export default {
   top: 50px;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 0px slategray;
+  background-color: #ffffff;
   padding-right: 15px;
   height: 40px;
   font-size: 20px;
