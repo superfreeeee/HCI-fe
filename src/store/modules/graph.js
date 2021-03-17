@@ -45,6 +45,9 @@ const graph = {
     // graph
     setGraph(state, graph) {
       state.graph = graph
+    },
+    setGraphPinned(state, bool) {
+      state.graph.pinned = bool
     }
   },
   actions: {
@@ -127,6 +130,7 @@ const graph = {
   getters: {
     graphData: state => state.graphData,
     graph: state => state.graph,
+    graphPinned: state => state.graph.pinned,
     panelContentType: state => state.panelContentType,
     panelEdit: state => state.panelEdit,
     panelItem: state => {

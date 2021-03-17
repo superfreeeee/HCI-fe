@@ -14,7 +14,8 @@ export default {
         height: 750,
         baseRadius: 25,
         font: '20px Arial'
-      }
+      },
+      pinned: false
     }
   },
   mounted() {
@@ -23,7 +24,17 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['graphData', 'graph'])
+    ...mapGetters(['graphData', 'graph', 'graphPinned'])
+  },
+  watch: {
+    graphPinned(bool) {
+      console.log(`${bool ? 'pin' : 'unpin'}`)
+      if (bool) {
+        this.pin()
+      } else {
+        this.unPin()
+      }
+    }
   },
   methods: {
     ...mapActions(['getGraphData', 'panelSelect', 'graphInit']),
@@ -57,8 +68,7 @@ export default {
         // .create('svg')
         .attr('viewBox', [-width / 2, -height / 2, width, height])
 
-      const root = svg
-        .append('g')
+      const root = svg.append('g').attr('class', 'root')
 
       const zoom = this.zoom(root)
       root.call(zoom)
@@ -71,6 +81,7 @@ export default {
       // init links
       const svg_links = root
         .append('g')
+        .attr('class', 'links')
         .attr('stroke', '#999')
         .attr('stroke-opacity', 0.6)
         .selectAll('line')
@@ -87,6 +98,7 @@ export default {
       const scale = d3.scaleOrdinal(d3.schemeCategory10)
       const svg_nodes = root
         .append('g')
+        .attr('class', 'nodes')
         .attr('stroke', '#fff')
         .attr('stroke-width', 1.5)
         .selectAll('circle')
@@ -102,6 +114,7 @@ export default {
 
       const svg_nodes_text = root
         .append('g')
+        .attr('class', 'nodes_text')
         .selectAll('text')
         .data(nodes)
         .join('text')
@@ -151,33 +164,11 @@ export default {
         nodes,
         svg_nodes_text,
         drag,
-        zoom
+        zoom,
+        pinned: false
       })
-
-      // d3.timeout(() => {
-      //   nodes.push({
-      //     id: 4,
-      //     group: 'other',
-      //     name: 'blablabla',
-      //     radius: 4
-      //   })
-      //   this.svg_nodes = svg_nodes
-      //     .data(nodes)
-      //     .enter()
-      //     .append('circle')
-      //     .attr('r', d => 10 + d.radius * 5)
-      //     .attr('fill', d => scale(d.group))
-      //     .merge(svg_nodes)
-      //     .call(this.drag(simulation))
-      //     .on('click', e => {
-      //       console.log(e)
-      //     })
-
-      //   simulation.nodes(nodes)
-      //   simulation.force('link').links(links)
-      //   simulation.alpha(1).restart()
-      // }, 1000)
     },
+    // d3.drag
     drag(simulation) {
       const d3 = this.$d3
 
@@ -192,10 +183,16 @@ export default {
         d.fy = event.y
       }
 
+      const that = this
+
       function dragended(event, d) {
         if (!event.active) simulation.alphaTarget(0)
-        d.fx = null
-        d.fy = null
+        if (that.graphPinned) {
+          simulation.stop()
+        } else {
+          d.fx = null
+          d.fy = null
+        }
       }
 
       return d3
@@ -204,11 +201,27 @@ export default {
         .on('drag', dragged)
         .on('end', dragended)
     },
+    // d3.zoom
     zoom(selection) {
       const d3 = this.$d3
       return d3.zoom().on('zoom', e => {
         selection.attr('transform', e.transform)
       })
+    },
+    pin() {
+      this.graph.simulation.stop()
+      for (const node of this.graph.nodes) {
+        node.fx = node.x
+        node.fy = node.y
+      }
+    },
+    unPin() {
+      for (const node of this.graph.nodes) {
+        node.fx = null
+        node.fy = null
+      }
+      const simulation = this.graph.simulation
+      simulation.alpha(1).restart()
     }
   }
 }
