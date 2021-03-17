@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import graph from './modules/graph'
-import getters from './getters'
 
 Vue.use(Vuex)
 
