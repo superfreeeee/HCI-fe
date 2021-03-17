@@ -3,7 +3,7 @@
     <h4 v-if="panelContentType === ''">点击实体/关系查看细节</h4>
     <div v-else>
       <div class="header">
-        <el-button size="small" icon="el-icon-arrow-left" @click="back()"
+        <el-button type="text" size="small" icon="el-icon-arrow-left" @click="back()"
           >返回</el-button
         >
         <h3>{{ title }}</h3>

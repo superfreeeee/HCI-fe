@@ -2,9 +2,8 @@
   <div class="home">
     <div class="graph">
       <graph-show />
-    </div>
-    <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
-      <div class="upper">
+      <div class="options">
+        <h3>图谱操作</h3>
         <el-button
           v-for="option in options"
           size="medium"
@@ -14,6 +13,8 @@
           >{{ option.label }}</el-button
         >
       </div>
+    </div>
+    <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
       <div class="lower">
         <el-input
           placeholder="请输入 projectId"
@@ -57,17 +58,27 @@ export default {
           handler: () => this.panelCreate({ type: 'relation' })
         },
         {
-          label: '恢复缩放',
-          type: 'error',
+          label: '回到中央',
+          type: 'info',
           handler: () => this.graphZoomReset(this.$d3)
         },
         {
-          label: '保存为png',
+          label: '固定节点',
+          type: 'danger',
+          handler: () => this.setGraphPinned(true)
+        },
+        {
+          label: '取消固定',
+          type: 'danger',
+          handler: () => this.setGraphPinned(false)
+        },
+        {
+          label: '保存为 png',
           type: 'warning',
           handler: () => this.graphToPng()
         },
         {
-          label: '保存为xml',
+          label: '保存为 xml',
           type: 'warning',
           handler: () => this.graphToXml()
         }
@@ -77,7 +88,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setProjectId']),
+    ...mapMutations(['setProjectId', 'setGraphPinned']),
     ...mapActions([
       'panelCreate',
       'graphZoomReset',
@@ -101,6 +112,25 @@ export default {
 
 .home > .graph {
   flex: 1;
+  position: relative;
+}
+
+.home > .graph > .options {
+  padding: 5px;
+  border: 1px groove;
+  background-color: #ffffff;
+  border-right: none;
+  position: absolute;
+  top: 50px;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.options > h3 {
+  text-align: center;
+  margin: 0;
 }
 
 .home > .panel {
@@ -132,7 +162,7 @@ export default {
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-start;
   gap: 10px;
   border-bottom: 1px groove;
