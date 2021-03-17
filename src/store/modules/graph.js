@@ -5,7 +5,6 @@ import { deepCopy, svgToPng } from '../../common/utils'
 const graph = {
   state: {
     graphData: {},
-    projectId: 0,
     // panel
     panelContentType: '',
     panelContentIndex: -1,
@@ -80,7 +79,7 @@ const graph = {
       if (res.status === 200) {
         let data = res.data
         data = {
-          projectID: data.projectID,
+          projectId: data.projectID,
           nodes: data.nodes.map(n => ({
             id: n.nodeID,
             name: n.name,
@@ -132,6 +131,7 @@ const graph = {
   },
   getters: {
     graphData: state => state.graphData,
+    projectId: (_, getters) => getters.graphData.projectId,
     graph: state => state.graph,
     graphPinned: state => state.graph.pinned,
     panelContentType: state => state.panelContentType,
