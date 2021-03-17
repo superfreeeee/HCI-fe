@@ -3,19 +3,15 @@
     <div class="graph">
       <graph-show />
     </div>
-    <div class="panel" :style="{ width: showPanel ? '300px' : '0' }">
+    <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
       <div class="upper">
         <el-button
-          type="primary"
+          v-for="option in options"
           size="medium"
-          @click="panelCreate({ type: 'node' })"
-          >新增实体</el-button
-        >
-        <el-button
-          type="info"
-          size="medium"
-          @click="panelCreate({ type: 'relation' })"
-          >新增关系</el-button
+          :key="option.label"
+          :type="option.type"
+          @click="option.handler"
+          >{{ option.label }}</el-button
         >
       </div>
       <div class="lower">
@@ -49,15 +45,45 @@ export default {
   },
   data() {
     return {
+      options: [
+        {
+          label: '新增实体',
+          type: 'primary',
+          handler: () => this.panelCreate({ type: 'node' })
+        },
+        {
+          label: '新增关系',
+          type: 'primary',
+          handler: () => this.panelCreate({ type: 'relation' })
+        },
+        {
+          label: '恢复缩放',
+          type: 'error',
+          handler: () => this.graphZoomReset(this.$d3)
+        },
+        {
+          label: '保存为png',
+          type: 'warning',
+          handler: () => this.graphToPng()
+        },
+        {
+          label: '保存为xml',
+          type: 'warning',
+          handler: () => this.graphToXml()
+        }
+      ],
       showPanel: true,
       projectId: ''
     }
   },
-  computed: {
-  },
   methods: {
     ...mapMutations(['setProjectId']),
-    ...mapActions(['panelCreate']),
+    ...mapActions([
+      'panelCreate',
+      'graphZoomReset',
+      'graphToPng',
+      'graphToXml'
+    ]),
     getGraph() {
       setProjectId(this.projectId)
     }
@@ -81,7 +107,7 @@ export default {
   border-left: 2px solid #bbbbbb;
   width: 0;
   box-sizing: border-box;
-  transition: width 1s ease-in-out;
+  transition: width 1s ease-out;
   display: flex;
   flex-direction: column;
   align-content: stretch;
@@ -102,10 +128,16 @@ export default {
 }
 
 .home > .panel > .upper {
-  padding: 16px;
+  padding: 10px;
+  box-sizing: border-box;
   display: flex;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
   border-bottom: 1px groove;
+  margin-bottom: -10px;
+  overflow: auto;
 }
 
 /* .home > .panel > .upper >.quarter {

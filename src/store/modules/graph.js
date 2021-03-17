@@ -9,7 +9,20 @@ const graph = {
     // panel
     panelContentType: '',
     panelContentIndex: -1,
-    panelEdit: false
+    panelEdit: false,
+    // graph
+    graph: {
+      // simulation,
+      // svg,
+      // root,
+      // svg_links,
+      // svg_nodes,
+      // links,
+      // nodes,
+      // svg_nodes_text,
+      // drag,
+      // zoom
+    }
   },
   mutations: {
     setGraphData(state, data) {
@@ -28,6 +41,10 @@ const graph = {
     },
     setPanelEdit(state, bool) {
       state.panelEdit = bool
+    },
+    // graph
+    setGraph(state, graph) {
+      state.graph = graph
     }
   },
   actions: {
@@ -51,6 +68,9 @@ const graph = {
       commit('setPanelContentIndex', -1)
       commit('setPanelEdit', true)
     },
+    graphInit({ commit }, graph) {
+      commit('setGraph', graph)
+    },
     getGraphData: async ({ commit }) => {
       // const res = await getGraphByProjectIdAPI(1)
       const res = { status: 200, data: fakeGraphData }
@@ -69,6 +89,8 @@ const graph = {
             name: r.name,
             source: r.source,
             target: r.target,
+            from: r.source,
+            to: r.target,
             value: r.val
           }))
         }
@@ -77,10 +99,34 @@ const graph = {
       } else {
         console.log('error')
       }
+    },
+    graphZoomReset({ state }, d3) {
+      const zoom = state.graph.zoom
+      const root = state.graph.root
+      root
+        .transition()
+        .duration(500)
+        .call(zoom.transform, d3.zoomIdentity)
+    },
+    graphToPng({ state }) {
+      console.log('save as png')
+      const node = state.graph.svg.node()
+      console.log(node)
+    },
+    graphToXml({ state }) {
+      console.log('save as xml')
+      const { nodes, links } = state.graph
+      const data = {
+        projectId: state.projectId,
+        nodes: deepCopy(nodes),
+        relations: deepCopy(links)
+      }
+      console.log(data)
     }
   },
   getters: {
     graphData: state => state.graphData,
+    graph: state => state.graph,
     panelContentType: state => state.panelContentType,
     panelEdit: state => state.panelEdit,
     panelItem: state => {

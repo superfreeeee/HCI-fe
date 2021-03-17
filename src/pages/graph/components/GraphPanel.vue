@@ -16,6 +16,7 @@
         >
           <el-input
             :disabled="!panelEdit"
+            :placeholder="option.holder"
             v-model="item[option.attr]"
           ></el-input>
         </el-form-item>
@@ -37,15 +38,15 @@ export default {
   data() {
     return {
       nodeOptions: [
-        { label: '实体名称', attr: 'name' },
-        { label: '实体类别', attr: 'group' },
-        { label: '实体权重', attr: 'radius' }
+        { label: '实体名称', attr: 'name', holder: '实体名称' },
+        { label: '实体类别', attr: 'group', holder: '实体类别' },
+        { label: '实体权重', attr: 'radius', holder: '1~100' }
       ],
       relationOptions: [
-        { label: '关系名称', attr: 'name' },
-        { label: '关系实体1', attr: 'source' },
-        { label: '关系实体2', attr: 'target' },
-        { label: '关系权重', attr: 'value' }
+        { label: '关系名称', attr: 'name', holder: '关系名称' },
+        { label: '关系实体1', attr: 'from', holder: 'ID' },
+        { label: '关系实体2', attr: 'to', holder: 'ID' },
+        { label: '关系权重', attr: 'value', holder: '1~100' }
       ],
       item: {
         name: '',
@@ -56,10 +57,7 @@ export default {
   },
   mounted() {
     if (!this.panelCreateNew) {
-      console.log(`panel node mounted, id = ${this.panelItem.id}`)
       this.overWriteItem(this.panelItem)
-    } else {
-      console.log(`panel node mounted, edit = ${this.panelEdit}`)
     }
   },
   computed: {
