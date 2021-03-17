@@ -109,9 +109,43 @@ const graph = {
         .call(zoom.transform, d3.zoomIdentity)
     },
     graphToPng({ state }) {
-      console.log('save as png')
-      const node = state.graph.svg.node()
-      console.log(node)
+      //svg 保存成 png
+      function svgToPng(svg, pngWidth, pngHeight){
+        var serializer = new XMLSerializer();  
+        var source = '<?xml version="1.0" standalone="no"?>\r\n'+serializer.serializeToString(svg.node());  
+        var image = new Image;  
+        image.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(source);  
+        var canvas = document.createElement('canvas');  
+        canvas.width = pngWidth;  
+        canvas.height = pngHeight; 
+        var context = canvas.getContext('2d');  
+        context.fillStyle = '#fff';//设置保存后的PNG 是白色的
+        context.fillRect(0,0,10000,10000);
+        image.onload = function() {  
+          context.drawImage(image, 0, 0);  
+          var a = document.createElement("a");  
+          a.download = "图片.png";  
+          a.href = canvas.toDataURL("image/png");
+          a.click();
+        }
+        // context.drawImage(image, 0, 0);  
+        // return canvas.toDataURL('image/png');  
+      }
+      // console.log('save as png')
+      const svg = state.graph.svg
+      const width = svg._groups[0][0].width.baseVal.value
+      const height = svg._groups[0][0].height.baseVal.value
+
+      svgToPng(svg, width, height)
+      // console.log(height)
+      // console.log(width)
+      // var url = svgToPng(svg, width, height)
+      // var pngName = '图片'
+      // var a = document.createElement("a");
+      // a.download = pngName+".png" 
+      // a.href = url
+      // a.click()
+      // console.log(svg)
     },
     graphToXml({ state }) {
       console.log('save as xml')
