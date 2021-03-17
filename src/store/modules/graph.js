@@ -143,6 +143,7 @@ const graph = {
       const svg = state.graph.svg
       const width = svg._groups[0][0].width.baseVal.value
       const height = svg._groups[0][0].height.baseVal.value
+      svgToPng(svg, width, height)
       // console.log(height)
       // console.log(width)
       // var url = svgToPng(svg, width, height)
