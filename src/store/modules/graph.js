@@ -1,72 +1,103 @@
 import { getGraphByProjectIdAPI } from '../../api/graph'
+import { fakeGraphData } from '../../common/sample'
+import { deepCopy } from '../../common/utils'
 
 const graph = {
   state: {
-    graphData: [],
-    insertDialogVisible: false,
-    deleteDialogVisible: false,
-    modifyDialogVisible: false,
-    searchDialogVisible: false,
-    projectId: 0
+    graphData: {},
+    projectId: 0,
+    // panel
+    panelContentType: '',
+    panelContentIndex: -1,
+    panelEdit: false
   },
   mutations: {
-    setGraphData: function(state, data) {
+    setGraphData(state, data) {
       state.graphData = data
     },
-    setInsertDialogVisible: function(state, data) {
-      state.insertDialogVisible = data
-    },
-    setDeleteDialogVisible: function(state, data) {
-      state.deleteDialogVisible = data
-    },
-    setModifyDialogVisible: function(state, data) {
-      state.modifyDialogVisible = data
-    },
-    setSearchDialogVisible: function(state, data) {
-      state.searchDialogVisible = data
-    },
-    setProjectId: function(state, data) {
+    setProjectId(state, data) {
       state.projectId = data
       console.log('state.projectId ', state.projectId)
+    },
+    // panel
+    setPanelContentType(state, type) {
+      state.panelContentType = type
+    },
+    setPanelContentIndex(state, index) {
+      state.panelContentIndex = index
+    },
+    setPanelEdit(state, bool) {
+      state.panelEdit = bool
     }
   },
   actions: {
+    panelSelect({ state, commit }, { type, id }) {
+      let items
+      if (type === 'node') {
+        items = state.graphData.nodes
+      } else if (type === 'relation') {
+        items = state.graphData.relations
+      }
+      items = items
+        .map((item, index) => ({ index, id: item.id }))
+        .filter(item => item.id === id)
+      const index = items.length > 0 ? items[0].index : -1
+      commit('setPanelContentType', type)
+      commit('setPanelContentIndex', index)
+      commit('setPanelEdit', false)
+    },
+    panelCreate({ commit }, { type }) {
+      commit('setPanelContentType', type)
+      commit('setPanelContentIndex', -1)
+      commit('setPanelEdit', true)
+    },
     getGraphData: async ({ commit }) => {
-      const res = await getGraphByProjectIdAPI(1)
-      // console.log(res)
+      // const res = await getGraphByProjectIdAPI(1)
+      const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        const data = res.data
-        // console.log("data ", data)
-        const nodes = data.nodes
-        // console.log("nodes ", nodes)
-        const relations = data.relations
-        // console.log("relations ", relations)
-        let newNodes = nodes.map(v => {
-          return {
-            id: v.nodeID.toString(),
-            name: v.name,
-            group: v.group,
-            radius: v.val
-          }
-        })
-        // console.log("newNodes ", newNodes)
-        let newRelations = relations.map(v => {
-          return {
-            relationID: v.relationID,
-            name: v.name,
-            source: v.source.toString(),
-            target: v.target.toString(),
-            value: v.val
-          }
-        })
-        // console.log("newRelations ", newRelations)
-        data.nodes = newNodes
-        data.relations = newRelations
+        let data = res.data
+        data = {
+          projectID: data.projectID,
+          nodes: data.nodes.map(n => ({
+            id: n.nodeID,
+            name: n.name,
+            group: n.group,
+            radius: n.val
+          })),
+          relations: data.relations.map(r => ({
+            id: r.relationID,
+            name: r.name,
+            source: r.source,
+            target: r.target,
+            value: r.val
+          }))
+        }
+        // console.log(deepCopy(data))
         commit('setGraphData', data)
       } else {
         console.log('error')
       }
     }
+  },
+  getters: {
+    graphData: state => state.graphData,
+    panelContentType: state => state.panelContentType,
+    panelEdit: state => state.panelEdit,
+    panelItem: state => {
+      const type = state.panelContentType
+      const index = state.panelContentIndex
+      if (index < 0) return null
+      let items
+      if (type === 'node') {
+        items = state.graphData.nodes
+      } else if (type === 'relation') {
+        items = state.graphData.relations
+      } else {
+        return null
+      }
+      return items[index]
+    },
+    panelCreateNew: (_, getters) => getters.panelItem == null
   }
 }
 

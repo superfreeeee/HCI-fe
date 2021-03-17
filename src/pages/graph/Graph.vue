@@ -1,22 +1,20 @@
 <template>
   <div class="home">
     <div class="graph">
-      <d-3-sample />
+      <graph-show />
     </div>
     <div class="panel" :style="{ width: showPanel ? '300px' : '0' }">
       <div class="upper">
         <el-button
           type="primary"
-          round
           size="medium"
-          @click="panel = 'panel-new-node'"
+          @click="panelCreate({ type: 'node' })"
           >新增实体</el-button
         >
         <el-button
-          type="primary"
-          round
+          type="info"
           size="medium"
-          @click="panel = 'panel-new-relation'"
+          @click="panelCreate({ type: 'relation' })"
           >新增关系</el-button
         >
       </div>
@@ -28,20 +26,9 @@
           change="getGraph()"
         >
         </el-input>
-        <h4 v-if="panel === ''">点击实体/关系查看细节</h4>
-        <component :is="panel" @back="panel = ''"></component>
-        <div>
-          <el-button @click="setInsertDialogVisible(true)">A</el-button>
-          <el-button @click="setDeleteDialogVisible(true)">B</el-button>
-          <el-button @click="setModifyDialogVisible(true)">C</el-button>
-          <el-button @click="setSearchDialogVisible(true)">D</el-button>
-        </div>
+        <graph-panel></graph-panel>
       </div>
     </div>
-    <insert-entity-dialog></insert-entity-dialog>
-    <delete-entity-dialog></delete-entity-dialog>
-    <modify-entity-dialog></modify-entity-dialog>
-    <search-entity-dialog></search-entity-dialog>
     <!-- <el-button @click="showPanel = !showPanel" icon="el-icon-arrow-left"></el-button> -->
     <el-button
       @click="showPanel = !showPanel"
@@ -51,40 +38,26 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
-import D3Sample from './components/D3Sample'
-import InsertEntityDialog from './components/InsertEntityDialog'
-import DeleteEntityDialog from './components/DeleteEntityDialog'
-import ModifyEntityDialog from './components/ModifyEntityDialog'
-import SearchEntityDialog from './components/SearchEntityDialog'
-import PanelNewNode from './components/PanelNewNode'
-import PanelNewRelation from './components/PanelNewRelation'
+import { mapActions, mapMutations } from 'vuex'
+import GraphPanel from './components/GraphPanel'
+import GraphShow from './components/GraphShow.vue'
 
 export default {
   components: {
-    D3Sample,
-    InsertEntityDialog,
-    DeleteEntityDialog,
-    ModifyEntityDialog,
-    SearchEntityDialog,
-    PanelNewNode,
-    PanelNewRelation
+    GraphShow,
+    GraphPanel
   },
   data() {
     return {
       showPanel: true,
-      projectId: '',
-      panel: 'panel-new-node'
+      projectId: ''
     }
   },
+  computed: {
+  },
   methods: {
-    ...mapMutations([
-      'setInsertDialogVisible',
-      'setDeleteDialogVisible',
-      'setModifyDialogVisible',
-      'setSearchDialogVisible',
-      'setProjectId'
-    ]),
+    ...mapMutations(['setProjectId']),
+    ...mapActions(['panelCreate']),
     getGraph() {
       setProjectId(this.projectId)
     }
