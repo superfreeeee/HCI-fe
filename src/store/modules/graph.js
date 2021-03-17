@@ -1,6 +1,6 @@
 import { getGraphByProjectIdAPI } from '../../api/graph'
 import { fakeGraphData } from '../../common/sample'
-import { deepCopy } from '../../common/utils'
+import { deepCopy, svgToPng } from '../../common/utils'
 
 const graph = {
   state: {
@@ -114,46 +114,10 @@ const graph = {
     graphToPng({ state }) {
       //svg 保存成 png
       const { projectID } = state.graphData
-      function svgToPng(svg, pngWidth, pngHeight) {
-        const serializer = new XMLSerializer()
-        const source = `<?xml version="1.0" standalone="no"?>${serializer.serializeToString(
-          svg.node()
-        )}`
-        const image = new Image()
-        image.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-          source
-        )}`
-        const canvas = document.createElement('canvas')
-        canvas.width = pngWidth
-        canvas.height = pngHeight
-        const context = canvas.getContext('2d')
-        context.fillStyle = '#fff' //设置保存后的PNG 是白色的
-        context.fillRect(0, 0, 10000, 10000)
-        image.onload = function() {
-          context.drawImage(image, 0, 0)
-          var a = document.createElement('a')
-          a.download = `知识图谱-${projectID}.png`
-          a.href = canvas.toDataURL('image/png')
-          a.click()
-        }
-        // context.drawImage(image, 0, 0);
-        // return canvas.toDataURL('image/png');
-      }
-      // console.log('save as png')
       const svg = state.graph.svg
       const width = svg._groups[0][0].width.baseVal.value
       const height = svg._groups[0][0].height.baseVal.value
-
-      svgToPng(svg, width, height)
-      // console.log(height)
-      // console.log(width)
-      // var url = svgToPng(svg, width, height)
-      // var pngName = '图片'
-      // var a = document.createElement("a");
-      // a.download = pngName+".png"
-      // a.href = url
-      // a.click()
-      // console.log(svg)
+      svgToPng(svg, width, height, projectID)
     },
     graphToXml({ state }) {
       console.log('save as xml')
