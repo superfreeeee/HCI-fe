@@ -128,8 +128,8 @@ const graph = {
       }
       console.log(data)
     },
-    createNewGraph() {
-      console.log("Create new graph")
+    createNewGraph(graphData) {
+      console.log("graphData", graphData)
     }
   },
   getters: {

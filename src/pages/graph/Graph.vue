@@ -20,7 +20,7 @@
         >
       </div>
     </div>
-    <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
+    <div class="panel" :style="{ width: showPanel ? '350px' : '0', padding: showPanel ? '16px' : '0'}">
       <!-- <el-input
         label="查找实体"
         placeholder="输入实体 ID"
@@ -157,12 +157,10 @@ export default {
 .home > .panel {
   border-left: 2px solid #bbbbbb;
   box-sizing: border-box;
-  padding: 16px;
   transition: width 1s ease-out;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 16px;
   overflow: hidden;
 }
 

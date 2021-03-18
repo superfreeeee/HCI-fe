@@ -21,11 +21,11 @@
       :visible.sync="showCreatePanel"
       width="45%"
     >
-      <el-form ref="form" :model="form" label-width="100px">
-        <el-form-item label="项目名称">
+      <el-form ref="form" :model="form" label-width="150px" :rules="rules">
+        <el-form-item label="项目名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入项目名称"></el-input>
         </el-form-item>
-        <el-form-item label="项目描述">
+        <el-form-item label="项目描述" prop="description">
           <el-input
             type="textarea"
             placeholder="请输入项目描述"
@@ -33,7 +33,7 @@
             v-model="form.description"
           ></el-input>
         </el-form-item>
-        <el-form-item label="知识图谱 xml">
+        <el-form-item label="知识图谱xml" prop="xml">
           <el-input
             type="textarea"
             placeholder="请输入知识图谱 xml"
@@ -43,8 +43,8 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="showCreatePanel = false">取 消</el-button>
-        <el-button type="primary" @click="doneCreate()">确 定</el-button>
+        <el-button @click="resetForm('form')">重 置</el-button>
+        <el-button type="primary" @click="doneCreate('form')">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -61,6 +61,11 @@ export default {
         name: '',
         description: '',
         xml: ''
+      },
+      rules: {
+        name: [{ required: true, message: '项目名称不能为空!'}],
+        description: [{ required: true, message: '项目描述不能为空!'}],
+        xml: [{ required: true, message: '知识图谱 xml 不能为空!'}]
       },
       showCreatePanel: false,
       mockProjectId: [1, 2, 3, 4] // fake data
@@ -79,9 +84,23 @@ export default {
     createNewGraph() {
       this.showCreatePanel = true
     },
-    doneCreate() {
-      // 把数据传向后端
-      // this.createNewGraph()
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
+    },
+    doneCreate(formName) {
+      this.$refs[formName].validate(valid => {
+        if(valid) {
+          // 把数据传向后端
+          const graph = {
+            name: this.form.name,
+            description: this.form.description,
+            xml: this.form.xml
+          }
+          // this.createNewGraph(graph)
+        }else {
+          console.log('error')
+        }
+      })
       // this.jumpTo('/graph')
     }
   }
