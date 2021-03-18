@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { mapMutations } from 'vuex'
+import { mapMutations, mapActions } from 'vuex'
 
 export default {
   name: 'Home',
@@ -68,6 +68,7 @@ export default {
   },
   methods: {
     ...mapMutations(['setProjectId']),
+    ...mapActions(['createNewGraph']),
     jumpTo(path) {
       this.$router.push({ path: path })
     },
@@ -80,7 +81,8 @@ export default {
     },
     doneCreate() {
       // 把数据传向后端
-      this.jumpTo('/graph')
+      // this.createNewGraph()
+      // this.jumpTo('/graph')
     }
   }
 }

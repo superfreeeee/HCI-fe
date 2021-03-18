@@ -74,8 +74,8 @@ const graph = {
     graphInit({ commit }, graph) {
       commit('setGraph', graph)
     },
-    getGraphData: async ({ commit }) => {
-      // const res = await getGraphByProjectIdAPI(1)
+    getGraphData: async ({ state, commit }) => {
+      // const res = await getGraphByProjectIdAPI(state.projectId)
       const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         let data = res.data
@@ -128,6 +128,9 @@ const graph = {
         relations: deepCopy(links)
       }
       console.log(data)
+    },
+    createNewGraph() {
+      console.log("Create new graph")
     }
   },
   getters: {
