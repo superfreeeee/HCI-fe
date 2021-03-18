@@ -130,18 +130,22 @@ export default {
 
       const svg_links_text = root
         .append('g')
-        .selectAll('path.link')
+        .attr('class', 'links_text')
+        .selectAll('text')
         .data(links)
-      // add path
-      svg_links_text
-        .enter()
-        .append('path')
-        .attr('class', 'link')
-        .attr('stroke', 'white')
-        .style('stroke-width', 0.5)
-        .style('fill', 'white')
-        .style('fill-opacity', 1)
-        .attr('id', d => `link-${d.id}`)
+        .join('text')
+        .style('fill', '#000000')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2)
+        .on('click', panelSelection('relation'))
+
+      console.log(svg_links_text)
 
       simulation.on('tick', () => {
         svg_links
@@ -152,6 +156,9 @@ export default {
 
         svg_nodes.attr('cx', d => d.x).attr('cy', d => d.y)
         svg_nodes_text.attr('x', d => d.x).attr('y', d => d.y)
+        svg_links_text
+          .attr('x', d => (d.source.x + d.target.x) / 2)
+          .attr('y', d => (d.source.y + d.target.y) / 2)
       })
 
       this.graphInit({

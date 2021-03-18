@@ -1,6 +1,12 @@
 <template>
   <div class="home">
     <div class="graph">
+      <div class="title">
+        <el-button round type="text" icon="el-icon-arrow-left" @click="back"
+          >返回</el-button
+        >
+        <span>知识图谱：项目-{{ projectId }}</span>
+      </div>
       <graph-show />
       <div class="options">
         <h3>图谱操作</h3>
@@ -15,18 +21,16 @@
       </div>
     </div>
     <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
-      <div class="lower">
-        <el-input
-          placeholder="请输入 projectId"
-          prefix-icon="el-icon-search"
-          v-model="projectId"
-          change="getGraph()"
-        >
-        </el-input>
-        <graph-panel></graph-panel>
-      </div>
+      <!-- <el-input
+        label="查找实体"
+        placeholder="输入实体 ID"
+        prefix-icon="el-icon-search"
+        v-model="searchNode"
+      >
+        @change="getGraph()"
+      </el-input> -->
+      <graph-panel></graph-panel>
     </div>
-    <!-- <el-button @click="showPanel = !showPanel" icon="el-icon-arrow-left"></el-button> -->
     <el-button
       @click="showPanel = !showPanel"
       :icon="`el-icon-arrow-${showPanel ? 'right' : 'left'}`"
@@ -35,7 +39,7 @@
 </template>
 
 <script>
-import { mapActions, mapMutations } from 'vuex'
+import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 import GraphPanel from './components/GraphPanel'
 import GraphShow from './components/GraphShow.vue'
 
@@ -83,9 +87,11 @@ export default {
           handler: () => this.graphToXml()
         }
       ],
-      showPanel: true,
-      projectId: ''
+      showPanel: true
     }
+  },
+  computed: {
+    ...mapGetters(['projectId'])
   },
   methods: {
     ...mapMutations(['setProjectId', 'setGraphPinned']),
@@ -95,8 +101,8 @@ export default {
       'graphToPng',
       'graphToXml'
     ]),
-    getGraph() {
-      setProjectId(this.projectId)
+    back() {
+      this.$router.back()
     }
   }
 }
@@ -113,6 +119,21 @@ export default {
 .home > .graph {
   flex: 1;
   position: relative;
+}
+
+.graph > .title {
+  position: absolute;
+  left: 50px;
+  top: 50px;
+  border-radius: 20px;
+  box-shadow: 1px 1px 1px 0px slategray;
+  background-color: #ffffff;
+  padding-right: 15px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
 }
 
 .home > .graph > .options {
@@ -135,55 +156,14 @@ export default {
 
 .home > .panel {
   border-left: 2px solid #bbbbbb;
-  width: 0;
   box-sizing: border-box;
+  padding: 16px;
   transition: width 1s ease-out;
   display: flex;
   flex-direction: column;
-  align-content: stretch;
-  overflow: hidden;
-}
-
-.panel > .arrow {
-  height: 30px;
-  width: 10px;
-  display: grid;
-  place-content: center;
-  cursor: pointer;
-  border: 1px solid black;
-  box-sizing: border-box;
-  position: absolute;
-  left: -10px;
-  top: calc(50vh - 15px);
-}
-
-.home > .panel > .upper {
-  padding: 10px;
-  box-sizing: border-box;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: flex-start;
-  gap: 10px;
-  border-bottom: 1px groove;
-  margin-bottom: -10px;
-  overflow: auto;
-}
-
-/* .home > .panel > .upper >.quarter {
-  width: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-} */
-
-.home > .panel > .lower {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
+  align-items: stretch;
   gap: 16px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .el-button {
