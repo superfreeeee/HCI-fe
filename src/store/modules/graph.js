@@ -1,80 +1,42 @@
 import { getGraphByProjectIdAPI } from '../../api/graph'
+import { consoleGroup, download, svgToPng } from '../../common/utils'
 import { fakeGraphData } from '../../common/sample'
-import { deepCopy, svgToPng } from '../../common/utils'
+import { itemOptions, typeMapper } from '../../common/editor'
 
 const graph = {
   state: {
-    graphData: {},
-    // panel
-    panelContentType: '',
-    panelContentIndex: -1,
-    panelEdit: false,
-    // graph
-    graph: {
-      // simulation,
-      // svg,
-      // root,
-      // svg_links,
-      // svg_nodes,
-      // links,
+    data: {
+      // projectId,
       // nodes,
-      // svg_nodes_text,
-      // drag,
-      // zoom
+      // links
+    },
+    svg: null,
+    editor: {
+      type: '', // 'node' | 'link' | ''
+      createNew: true,
+      item: null,
+      editable: true
     }
   },
   mutations: {
     setGraphData(state, data) {
-      state.graphData = data
+      state.data = data
     },
-    setProjectId(state, data) {
-      state.projectId = data
-      console.log('state.projectId ', state.projectId)
+    setGraphSvg(state, svg) {
+      state.svg = svg
     },
-    // panel
-    setPanelContentType(state, type) {
-      state.panelContentType = type
+    setEditor(state, { type = '', item = null, createNew = true } = {}) {
+      state.editor.type = type
+      state.editor.item = item
+      state.editor.createNew = createNew
     },
-    setPanelContentIndex(state, index) {
-      state.panelContentIndex = index
-    },
-    setPanelEdit(state, bool) {
-      state.panelEdit = bool
-    },
-    // graph
-    setGraph(state, graph) {
-      state.graph = graph
-    },
-    setGraphPinned(state, bool) {
-      state.graph.pinned = bool
+    setEditorEditable(state, bool) {
+      state.editor.editable = bool
     }
   },
   actions: {
-    panelSelect({ state, commit }, { type, id }) {
-      let items
-      if (type === 'node') {
-        items = state.graphData.nodes
-      } else if (type === 'relation') {
-        items = state.graphData.relations
-      }
-      items = items
-        .map((item, index) => ({ index, id: item.id }))
-        .filter(item => item.id === id)
-      const index = items.length > 0 ? items[0].index : -1
-      commit('setPanelContentType', type)
-      commit('setPanelContentIndex', index)
-      commit('setPanelEdit', false)
-    },
-    panelCreate({ commit }, { type }) {
-      commit('setPanelContentType', type)
-      commit('setPanelContentIndex', -1)
-      commit('setPanelEdit', true)
-    },
-    graphInit({ commit }, graph) {
-      commit('setGraph', graph)
-    },
-    getGraphData: async ({ commit }) => {
-      // const res = await getGraphByProjectIdAPI(1)
+    graphInit({ commit }, projectId = 1) {
+      // const res = await getGraphByProjectIdAPI(projectId)
       const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         let data = res.data
@@ -86,7 +48,7 @@ const graph = {
             group: n.group,
             radius: n.val
           })),
-          relations: data.relations.map(r => ({
+          links: data.relations.map(r => ({
             id: r.relationID,
             name: r.name,
             source: r.source,
@@ -96,61 +58,97 @@ const graph = {
             value: r.val
           }))
         }
-        // console.log(deepCopy(data))
         commit('setGraphData', data)
+        commit('setEditor')
+        consoleGroup('[action] graphInit', () => {
+          console.log({ ...data })
+        })
       } else {
         console.log('error')
       }
     },
-    graphZoomReset({ state }, d3) {
-      const zoom = state.graph.zoom
-      const root = state.graph.root
-      root
-        .transition()
-        .duration(500)
-        .call(zoom.transform, d3.zoomIdentity)
+    // 选取 实体/关系
+    editorSelect({ state, commit }, { type, id }) {
+      consoleGroup('[action] editorSelect', () => {
+        console.log(`type=${type}, id=${id}`)
+      })
+      const items = state.data[`${type}s`]
+      const rest = items.filter(item => item.id === id)
+      // console.log(rest)
+      if (rest.length > 0) {
+        commit('setEditor', { type, item: { ...rest[0] }, createNew: false })
+        commit('setEditorEditable', false)
+      }
     },
-    graphToPng({ state }) {
-      //svg 保存成 png
-      const { projectID } = state.graphData
-      const svg = state.graph.svg
+    // 创建 实体/关系
+    editorCreate({ commit }, type) {
+      const item = {}
+      for (const { attr } of itemOptions[type]) {
+        item[attr] = ''
+      }
+      commit('setEditor', { type, item })
+      commit('setEditorEditable', true)
+    },
+    // 提交 实体/关系 创建
+    editorCreateCommit(_, item) {
+      consoleGroup('[action] editorItemCreate', () => {
+        console.log({ ...item })
+      })
+    },
+    // 提交 实体/关系 更新
+    editorUpdateCommit(_, item) {
+      consoleGroup('[action] editorItemUpdate', () => {
+        console.log({ ...item })
+      })
+    },
+    // 持久化相关
+    saveAsPng({ state }) {
+      console.log('[action] saveAsPng')
+      const projectId = state.data.projectId
+      const svg = state.svg
       const width = svg._groups[0][0].width.baseVal.value
       const height = svg._groups[0][0].height.baseVal.value
-      svgToPng(svg, width, height, projectID)
+      // const {
+      //   _groups: [
+      //     [
+      //       {
+      //         width: {
+      //           baseVal: { value: width }
+      //         },
+      //         height: {
+      //           baseVal: { value: height }
+      //         }
+      //       }
+      //     ]
+      //   ]
+      // } = svg
+      svgToPng(svg, width, height).then(dataUrl => {
+        download(`知识图谱-${projectId}.png`, dataUrl)
+      })
     },
-    graphToXml({ state }) {
-      console.log('save as xml')
-      const { nodes, links } = state.graph
-      const data = {
-        projectId: state.projectId,
-        nodes: deepCopy(nodes),
-        relations: deepCopy(links)
-      }
-      console.log(data)
+    saveAsXml() {
+      console.log('[action] saveAsXml')
     }
   },
   getters: {
-    graphData: state => state.graphData,
-    projectId: (_, getters) => getters.graphData.projectId,
-    graph: state => state.graph,
-    graphPinned: state => state.graph.pinned,
-    panelContentType: state => state.panelContentType,
-    panelEdit: state => state.panelEdit,
-    panelItem: state => {
-      const type = state.panelContentType
-      const index = state.panelContentIndex
-      if (index < 0) return null
-      let items
-      if (type === 'node') {
-        items = state.graphData.nodes
-      } else if (type === 'relation') {
-        items = state.graphData.relations
-      } else {
-        return null
+    graphData: state => state.data,
+    graphNodes: state => state.data.nodes,
+    graphLinks: state => state.data.links,
+    graphSvg: state => state.svg,
+    graphEditorType: state => state.editor.type,
+    graphEditorTitle: state => {
+      const body = typeMapper[state.editor.type]
+      if (state.editor.createNew) {
+        return `新增${body}`
       }
-      return items[index]
+      const id = state.editor.item.id
+      return `${body} ID：${id}`
     },
-    panelCreateNew: (_, getters) => getters.panelItem == null
+    graphEditorOptions: state =>
+      !state.editor.type ? [] : itemOptions[state.editor.type],
+    graphEditorItem: state => state.editor.item,
+    graphEditorCreateNew: state => state.editor.createNew,
+    graphEditorEditable: state => state.editor.editable
   }
 }
 

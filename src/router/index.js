@@ -12,7 +12,7 @@ export default new Router({
       component: Home
     },
     {
-      path: '/graph',
+      path: '/graph/:projectId',
       name: 'Graph',
       component: () => import('@/pages/graph/Graph.vue')
     },

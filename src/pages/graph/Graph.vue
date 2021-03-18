@@ -1,35 +1,17 @@
 <template>
-  <div class="home">
-    <div class="graph">
+  <div class="graph">
+    <div class="main">
       <div class="title">
-        <el-button round type="text" icon="el-icon-arrow-left" @click="back"
+        <el-button round type="text" icon="el-icon-arrow-left" @click="back()"
           >返回</el-button
         >
-        <span>知识图谱：项目-{{ projectId }}</span>
+        <span>知识图谱：项目-{{ graphData.projectId }}</span>
       </div>
-      <graph-show />
-      <div class="options">
-        <h3>图谱操作</h3>
-        <el-button
-          v-for="option in options"
-          size="medium"
-          :key="option.label"
-          :type="option.type"
-          @click="option.handler"
-          >{{ option.label }}</el-button
-        >
-      </div>
+      <graph-board ref="board"></graph-board>
+      <graph-options @graph-action="actionDispatch"></graph-options>
     </div>
-    <div class="panel" :style="{ width: showPanel ? '350px' : '0' }">
-      <!-- <el-input
-        label="查找实体"
-        placeholder="输入实体 ID"
-        prefix-icon="el-icon-search"
-        v-model="searchNode"
-      >
-        @change="getGraph()"
-      </el-input> -->
-      <graph-panel></graph-panel>
+    <div :class="['panel', showPanel ? 'open' : 'close']">
+      <graph-editor></graph-editor>
     </div>
     <el-button
       @click="showPanel = !showPanel"
@@ -39,92 +21,52 @@
 </template>
 
 <script>
-import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
-import GraphPanel from './components/GraphPanel'
-import GraphShow from './components/GraphShow.vue'
+import GraphBoard from './components/GraphBoard'
+import GraphOptions from './components/GraphOptions'
+import GraphEditor from './components/GraphEditor'
+import { mapGetters } from 'vuex'
 
 export default {
+  name: 'Graph',
   components: {
-    GraphShow,
-    GraphPanel
+    GraphBoard,
+    GraphOptions,
+    GraphEditor
   },
   data() {
     return {
-      options: [
-        {
-          label: '新增实体',
-          type: 'primary',
-          handler: () => this.panelCreate({ type: 'node' })
-        },
-        {
-          label: '新增关系',
-          type: 'primary',
-          handler: () => this.panelCreate({ type: 'relation' })
-        },
-        {
-          label: '回到中央',
-          type: 'info',
-          handler: () => this.graphZoomReset(this.$d3)
-        },
-        {
-          label: '固定节点',
-          type: 'danger',
-          handler: () => this.setGraphPinned(true)
-        },
-        {
-          label: '取消固定',
-          type: 'danger',
-          handler: () => this.setGraphPinned(false)
-        },
-        {
-          label: '保存为 png',
-          type: 'warning',
-          handler: () => this.graphToPng()
-        },
-        {
-          label: '保存为 xml',
-          type: 'warning',
-          handler: () => this.graphToXml()
-        }
-      ],
       showPanel: true
     }
   },
   computed: {
-    ...mapGetters(['projectId'])
+    ...mapGetters(['graphData'])
   },
   methods: {
-    ...mapMutations(['setProjectId', 'setGraphPinned']),
-    ...mapActions([
-      'panelCreate',
-      'graphZoomReset',
-      'graphToPng',
-      'graphToXml'
-    ]),
     back() {
       this.$router.back()
+    },
+    actionDispatch(name, ...args) {
+      this.$refs.board[name](...args)
     }
   }
 }
 </script>
 
 <style scoped>
-.home {
-  display: flex;
+.graph {
   width: 100vw;
   height: 100vh;
-  overflow: auto;
+  display: flex;
+  align-items: stretch;
 }
-
-.home > .graph {
+.graph > .main {
   flex: 1;
   position: relative;
 }
-
-.graph > .title {
+.graph > .main > .title {
   position: absolute;
-  left: 50px;
-  top: 50px;
+  left: 40px;
+  top: 40px;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 0px slategray;
   background-color: #ffffff;
@@ -135,38 +77,15 @@ export default {
   display: flex;
   align-items: center;
 }
-
-.home > .graph > .options {
-  padding: 5px;
-  border: 1px groove;
-  background-color: #ffffff;
-  border-right: none;
-  position: absolute;
-  top: 50px;
-  right: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.options > h3 {
-  text-align: center;
-  margin: 0;
-}
-
-.home > .panel {
-  border-left: 2px solid #bbbbbb;
+.graph > .panel {
+  border-left: 1px solid #bbbbbb;
   box-sizing: border-box;
-  padding: 16px;
   transition: width 1s ease-out;
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 16px;
-  overflow: hidden;
 }
-
-.el-button {
-  margin: 0;
+.graph > .panel.open {
+  width: 350px;
+}
+.graph > .panel.close {
+  width: 0;
 }
 </style>

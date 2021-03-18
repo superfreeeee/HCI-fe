@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 
 export default {
   name: 'D3Sample',
@@ -24,19 +24,31 @@ export default {
     })
   },
   computed: {
-    ...mapGetters(['graphData', 'graph', 'graphPinned'])
+    ...mapGetters([
+      'graphData',
+      'graph',
+      'graphPinned',
+      'graphNodes',
+      'graphLinks'
+    ])
   },
   watch: {
     graphPinned(bool) {
-      console.log(`${bool ? 'pin' : 'unpin'}`)
       if (bool) {
         this.pin()
       } else {
         this.unPin()
       }
+    },
+    graphNodes() {
+      this.updateNodes()
+    },
+    graphLinks() {
+      this.updateLinks()
     }
   },
   methods: {
+    ...mapMutations(['setGraph', 'updateGraphNode', 'updateGraphLink']),
     ...mapActions(['getGraphData', 'panelSelect', 'graphInit']),
     init() {
       const d3 = this.$d3
@@ -59,7 +71,6 @@ export default {
         .force('charge', d3.forceManyBody().strength(-500))
         .force('x', d3.forceX())
         .force('y', d3.forceY())
-
       const drag = this.drag(simulation)
 
       // init svg
@@ -69,8 +80,8 @@ export default {
         .attr('viewBox', [-width / 2, -height / 2, width, height])
 
       const root = svg.append('g').attr('class', 'root')
-
       const zoom = this.zoom(root)
+
       root.call(zoom)
 
       const panelSelection = type => e => {
@@ -104,6 +115,7 @@ export default {
         .selectAll('circle')
         .data(nodes)
         .join('circle')
+        .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
         .attr('fill', d => scale(d.group))
         .attr('data-id', d => d.id)
@@ -145,8 +157,6 @@ export default {
         .attr('y', d => (d.source.y + d.target.y) / 2)
         .on('click', panelSelection('relation'))
 
-      console.log(svg_links_text)
-
       simulation.on('tick', () => {
         svg_links
           .attr('x1', d => d.source.x)
@@ -167,13 +177,67 @@ export default {
         root,
         svg_links,
         svg_nodes,
+        svg_links_text,
+        svg_nodes_text,
         links,
         nodes,
-        svg_nodes_text,
         drag,
         zoom,
         pinned: false
       })
+    },
+    updateNodes() {
+      const { baseRadius, font } = this.config
+      const { simulation, svg_links, svg_links_text, drag, nodes } = this.graph
+      let { svg_nodes, svg_nodes_text } = this.graph
+      const d3 = this.$d3
+      const scale = d3.scaleOrdinal(d3.schemeCategory10)
+      const panelSelection = type => e => {
+        const id = Number(e.target.attributes['data-id'].value)
+        this.panelSelect({ type, id })
+      }
+      svg_nodes = svg_nodes
+        .data(nodes)
+        .enter()
+        .append('circle')
+        .attr('r', d => baseRadius + d.radius * 10)
+        .attr('fill', d => scale(d.group))
+        .attr('data-id', d => d.id)
+        .merge(svg_nodes)
+        .call(drag)
+        .on('click', panelSelection('node'))
+      svg_nodes_text = svg_nodes_text
+        .data(nodes)
+        .enter()
+        .append('text')
+        .style('fill', '#ffffff')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .merge(svg_nodes_text)
+        .call(drag)
+        .on('click', panelSelection('node'))
+
+      simulation.nodes(nodes).on('tick', () => {
+        svg_links
+          .attr('x1', d => d.source.x)
+          .attr('y1', d => d.source.y)
+          .attr('x2', d => d.target.x)
+          .attr('y2', d => d.target.y)
+        svg_links_text
+          .attr('x', d => (d.source.x + d.target.x) / 2)
+          .attr('y', d => (d.source.y + d.target.y) / 2)
+        svg_nodes.attr('cx', d => d.x).attr('cy', d => d.y)
+        svg_nodes_text.attr('x', d => d.x).attr('y', d => d.y)
+      })
+      simulation.alpha(1).restart()
+      this.updateGraphNode({ svg_nodes, svg_nodes_text })
+    },
+    updateLinks() {
+      console.log('update links')
     },
     // d3.drag
     drag(simulation) {
@@ -215,6 +279,7 @@ export default {
         selection.attr('transform', e.transform)
       })
     },
+    // zoom pin & unpin
     pin() {
       this.graph.simulation.stop()
       for (const node of this.graph.nodes) {
@@ -238,5 +303,8 @@ export default {
 .graph {
   height: 100%;
   width: 100%;
+}
+.pointer:hover {
+  cursor: pointer;
 }
 </style>
