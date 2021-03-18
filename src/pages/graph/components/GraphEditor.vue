@@ -15,7 +15,7 @@
           <h3>{{ graphEditorTitle }}</h3>
         </div>
         <el-button
-          v-if="graphEditorCreateNew"
+          v-if="!graphEditorCreateNew"
           size="small"
           type="danger"
           icon="el-icon-delete"
@@ -56,8 +56,8 @@
           <el-button type="primary" @click="primaryButton.handler">{{
             primaryButton.name
           }}</el-button>
-          <el-button type="danger" @click="dangerButton.handler">{{
-            dangerButton.name
+          <el-button @click="alterButton.handler">{{
+            alterButton.name
           }}</el-button>
         </el-form-item>
       </el-form>
@@ -109,7 +109,7 @@ export default {
         }
       }
     },
-    dangerButton() {
+    alterButton() {
       return {
         name: this.graphEditorCreateNew ? '重置选项' : '取消修改',
         handler: !this.graphEditorEditable
@@ -156,8 +156,5 @@ export default {
 .header > .left {
   display: flex;
   gap: 16px;
-}
-.el-button {
-  margin: 0;
 }
 </style>

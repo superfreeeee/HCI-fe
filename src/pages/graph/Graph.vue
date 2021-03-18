@@ -46,6 +46,7 @@ export default {
       this.$router.back()
     },
     actionDispatch(name, ...args) {
+      // console.log(`[GraphAction] ${name}`)
       this.$refs.board[name](...args)
     }
   }

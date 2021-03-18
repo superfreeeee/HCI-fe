@@ -35,14 +35,14 @@ export default {
           handler: () => {}
         },
         {
-          label: '回到中心',
-          type: 'info',
-          handler: () => this.$emit('graph-action', 'backCenter')
-        },
-        {
           label: '重置缩放',
           type: 'info',
           handler: () => this.$emit('graph-action', 'zoomReset')
+        },
+        {
+          label: '全局刷新',
+          type: 'info',
+          handler: () => this.$emit('graph-action', 'backCenter')
         },
         {
           label: '固定实体',

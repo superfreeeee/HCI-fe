@@ -4,14 +4,14 @@
       <h1>欢迎使用 co$in</h1>
     </div>
     <el-button
-      v-for="id in mockProjectId"
-      :key="id"
+      v-for="project in ownProjects"
+      :key="project.projectID"
       type="primary"
       style="width: 30%; margin: 0 0 15px 0"
       round
-      @click="gotoProject(id)"
+      @click="gotoProject(project.projectID)"
     >
-      项目 {{ id }}
+      项目 {{ project.projectID }}
     </el-button>
     <el-button style="margin: 0" @click="createNewGraph()">
       新建项目
@@ -43,15 +43,15 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="resetForm('form')">重 置</el-button>
-        <el-button type="primary" @click="doneCreate('form')">确 定</el-button>
+        <el-button @click="resetForm()">重 置</el-button>
+        <el-button type="primary" @click="doneCreate()">确 定</el-button>
       </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex'
+import { mapMutations, mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Home',
@@ -63,45 +63,41 @@ export default {
         xml: ''
       },
       rules: {
-        name: [{ required: true, message: '项目名称不能为空!'}],
-        description: [{ required: true, message: '项目描述不能为空!'}],
-        xml: [{ required: true, message: '知识图谱 xml 不能为空!'}]
+        name: [{ required: true, message: '项目名称不能为空!' }],
+        description: [{ required: true, message: '项目描述不能为空!' }],
+        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }]
       },
-      showCreatePanel: false,
-      mockProjectId: [1, 2, 3, 4] // fake data
+      showCreatePanel: false
     }
   },
+  computed: {
+    ...mapGetters(['ownProjects'])
+  },
   methods: {
-    ...mapMutations(['setProjectId']),
-    ...mapActions(['createNewGraph']),
-    jumpTo(path) {
-      this.$router.push({ path: path })
-    },
+    ...mapActions(['graphCreate']),
     gotoProject(id) {
-      this.setProjectId(id)
-      this.jumpTo('/graph')
+      this.$router.push(`/graph/${id}`)
     },
     createNewGraph() {
       this.showCreatePanel = true
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
+    resetForm() {
+      this.$refs.form.resetFields()
     },
-    doneCreate(formName) {
-      this.$refs[formName].validate(valid => {
-        if(valid) {
+    doneCreate() {
+      this.$refs.form.validate(valid => {
+        if (valid) {
           // 把数据传向后端
-          const graph = {
+          const projectParam = {
             name: this.form.name,
             description: this.form.description,
             xml: this.form.xml
           }
-          // this.createNewGraph(graph)
-        }else {
+          this.graphCreate(projectParam)
+        } else {
           console.log('error')
         }
       })
-      // this.jumpTo('/graph')
     }
   }
 }

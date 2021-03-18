@@ -24,3 +24,28 @@ export const fakeGraphData = {
     }
   ]
 }
+
+// base on: /project/listByUserID/{userID}  根据用户搜索知识图谱项目列表
+export const fakeProjects = [
+  {
+    description: 'string',
+    name: 'string',
+    projectID: 1,
+    userID: 0,
+    xml: 'string'
+  },
+  {
+    description: 'string',
+    name: 'string',
+    projectID: 2,
+    userID: 0,
+    xml: 'string'
+  },
+  {
+    description: 'string',
+    name: 'string',
+    projectID: 3,
+    userID: 0,
+    xml: 'string'
+  }
+]

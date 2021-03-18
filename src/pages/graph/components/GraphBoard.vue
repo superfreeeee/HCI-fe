@@ -272,13 +272,16 @@ export default {
     },
     /********** GraphOptions **********/
     backCenter() {
-      console.log('[GraphBoard] backCenter')
       this.graphSvg.select('g').remove()
-      this.unPinNodes()
+      this.pinned = false
+      for (const node of this.graphNodes) {
+        node.x = node.y = 0
+        node.vx = node.vy = 0
+        node.fx = node.fy = null
+      }
       this.init()
     },
     zoomReset() {
-      console.log('[GraphBoard] zoomReset')
       this.root
         .transition()
         .duration(500)
@@ -286,7 +289,6 @@ export default {
     },
     pinNodes() {
       if (!this.pinned) {
-        console.log('[GraphBoard] pinNodes')
         this.pinned = true
         this.simulation.stop()
         for (const node of this.graphNodes) {
@@ -297,7 +299,6 @@ export default {
     },
     unPinNodes() {
       if (this.pinned) {
-        console.log('[GraphBoard] unPinNodes')
         this.pinned = false
         for (const node of this.graphNodes) {
           node.fx = null
