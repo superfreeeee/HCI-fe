@@ -10,12 +10,12 @@
       <graph-board ref="board"></graph-board>
       <graph-options @graph-action="actionDispatch"></graph-options>
     </div>
-    <div :class="['panel', showPanel ? 'open' : 'close']">
+    <div :class="['editor', showEditor ? 'open' : 'close']">
       <graph-editor></graph-editor>
     </div>
     <el-button
-      @click="showPanel = !showPanel"
-      :icon="`el-icon-arrow-${showPanel ? 'right' : 'left'}`"
+      @click="showEditor = !showEditor"
+      :icon="`el-icon-arrow-${showEditor ? 'right' : 'left'}`"
     ></el-button>
   </div>
 </template>
@@ -35,7 +35,7 @@ export default {
   },
   data() {
     return {
-      showPanel: true
+      showEditor: true
     }
   },
   computed: {
@@ -77,15 +77,19 @@ export default {
   display: flex;
   align-items: center;
 }
-.graph > .panel {
+.graph > .editor {
   border-left: 1px solid #bbbbbb;
   box-sizing: border-box;
   transition: width 1s ease-out;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  overflow: auto;
 }
-.graph > .panel.open {
+.graph > .editor.open {
   width: 350px;
 }
-.graph > .panel.close {
+.graph > .editor.close {
   width: 0;
 }
 </style>
