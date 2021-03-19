@@ -5,7 +5,10 @@
         <el-button round type="text" icon="el-icon-arrow-left" @click="back()"
           >返回</el-button
         >
-        <span>知识图谱：项目-{{ graphData.projectId }}</span>
+        <span>知识图谱：{{ projectInfo.name }}</span>
+        <el-button round type="text" icon="el-icon-info" @click="showDescription()"
+          >关于</el-button
+        >
       </div>
       <graph-board ref="board"></graph-board>
       <graph-options @graph-action="actionDispatch"></graph-options>
@@ -24,7 +27,7 @@
 import GraphBoard from './components/GraphBoard'
 import GraphOptions from './components/GraphOptions'
 import GraphEditor from './components/GraphEditor'
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   name: 'Graph',
@@ -38,16 +41,29 @@ export default {
       showEditor: true
     }
   },
+  mounted() {
+    this.getProjectInfo(this.projectId)
+  },
   computed: {
-    ...mapGetters(['graphData'])
+    ...mapGetters(['graphData', 'projectId', 'projectInfo'])
   },
   methods: {
+    ...mapActions(['getProjectInfo']),
     back() {
       this.$router.back()
     },
     actionDispatch(name, ...args) {
       // console.log(`[GraphAction] ${name}`)
       this.$refs.board[name](...args)
+    },
+    showDescription() {
+      this.$notify({
+        title: `关于 ${this.projectInfo.name}`,
+        message: this.projectInfo.description,
+        duration: 5000,
+        type: 'info',
+        position: 'bottom-left'
+      })
     }
   }
 }
@@ -67,7 +83,7 @@ export default {
 .graph > .main > .title {
   position: absolute;
   left: 40px;
-  top: 40px;
+  top: 20px;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 0px slategray;
   background-color: #ffffff;

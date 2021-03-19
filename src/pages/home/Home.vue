@@ -70,12 +70,17 @@ export default {
       showCreatePanel: false
     }
   },
+  mounted() {
+    this.getListByUserId(1)
+  },
   computed: {
-    ...mapGetters(['ownProjects'])
+    ...mapGetters(['ownProjects', 'projectId'])
   },
   methods: {
-    ...mapActions(['graphCreate']),
+    ...mapMutations(['setProjectId']),
+    ...mapActions(['createProject', 'getListByUserId']),
     gotoProject(id) {
+      this.setProjectId(id)
       this.$router.push(`/graph/${id}`)
     },
     createNewGraph() {
@@ -91,9 +96,19 @@ export default {
           const projectParam = {
             name: this.form.name,
             description: this.form.description,
-            xml: this.form.xml
+            xml: this.form.xml,
+            userID: 1
           }
-          this.graphCreate(projectParam)
+          this.createProject(projectParam)
+          .then(() => {
+            this.$router.push(`/graph/${this.projectId}`)
+          })
+          .catch(() => {
+            this.$message({
+              message: 'xml 格式错误！',
+              type: 'error'
+            })
+          })
         } else {
           console.log('error')
         }
