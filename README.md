@@ -6,22 +6,24 @@
 
 ``` bash
 # install dependencies
-npm install
+yarn install
 
 # serve with hot reload at localhost:8080
-npm run dev
+yarn start
 
 # build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
+yarn build
 
 # run all tests
-npm test
+yarn test
 ```
+
+## TODO
+
+- [x] 实体/关系展示
+- [x] png 导出
+- [ ] 实体/关系添加
+- [ ] 关系箭头
+- [ ] xml 导出
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
