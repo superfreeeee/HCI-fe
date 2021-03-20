@@ -49,6 +49,7 @@ export default {
     }
   },
   mounted() {
+    // console.log('mounted graph', this.projectId)
     this.getProjectInfo(this.projectId)
   },
   computed: {

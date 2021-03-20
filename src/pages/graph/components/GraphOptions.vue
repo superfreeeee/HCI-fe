@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   name: 'GraphOptions',
   data() {
@@ -68,13 +68,19 @@ export default {
         {
           label: '保存为 xml',
           type: 'warning',
-          handler: () => this.saveAsXml()
+          handler: () => this.exportXml()
         }
       ]
     }
   },
+  computed: {
+    ...mapGetters(['projectId']),
+  },
   methods: {
-    ...mapActions(['editorCreate', 'saveAsPng', 'saveAsXml'])
+    ...mapActions(['editorCreate', 'saveAsPng', 'saveAsXml']),
+    exportXml() {
+      this.saveAsXml(this.projectId)
+    }
   }
 }
 </script>

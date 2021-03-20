@@ -27,3 +27,10 @@ export function createProjectAPI(data) {
         data
     })
 }
+
+export function exportProjectXmlAPI(projectId) {
+    return axios({
+        url: `${api.projectPre}/export/${projectId}`,
+        method: 'GET'
+    })
+}

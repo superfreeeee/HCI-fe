@@ -97,8 +97,9 @@ export default {
             name: this.form.name,
             description: this.form.description,
             xml: this.form.xml,
-            userID: 1
+            userId: 1
           }
+          console.log('projectParam', projectParam)
           this.createProject(projectParam)
             .then(() => {
               this.$router.push(`/graph/${this.projectId}`)
