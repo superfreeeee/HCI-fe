@@ -3,8 +3,7 @@ import {
   graphDeleteNodeAPI,
   graphDeleteRelAPI,
   graphInsertNodeAPI,
-  graphInsertRelAPI,
-  getGraphByProjectIdAPI
+  graphInsertRelAPI
 } from '../../api/graph'
 import { exportProjectXmlAPI } from '../../api/project'
 import { consoleGroup, download, svgToPng } from '../../common/utils'

@@ -283,7 +283,7 @@ export default {
        */
       this.nodes.remove()
       /**
-       * remove nodesTetxt
+       * remove nodesText
        */
       this.nodesText.remove()
 
@@ -326,7 +326,58 @@ export default {
       this.simulation.on('tick', this.tick)
       this.simulation.alpha(1).restart()
     },
-    deleteLinks() {},
+    deleteLinks() {
+      this.simulation.stop()
+      const { baseRadius, font } = this.config
+
+      /**
+       * remove nodes
+       */
+      this.links.remove()
+      /**
+       * remove nodesText
+       */
+      this.linksText.remove()
+
+      /**
+       * redraw nodes
+       */
+      this.links = this.$d3
+        .select('.links')
+        .selectAll('line')
+        .data(this.graphLinks)
+        .join('line')
+        .attr('stroke-width', d => d.value * 5)
+        .attr('id', d => `link-${d.id}`)
+        .attr('data-id', d => d.id)
+        .on('click', this.selectItemHandler('link'))
+      this.links.append('title').text(d => d.name)
+
+      /**
+       * redraw nodesText
+       */
+      this.linksText = this.$d3
+        .select('.links_text')
+        .selectAll('text')
+        .data(this.graphLinks)
+        .join('text')
+        .style('fill', '#000000')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2)
+        .on('click', this.selectItemHandler('link'))
+
+      /**
+       * reset simulation
+       */
+      this.simulation.on('tick', this.tick)
+      this.simulation.alpha(1).restart()
+    },
     /********** d3 gesture **********/
     drag(simulation) {
       const d3 = this.$d3
