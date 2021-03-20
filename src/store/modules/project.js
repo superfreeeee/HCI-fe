@@ -1,5 +1,9 @@
 import { fakeProjects } from '../../common/sample'
-import { getProjectInfoAPI, getListByUserIdAPI, createProjectAPI } from '../../api/project'
+import {
+  getProjectInfoAPI,
+  getListByUserIdAPI,
+  createProjectAPI
+} from '../../api/project'
 
 const project = {
   state: {
@@ -19,31 +23,30 @@ const project = {
     }
   },
   actions: {
-    getProjectInfo: async({ commit, state }, projectId) => {
+    getProjectInfo: async ({ commit }, projectId) => {
       const res = await getProjectInfoAPI(projectId)
-      if(res.status === 200) {
+      if (res.status === 200) {
         commit('setProjectInfo', res.data)
-      }else {
+      } else {
         console.log('getProjectInfo error')
       }
     },
-    getListByUserId: async({ commit, state }, userId) => {
+    getListByUserId: async ({ commit }, userId) => {
       const res = await getListByUserIdAPI(userId)
-      if(res.status === 200) {
+      if (res.status === 200) {
         commit('setOwnProjects', res.data)
-      }else {
+      } else {
         console.log('getListByUserId error')
       }
     },
-    createProject: async({ commit, state }, data) => {
+    createProject: async ({ commit }, data) => {
       const res = await createProjectAPI(data)
-      console.log('createProject res', res)
-      if(res.status === 200) {
+      if (res.status === 200) {
         commit('setProjectInfo', res.data)
         commit('setProjectId', res.data.projectId)
-      }else if(res.status === 500) {
-        return Promise.reject('xml 格式错误')
-      }else {
+      } else if (res.status === 500) {
+        return Promise.reject(res.data.msg)
+      } else {
         console.log('createProject error')
       }
     }

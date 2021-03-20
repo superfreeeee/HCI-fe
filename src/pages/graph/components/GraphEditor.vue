@@ -76,7 +76,7 @@ export default {
   name: 'GraphEditor',
   data() {
     return {
-      item: null,
+      item: {},
       itemOptions
     }
   },
@@ -144,6 +144,9 @@ export default {
       for (const prop in this.item) {
         this.item[prop] = ''
       }
+    },
+    deleteCommit() {
+      this.setEditor()
     }
   },
   mounted() {

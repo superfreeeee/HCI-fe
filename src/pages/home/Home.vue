@@ -104,9 +104,9 @@ export default {
             .then(() => {
               this.$router.push(`/graph/${this.projectId}`)
             })
-            .catch(() => {
+            .catch(msg => {
               this.$message({
-                message: 'xml 格式错误！',
+                message: msg,
                 type: 'error'
               })
             })

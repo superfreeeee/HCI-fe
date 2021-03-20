@@ -6,7 +6,7 @@ import router from './router'
 import vuex from 'vuex'
 import elementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import store from './store';
+import store from './store'
 import * as d3 from 'd3'
 import axios from 'axios'
 
@@ -17,27 +17,32 @@ Vue.use(elementUI)
 
 Vue.config.productionTip = false
 Vue.prototype.$d3 = d3
-Vue.prototype.$axios = axios;
+Vue.prototype.$axios = axios
 
-axios.interceptors.request.use(config => {
-  consoleGroup(`[axios.request] ${config.url}`, () => {
-    console.log(config)
-  })
-  return config
-}, err => {
-  return err
-})
+axios.interceptors.request.use(
+  config => {
+    consoleGroup(`[axios.request] ${config.url}`, () => {
+      console.log(config)
+    })
+    return config
+  },
+  err => {
+    return err
+  }
+)
 
-
-axios.interceptors.response.use(response => {
-  const config = response.config
-  consoleGroup(`[axios.response] ${config.url}`, () => {
-    console.log(response)
-  })
-  return response
-}, err => {
-  return err
-})
+axios.interceptors.response.use(
+  response => {
+    const config = response.config
+    consoleGroup(`[axios.response] ${config.url}`, () => {
+      console.log(response)
+    })
+    return response
+  },
+  err => {
+    return err.response
+  }
+)
 
 /* eslint-disable no-new */
 new Vue({

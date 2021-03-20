@@ -178,6 +178,7 @@ const graph = {
           res = await graphDeleteRelAPI(id)
         }
         commit('deleteGraphItem', id)
+        commit('setEditor')
       }
     },
     // 持久化相关
@@ -205,9 +206,8 @@ const graph = {
         download(`知识图谱-${projectId}.png`, dataUrl)
       })
     },
-    saveAsXml: async ({ state }, projectId) => {
+    async saveAsXml(_, projectId) {
       const res = await exportProjectXmlAPI(projectId)
-      console.log('saveAsXml', res)
 
       function stringToXml(xmlString) {
         var xmlDoc
