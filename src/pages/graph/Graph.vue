@@ -5,13 +5,20 @@
         <el-button round type="text" icon="el-icon-arrow-left" @click="back()"
           >返回</el-button
         >
-        <span>知识图谱：{{ projectInfo.name }}</span>
-        <el-button round type="text" icon="el-icon-info" @click="showDescription()"
+        <span>项目：{{ projectInfo.name }}</span>
+        <el-button
+          round
+          type="text"
+          icon="el-icon-info"
+          @click="showDescription()"
           >关于</el-button
         >
       </div>
       <graph-board ref="board"></graph-board>
-      <graph-options @graph-action="actionDispatch"></graph-options>
+      <graph-options
+        @graph-action="actionDispatch"
+        @editor-open="showEditor = true"
+      ></graph-options>
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
       <graph-editor></graph-editor>

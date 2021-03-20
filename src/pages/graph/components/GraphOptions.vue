@@ -22,12 +22,18 @@ export default {
         {
           label: '新增实体',
           type: 'primary',
-          handler: () => this.editorCreate('node')
+          handler: () => {
+            this.editorCreate('node')
+            this.$emit('editor-open')
+          }
         },
         {
           label: '新增关系',
           type: 'primary',
-          handler: () => this.editorCreate('link')
+          handler: () => {
+            this.editorCreate('link')
+            this.$emit('editor-open')
+          }
         },
         {
           label: '批量新增',

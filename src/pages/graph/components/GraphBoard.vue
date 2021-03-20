@@ -14,10 +14,13 @@ export default {
         baseRadius: 25,
         font: '20px Arial'
       },
+      initialized: false,
       simulation: null,
       root: null,
       links: null,
+      recentLinks: 0,
       nodes: null,
+      recentNodes: 0,
       linksText: null,
       nodesText: null,
       boundDrag: null,
@@ -28,11 +31,34 @@ export default {
   computed: {
     ...mapGetters(['graphNodes', 'graphLinks', 'graphSvg'])
   },
+  watch: {
+    graphNodes(nodes) {
+      if (this.initialized) {
+        if (nodes.length > this.recentNodes) {
+          this.updateNodes()
+        } else {
+          this.deleteNodes()
+        }
+        this.recentNodes = nodes.length
+      }
+    },
+    graphLinks(links) {
+      if (this.initialized) {
+        if (links.length > this.recentLinks) {
+          this.updateLinks()
+        } else {
+          this.deleteLinks()
+        }
+        this.recentLinks = links.length
+      }
+    }
+  },
   methods: {
     ...mapMutations(['setGraphSvg']),
     ...mapActions(['graphInit', 'editorSelect']),
     /********** d3 graph init **********/
     init() {
+      this.initialized = false
       const d3 = this.$d3
       const { width, height, baseRadius, font } = this.config
       const nodesData = this.graphNodes
@@ -152,68 +178,155 @@ export default {
       this.setGraphSvg(svg)
       this.root = root
       this.links = links
+      this.recentLinks = links.length
       this.nodes = nodes
+      this.recentNodes = nodes.length
       this.linksText = linksText
       this.nodesText = nodesText
       this.boundDrag = boundDrag
       this.boundZoom = boundZoom
+      this.scale = scale
 
       /**
        * bind simulation tick
        */
       simulation.on('tick', this.tick)
+      this.initialized = true
     },
     /********** d3 graph update **********/
     updateNodes() {
-      // const { baseRadius, font } = this.config
-      // const { simulation, svg_links, svg_links_text, drag, nodes } = this.graph
-      // let { svg_nodes, svg_nodes_text } = this.graph
-      // const d3 = this.$d3
-      // const scale = d3.scaleOrdinal(d3.schemeCategory10)
-      // const panelSelection = type => e => {
-      //   const id = Number(e.target.attributes['data-id'].value)
-      //   this.panelSelect({ type, id })
-      // }
-      // svg_nodes = svg_nodes
-      //   .data(nodes)
-      //   .enter()
-      //   .append('circle')
-      //   .attr('r', d => baseRadius + d.radius * 10)
-      //   .attr('fill', d => scale(d.group))
-      //   .attr('data-id', d => d.id)
-      //   .merge(svg_nodes)
-      //   .call(drag)
-      //   .on('click', panelSelection('node'))
-      // svg_nodes_text = svg_nodes_text
-      //   .data(nodes)
-      //   .enter()
-      //   .append('text')
-      //   .style('fill', '#ffffff')
-      //   .style('font', font)
-      //   .style('user-select', 'none')
-      //   .attr('dominant-baseline', 'middle')
-      //   .attr('text-anchor', 'middle')
-      //   .attr('data-id', d => d.id)
-      //   .text(d => d.name)
-      //   .merge(svg_nodes_text)
-      //   .call(drag)
-      //   .on('click', panelSelection('node'))
-      // simulation.nodes(nodes).on('tick', () => {
-      //   svg_links
-      //     .attr('x1', d => d.source.x)
-      //     .attr('y1', d => d.source.y)
-      //     .attr('x2', d => d.target.x)
-      //     .attr('y2', d => d.target.y)
-      //   svg_links_text
-      //     .attr('x', d => (d.source.x + d.target.x) / 2)
-      //     .attr('y', d => (d.source.y + d.target.y) / 2)
-      //   svg_nodes.attr('cx', d => d.x).attr('cy', d => d.y)
-      //   svg_nodes_text.attr('x', d => d.x).attr('y', d => d.y)
-      // })
-      // simulation.alpha(1).restart()
-      // this.updateGraphNode({ svg_nodes, svg_nodes_text })
+      // console.log('graphNodes update')
+      const { baseRadius, font } = this.config
+      /**
+       * update nodes
+       */
+      this.nodes = this.nodes
+        .data(this.graphNodes)
+        .enter()
+        .append('circle')
+        .attr('class', 'pointer')
+        .attr('r', d => baseRadius + d.radius * 10)
+        .attr('fill', d => this.scale(d.group))
+        .attr('data-id', d => d.id)
+        .merge(this.nodes)
+        .call(this.boundDrag)
+        .on('click', this.selectItemHandler('node'))
+
+      /**
+       * update nodesText
+       */
+      this.nodesText = this.nodesText
+        .data(this.graphNodes)
+        .enter()
+        .append('text')
+        .style('fill', '#ffffff')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .merge(this.nodesText)
+        .call(this.boundDrag)
+        .on('click', this.selectItemHandler('node'))
+      /**
+       * update simulation
+       */
+      this.simulation.nodes(this.graphNodes).on('tick', this.tick)
+      this.simulation.alpha(1).restart()
     },
-    updateLinks() {},
+    updateLinks() {
+      // console.log('graphLinks update')
+      const { font } = this.config
+      /**
+       * update links
+       */
+      this.links = this.links
+        .data(this.graphLinks)
+        .enter()
+        .append('line')
+        .attr('stroke-width', d => d.value * 5)
+        .attr('id', d => `link-${d.id}`)
+        .attr('data-id', d => d.id)
+        .merge(this.links)
+        .on('click', this.selectItemHandler('link'))
+      /**
+       * update linksText
+       */
+      this.linksText = this.linksText
+        .data(this.graphLinks)
+        .enter()
+        .append('text')
+        .style('fill', '#000000')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .attr('x', d => (d.source.x + d.target.x) / 2)
+        .attr('y', d => (d.source.y + d.target.y) / 2)
+        .merge(this.linksText)
+        .on('click', this.selectItemHandler('link'))
+      /**
+       * update simulation
+       */
+      this.simulation.force('link').links(this.graphLinks)
+      this.simulation.alpha(1).restart()
+    },
+    deleteNodes() {
+      this.simulation.stop()
+      const { baseRadius, font } = this.config
+
+      /**
+       * remove nodes
+       */
+      this.nodes.remove()
+      /**
+       * remove nodesTetxt
+       */
+      this.nodesText.remove()
+
+      /**
+       * redraw nodes
+       */
+      this.nodes = this.$d3
+        .select('.nodes')
+        .selectAll('circle')
+        .data(this.graphNodes)
+        .join('circle')
+        .attr('class', 'pointer')
+        .attr('r', d => baseRadius + d.radius * 10)
+        .attr('fill', d => this.scale(d.group))
+        .attr('data-id', d => d.id)
+        .call(this.boundDrag)
+        .on('click', this.selectItemHandler('node'))
+      this.nodes.append('title').text(d => d.name)
+
+      /**
+       * redraw nodesText
+       */
+      this.nodesText = this.$d3
+        .select('.nodes_text')
+        .selectAll('text')
+        .data(this.graphNodes)
+        .join('text')
+        .style('fill', '#ffffff')
+        .style('font', font)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .call(this.boundDrag)
+        .on('click', this.selectItemHandler('node'))
+      /**
+       * reset simulation
+       */
+      this.simulation.on('tick', this.tick)
+      this.simulation.alpha(1).restart()
+    },
+    deleteLinks() {},
     /********** d3 gesture **********/
     drag(simulation) {
       const d3 = this.$d3

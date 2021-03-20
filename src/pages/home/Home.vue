@@ -5,13 +5,13 @@
     </div>
     <el-button
       v-for="project in ownProjects"
-      :key="project.projectID"
+      :key="project.projectId"
       type="primary"
       style="width: 30%; margin: 0 0 15px 0"
       round
-      @click="gotoProject(project.projectID)"
+      @click="gotoProject(project.projectId)"
     >
-      项目 {{ project.projectID }}
+      项目：{{ project.name }}
     </el-button>
     <el-button style="margin: 0" @click="createNewGraph()">
       新建项目
@@ -100,15 +100,15 @@ export default {
             userID: 1
           }
           this.createProject(projectParam)
-          .then(() => {
-            this.$router.push(`/graph/${this.projectId}`)
-          })
-          .catch(() => {
-            this.$message({
-              message: 'xml 格式错误！',
-              type: 'error'
+            .then(() => {
+              this.$router.push(`/graph/${this.projectId}`)
             })
-          })
+            .catch(() => {
+              this.$message({
+                message: 'xml 格式错误！',
+                type: 'error'
+              })
+            })
         } else {
           console.log('error')
         }

@@ -15,7 +15,7 @@ export function getProjectInfoAPI(projectId) {
 
 export function getListByUserIdAPI(userId) {
     return axios({
-        url: `${api.projectPre}/listByUserID/${userId}`,
+        url: `${api.projectPre}/listByUserId/${userId}`,
         method: 'GET'
     })
 }

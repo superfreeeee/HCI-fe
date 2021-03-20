@@ -4,7 +4,7 @@ import { getProjectInfoAPI, getListByUserIdAPI, createProjectAPI } from '../../a
 const project = {
   state: {
     ownProjects: [],
-    projectId: 0,
+    projectId: 1,
     projectInfo: {}
   },
   mutations: {

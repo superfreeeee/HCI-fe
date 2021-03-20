@@ -19,6 +19,7 @@
           size="small"
           type="danger"
           icon="el-icon-delete"
+          @click="editorDeleteCommit()"
           >删除{{ typeStr }}</el-button
         >
       </div>
@@ -32,6 +33,7 @@
           <!-- 输入框 -->
           <el-input
             v-if="option.type === 'input'"
+            clearable
             :disabled="!graphEditorEditable"
             :placeholder="option.holder"
             v-model="item[option.attr]"
@@ -39,6 +41,7 @@
           <!-- 下拉框(source/target in link) -->
           <el-select
             v-else
+            clearable
             :disabled="!graphEditorEditable"
             :placeholder="option.holder"
             v-model="item[option.attr]"
@@ -131,7 +134,12 @@ export default {
   },
   methods: {
     ...mapMutations(['setEditor', 'setEditorEditable']),
-    ...mapActions(['editorSelect', 'editorCreateCommit', 'editorUpdateCommit']),
+    ...mapActions([
+      'editorSelect',
+      'editorCreateCommit',
+      'editorUpdateCommit',
+      'editorDeleteCommit'
+    ]),
     resetItem() {
       for (const prop in this.item) {
         this.item[prop] = ''

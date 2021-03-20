@@ -6,8 +6,8 @@ export const itemOptions = {
   ],
   link: [
     { label: '关系名称', attr: 'name', holder: '关系名称', type: 'input' },
-    { label: '关系实体1', attr: 'from', holder: 'ID', type: 'select' },
-    { label: '关系实体2', attr: 'to', holder: 'ID', type: 'select' },
+    { label: '关系实体1', attr: 'from', holder: '实体名称', type: 'select' },
+    { label: '关系实体2', attr: 'to', holder: '实体名称', type: 'select' },
     { label: '关系权重', attr: 'value', holder: '1~20', type: 'input' }
   ]
 }

@@ -1,10 +1,17 @@
-import { getGraphByProjectIdAPI } from '../../api/graph'
+import {
+  getGraphByProjectIdAPI,
+  graphDeleteNodeAPI,
+  graphDeleteRelAPI,
+  graphInsertNodeAPI,
+  graphInsertRelAPI
+} from '../../api/graph'
 import { consoleGroup, download, svgToPng } from '../../common/utils'
 import { fakeGraphData } from '../../common/sample'
 import { itemOptions, typeMapper } from '../../common/editor'
 
 const graph = {
   state: {
+    projectId: -1,
     data: {
       // projectId,
       // nodes,
@@ -19,6 +26,9 @@ const graph = {
     }
   },
   mutations: {
+    setGraphProjectId(state, id) {
+      state.projectId = id
+    },
     setGraphData(state, data) {
       state.data = data
     },
@@ -32,27 +42,40 @@ const graph = {
     },
     setEditorEditable(state, bool) {
       state.editor.editable = bool
+    },
+    addGraphItem(state, item) {
+      state.data[`${state.editor.type}s`].push(item)
+    },
+    deleteGraphItem(state, id) {
+      const items = state.data[`${state.editor.type}s`]
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === id) {
+          items.splice(i, 1)
+          break
+        }
+      }
     }
   },
   actions: {
     // graphCreate: async({ commit }, data) => {
 
     // },
-    graphInit({ commit }, projectId = 1) {
-      // const res = await getGraphByProjectIdAPI(projectId)
-      const res = { status: 200, data: fakeGraphData }
+    async graphInit({ commit, rootState }) {
+      const projectId = rootState.project.projectId
+      commit('setGraphProjectId', projectId)
+      const res = await getGraphByProjectIdAPI(projectId)
+      // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         let data = res.data
         data = {
-          projectId: data.projectID,
           nodes: data.nodes.map(n => ({
-            id: n.nodeID,
+            id: n.nodeId,
             name: n.name,
             group: n.group,
             radius: n.val
           })),
           links: data.relations.map(r => ({
-            id: r.relationID,
+            id: r.relationId,
             name: r.name,
             source: r.source,
             target: r.target,
@@ -93,10 +116,47 @@ const graph = {
       commit('setEditorEditable', true)
     },
     // 提交 实体/关系 创建
-    editorCreateCommit(_, item) {
+    async editorCreateCommit({ state, commit, dispatch }, item) {
       consoleGroup('[action] editorItemCreate', () => {
         console.log({ ...item })
       })
+      const type = state.editor.type
+      if (type === 'node') {
+        item = {
+          name: item.name,
+          group: item.group,
+          val: item.radius
+        }
+        const { data } = await graphInsertNodeAPI(item)
+        item = {
+          id: data.nodeId,
+          name: data.name,
+          group: data.group,
+          radius: data.val
+        }
+      } else {
+        item = {
+          name: item.name,
+          source: item.from,
+          target: item.to,
+          val: item.value
+        }
+        const { data } = await graphInsertRelAPI(item)
+        item = {
+          name: data.name,
+          id: data.relationId,
+          source: data.source,
+          target: data.target,
+          from: data.source,
+          to: data.target,
+          value: data.val
+        }
+      }
+      consoleGroup('[action] editorCreateCommit', () => {
+        console.log(item)
+      })
+      commit('addGraphItem', item)
+      dispatch('editorSelect', { type, id: item.id })
     },
     // 提交 实体/关系 更新
     editorUpdateCommit(_, item) {
@@ -104,10 +164,25 @@ const graph = {
         console.log({ ...item })
       })
     },
+    async editorDeleteCommit({ state, commit }) {
+      if (!state.editor.createNew) {
+        const {
+          type,
+          item: { id }
+        } = state.editor
+        let res
+        if (type === 'node') {
+          res = await graphDeleteNodeAPI(id)
+        } else {
+          res = await graphDeleteRelAPI(id)
+        }
+        commit('deleteGraphItem', id)
+      }
+    },
     // 持久化相关
     saveAsPng({ state }) {
       console.log('[action] saveAsPng')
-      const projectId = state.data.projectId
+      const projectId = state.projectId
       const svg = state.svg
       const width = svg._groups[0][0].width.baseVal.value
       const height = svg._groups[0][0].height.baseVal.value
@@ -135,8 +210,14 @@ const graph = {
   },
   getters: {
     graphData: state => state.data,
-    graphNodes: state => state.data.nodes,
-    graphLinks: state => state.data.links,
+    graphNodes: state => {
+      const nodes = state.data.nodes
+      return nodes ? nodes : []
+    },
+    graphLinks: state => {
+      const links = state.data.links
+      return links ? links : []
+    },
     graphSvg: state => state.svg,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
