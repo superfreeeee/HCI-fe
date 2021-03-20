@@ -1,4 +1,5 @@
 import { getGraphByProjectIdAPI } from '../../api/graph'
+import { exportProjectXmlAPI } from '../../api/project'
 import { consoleGroup, download, svgToPng } from '../../common/utils'
 import { fakeGraphData } from '../../common/sample'
 import { itemOptions, typeMapper } from '../../common/editor'
@@ -129,8 +130,29 @@ const graph = {
         download(`知识图谱-${projectId}.png`, dataUrl)
       })
     },
-    saveAsXml() {
-      console.log('[action] saveAsXml')
+    saveAsXml: async({ state }, projectId) => {
+      const res = await exportProjectXmlAPI(projectId)
+      console.log('saveAsXml', res)
+       
+      function stringToXml(xmlString) {
+        var xmlDoc;
+        if (typeof xmlString == "string") {  
+            if (document.implementation.createDocument) {
+                var parser = new DOMParser();
+                xmlDoc = parser.parseFromString(xmlString, "text/xml");
+            } else if (window.ActiveXObject) {
+                xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+                xmlDoc.async = false;
+                xmlDoc.loadXML(xmlString);
+            }
+        }
+        else {
+            xmlDoc = xmlString;
+        }
+        return xmlDoc;
+      }
+      const xmlObj = stringToXml(res.data.xml)
+      console.log('xmlObj', xmlObj)
     }
   },
   getters: {

@@ -21,7 +21,6 @@ const project = {
   actions: {
     getProjectInfo: async({ commit, state }, projectId) => {
       const res = await getProjectInfoAPI(projectId)
-      console.log('res', res)
       if(res.status === 200) {
         commit('setProjectInfo', res.data)
       }else {
@@ -41,7 +40,7 @@ const project = {
       console.log('createProject res', res)
       if(res.status === 200) {
         commit('setProjectInfo', res.data)
-        commit('setProjectId', res.data.projectID)
+        commit('setProjectId', res.data.projectId)
       }else if(res.status === 500) {
         return Promise.reject('xml 格式错误')
       }else {

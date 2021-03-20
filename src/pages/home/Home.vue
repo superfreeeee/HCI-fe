@@ -5,13 +5,13 @@
     </div>
     <el-button
       v-for="project in ownProjects"
-      :key="project.projectID"
+      :key="project.projectId"
       type="primary"
       style="width: 30%; margin: 0 0 15px 0"
       round
-      @click="gotoProject(project.projectID)"
+      @click="gotoProject(project.projectId)"
     >
-      项目 {{ project.projectID }}
+      项目 {{ project.projectId }}
     </el-button>
     <el-button style="margin: 0" @click="createNewGraph()">
       新建项目
@@ -97,8 +97,9 @@ export default {
             name: this.form.name,
             description: this.form.description,
             xml: this.form.xml,
-            userID: 1
+            userId: 1
           }
+          console.log('projectParam', projectParam)
           this.createProject(projectParam)
           .then(() => {
             this.$router.push(`/graph/${this.projectId}`)
