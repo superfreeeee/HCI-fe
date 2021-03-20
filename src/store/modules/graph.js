@@ -41,6 +41,12 @@ const graph = {
     setGraphData(state, data) {
       state.data = data
     },
+    setGraphNodes(state, nodes) {
+      state.data.nodes = nodes
+    },
+    setGraphLinks(state, links) {
+      state.data.nodes = links
+    },
     setGraphSvg(state, svg) {
       state.svg = svg
     },
@@ -56,7 +62,8 @@ const graph = {
       state.data[`${state.editor.type}s`].push(item)
     },
     deleteGraphItem(state, id) {
-      const items = state.data[`${state.editor.type}s`]
+      const type = state.editor.type
+      const items = state.data[`${type}s`]
       for (let i = 0; i < items.length; i++) {
         if (items[i].id === id) {
           items.splice(i, 1)
@@ -154,6 +161,19 @@ const graph = {
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
       if (!state.editor.createNew) {
+        function clearNodes(linkId) {}
+        function checkNode(nodeId) {}
+        function clearLinks(nodeId) {
+          const links = state.data.links
+          for (let i = 0; i < links.length; i++) {
+            const { from, to } = links[i]
+            if (from === nodeId || to === nodeId) {
+              links.splice(i, 1)
+              i--
+              clearNodes(from === nodeId ? to : from)
+            }
+          }
+        }
         const {
           type,
           item: { id }

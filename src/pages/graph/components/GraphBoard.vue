@@ -37,7 +37,7 @@ export default {
         if (nodes.length > this.recentNodes) {
           this.updateNodes()
         } else {
-          this.deleteNodes()
+          this.reloadNodes()
         }
         this.recentNodes = nodes.length
       }
@@ -47,7 +47,7 @@ export default {
         if (links.length > this.recentLinks) {
           this.updateLinks()
         } else {
-          this.deleteLinks()
+          this.reloadLinks()
         }
         this.recentLinks = links.length
       }
@@ -274,7 +274,7 @@ export default {
       this.simulation.force('link').links(this.graphLinks)
       this.simulation.alpha(1).restart()
     },
-    deleteNodes() {
+    reloadNodes() {
       this.simulation.stop()
       const { baseRadius, font } = this.config
 
@@ -326,7 +326,7 @@ export default {
       this.simulation.on('tick', this.tick)
       this.simulation.alpha(1).restart()
     },
-    deleteLinks() {
+    reloadLinks() {
       this.simulation.stop()
       const { baseRadius, font } = this.config
 
