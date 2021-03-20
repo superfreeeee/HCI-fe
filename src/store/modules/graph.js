@@ -35,11 +35,9 @@ const graph = {
     }
   },
   actions: {
-    graphCreate(_, projectParam) {
-      consoleGroup('[action] editorSelect', () => {
-        console.log(projectParam)
-      })
-    },
+    // graphCreate: async({ commit }, data) => {
+
+    // },
     graphInit({ commit }, projectId = 1) {
       // const res = await getGraphByProjectIdAPI(projectId)
       const res = { status: 200, data: fakeGraphData }
