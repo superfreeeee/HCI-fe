@@ -3,10 +3,18 @@ import {
   graphDeleteNodeAPI,
   graphDeleteRelAPI,
   graphInsertNodeAPI,
-  graphInsertRelAPI
+  graphInsertRelAPI,
+  graphUpdateNodeAPI,
+  graphUpdateRelAPI
 } from '../../api/graph'
 import { exportProjectXmlAPI } from '../../api/project'
-import { consoleGroup, download, svgToPng } from '../../common/utils'
+import {
+  consoleGroup,
+  download,
+  itemTransformer,
+  responseItemTranformer,
+  svgToPng
+} from '../../common/utils'
 import { fakeGraphData } from '../../common/sample'
 import { itemOptions, typeMapper } from '../../common/editor'
 
@@ -58,32 +66,16 @@ const graph = {
     }
   },
   actions: {
-    // graphCreate: async({ commit }, data) => {
-
-    // },
     async graphInit({ commit, rootState }) {
       const projectId = rootState.project.projectId
       commit('setGraphProjectId', projectId)
-      const res = await getGraphByProjectIdAPI(projectId)
-      // const res = { status: 200, data: fakeGraphData }
+      // const res = await getGraphByProjectIdAPI(projectId)
+      const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        let data = res.data
-        data = {
-          nodes: data.nodes.map(n => ({
-            id: n.nodeId,
-            name: n.name,
-            group: n.group,
-            radius: n.val
-          })),
-          links: data.relations.map(r => ({
-            id: r.relationId,
-            name: r.name,
-            source: r.source,
-            target: r.target,
-            from: r.source,
-            to: r.target,
-            value: r.val
-          }))
+        const { nodes, relations } = res.data
+        const data = {
+          nodes: nodes.map(n => responseItemTranformer('node', n)),
+          links: relations.map(r => responseItemTranformer('link', r))
         }
         commit('setGraphData', data)
         commit('setEditor')
@@ -105,6 +97,8 @@ const graph = {
       if (rest.length > 0) {
         commit('setEditor', { type, item: { ...rest[0] }, createNew: false })
         commit('setEditorEditable', false)
+      } else {
+        console.log(`[action] editorSelect, id = ${id} not found`)
       }
     },
     // 创建 实体/关系
@@ -118,67 +112,61 @@ const graph = {
     },
     // 提交 实体/关系 创建
     async editorCreateCommit({ state, commit, dispatch }, item) {
-      consoleGroup('[action] editorItemCreate', () => {
+      consoleGroup('[action] editorCreateCommit', () => {
         console.log({ ...item })
       })
       const type = state.editor.type
-      if (type === 'node') {
-        item = {
-          name: item.name,
-          group: item.group,
-          val: item.radius
-        }
-        const { data } = await graphInsertNodeAPI(item)
-        item = {
-          id: data.nodeId,
-          name: data.name,
-          group: data.group,
-          radius: data.val
-        }
+      // form param item
+      item = itemTransformer(type, item)
+      // request
+      const res = await (type === 'node'
+        ? graphInsertNodeAPI(item)
+        : graphInsertRelAPI(item))
+      if (res.status === 200) {
+        // solve response item
+        item = responseItemTranformer(type, res.data)
+        consoleGroup('[action] editorCreateCommit', () => {
+          console.log(item)
+        })
+        commit('addGraphItem', item)
+        dispatch('editorSelect', { type, id: item.id })
       } else {
-        item = {
-          name: item.name,
-          source: item.from,
-          target: item.to,
-          val: item.value
-        }
-        const { data } = await graphInsertRelAPI(item)
-        item = {
-          name: data.name,
-          id: data.relationId,
-          source: data.source,
-          target: data.target,
-          from: data.source,
-          to: data.target,
-          value: data.val
-        }
+        console.log('[action] editorCreateCommit error')
       }
-      consoleGroup('[action] editorCreateCommit', () => {
-        console.log(item)
-      })
-      commit('addGraphItem', item)
-      dispatch('editorSelect', { type, id: item.id })
     },
     // 提交 实体/关系 更新
-    editorUpdateCommit(_, item) {
-      consoleGroup('[action] editorItemUpdate', () => {
+    async editorUpdateCommit({ state }, item) {
+      consoleGroup('[action] editorUpdateCommit', () => {
         console.log({ ...item })
       })
+      const type = state.editor.type
+      // form param item
+      item = itemTransformer(type, item)
+      // request
+      const res = await (type === 'node'
+        ? graphUpdateNodeAPI(item)
+        : graphUpdateRelAPI(item))
+      if (res.status === 200) {
+      } else {
+        console.log('[action] editorUpdateCommit error')
+      }
     },
     async editorDeleteCommit({ state, commit }) {
+      console.log('[action] editorDeleteCommit')
       if (!state.editor.createNew) {
         const {
           type,
           item: { id }
         } = state.editor
-        let res
-        if (type === 'node') {
-          res = await graphDeleteNodeAPI(id)
+        let res = await (type === 'node'
+          ? graphDeleteNodeAPI(id)
+          : graphDeleteRelAPI(id))
+        if (res.status === 200) {
+          commit('deleteGraphItem', id)
+          commit('setEditor')
         } else {
-          res = await graphDeleteRelAPI(id)
+          console.log('[action] editorDeleteCommit error')
         }
-        commit('deleteGraphItem', id)
-        commit('setEditor')
       }
     },
     // 持久化相关

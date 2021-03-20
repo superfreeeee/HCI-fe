@@ -1,36 +1,17 @@
-import axios from 'axios'
+import { requestWrapper } from './utils'
 
-axios.defaults.baseURL = 'http://39.97.124.144:8001'
+const baseURL = 'http://39.97.124.144:8001'
+const projectPrefix = '/project'
 
-const api = {
-  projectPre: '/project'
-}
+const projectRequest = requestWrapper(`${baseURL}${projectPrefix}`)
 
-export function getProjectInfoAPI(projectId) {
-    return axios({
-        url: `${api.projectPre}/${projectId}`,
-        method: 'GET'
-    })
-}
+export const getProjectInfoAPI = projectId => projectRequest(`/${projectId}`)
 
-export function getListByUserIdAPI(userId) {
-    return axios({
-        url: `${api.projectPre}/listByUserId/${userId}`,
-        method: 'GET'
-    })
-}
+export const getListByUserIdAPI = userId =>
+  projectRequest(`/listByUserId/${userId}`)
 
-export function createProjectAPI(data) {
-    return axios({
-        url: `${api.projectPre}/create`,
-        method: 'POST',
-        data
-    })
-}
+export const createProjectAPI = projectInfo =>
+  projectRequest('/create', 'POST', projectInfo)
 
-export function exportProjectXmlAPI(projectId) {
-    return axios({
-        url: `${api.projectPre}/export/${projectId}`,
-        method: 'GET'
-    })
-}
+export const exportProjectXmlAPI = projectId =>
+  projectRequest(`/export/${projectId}`)

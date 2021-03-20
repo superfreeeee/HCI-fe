@@ -14,7 +14,7 @@
           >关于</el-button
         >
       </div>
-      <graph-board ref="board"></graph-board>
+      <graph-board ref="board" @editor-open="showEditor = true"></graph-board>
       <graph-options
         @graph-action="actionDispatch"
         @editor-open="showEditor = true"
@@ -95,7 +95,6 @@ export default {
   border-radius: 20px;
   box-shadow: 1px 1px 1px 0px slategray;
   background-color: #ffffff;
-  padding-right: 15px;
   height: 40px;
   font-size: 20px;
   font-weight: 600;

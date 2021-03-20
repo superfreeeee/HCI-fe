@@ -1,4 +1,4 @@
-import { fakeProjects } from '../../common/sample'
+import { fakeProjectInfo, fakeProjects } from '../../common/sample'
 import {
   getProjectInfoAPI,
   getListByUserIdAPI,
@@ -24,7 +24,8 @@ const project = {
   },
   actions: {
     getProjectInfo: async ({ commit }, projectId) => {
-      const res = await getProjectInfoAPI(projectId)
+      // const res = await getProjectInfoAPI(projectId)
+      const res = { status: 200, data: fakeProjectInfo }
       if (res.status === 200) {
         commit('setProjectInfo', res.data)
       } else {

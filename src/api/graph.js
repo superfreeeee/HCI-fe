@@ -1,46 +1,30 @@
-import axios from 'axios'
+import { requestWrapper } from "./utils"
 
-axios.defaults.baseURL = 'http://39.97.124.144:8001'
+const baseURL = 'http://39.97.124.144:8001'
+const graphPrefix = '/graph'
 
-const api = {
-  graphPre: '/graph'
-}
+const graphRequest = requestWrapper(`${baseURL}${graphPrefix}`)
 
-export function getGraphByProjectIdAPI(projectId) {
-  return axios({
-    url: `${api.graphPre}/${projectId}`,
-    method: 'GET'
-  })
-}
+/* 获取图数据 */
+export const getGraphByProjectIdAPI = projectId => graphRequest(`/${projectId}`)
 
-export function graphInsertNodeAPI(data) {
-  return axios({
-    url: `${api.graphPre}/insertNode`,
-    method: 'POST',
-    data
-  })
-}
+/* 插入实体 */
+export const graphInsertNodeAPI = node =>
+  graphRequest('/insertNode', 'POST', node)
+/* 插入关系 */
+export const graphInsertRelAPI = relation =>
+  graphRequest('/insertRel', 'POST', relation)
 
-export function graphInsertRelAPI(data) {
-  return axios({
-    url: `${api.graphPre}/insertRel`,
-    method: 'POST',
-    data
-  })
-}
+/* 删除实体 */
+export const graphDeleteNodeAPI = nodeId =>
+  graphRequest('/deleteNode', 'POST', { nodeId })
+/* 删除关系 */
+export const graphDeleteRelAPI = relationId =>
+  graphRequest('/deleteRel', 'POST', { relationId })
 
-export function graphDeleteNodeAPI(nodeId) {
-  return axios({
-    url: `${api.graphPre}/deleteNode`,
-    method: 'POST',
-    data: { nodeId }
-  })
-}
-
-export function graphDeleteRelAPI(relationId) {
-  return axios({
-    url: `${api.graphPre}/deleteRel`,
-    method: 'POST',
-    data: { relationId }
-  })
-}
+/* 更新实体 */
+export const graphUpdateNodeAPI = node =>
+  graphRequest('/updateNode', 'POST', node)
+/* 更新关系 */
+export const graphUpdateRelAPI = relation =>
+  graphRequest('/updateRel', 'POST', relation)

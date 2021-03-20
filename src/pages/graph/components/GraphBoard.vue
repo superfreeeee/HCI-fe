@@ -432,6 +432,7 @@ export default {
       return e => {
         const id = Number(e.target.attributes['data-id'].value)
         this.editorSelect({ type, id })
+        this.$emit('editor-open')
       }
     },
     /********** GraphOptions **********/
