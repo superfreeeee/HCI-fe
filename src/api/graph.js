@@ -1,4 +1,4 @@
-import { requestWrapper } from "./utils"
+import { requestWrapper } from './utils'
 
 const baseURL = 'http://39.97.124.144:8001'
 const graphPrefix = '/graph'
@@ -16,11 +16,11 @@ export const graphInsertRelAPI = relation =>
   graphRequest('/insertRel', 'POST', relation)
 
 /* 删除实体 */
-export const graphDeleteNodeAPI = nodeId =>
-  graphRequest('/deleteNode', 'POST', { nodeId })
+export const graphDeleteNodeAPI = node =>
+  graphRequest('/deleteNode', 'POST', node)
 /* 删除关系 */
-export const graphDeleteRelAPI = relationId =>
-  graphRequest('/deleteRel', 'POST', { relationId })
+export const graphDeleteRelAPI = relation =>
+  graphRequest('/deleteRel', 'POST', relation)
 
 /* 更新实体 */
 export const graphUpdateNodeAPI = node =>

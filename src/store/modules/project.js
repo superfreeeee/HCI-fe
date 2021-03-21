@@ -1,40 +1,25 @@
-import { fakeProjectInfo, fakeProjects } from '../../common/sample'
-import {
-  getProjectInfoAPI,
-  getListByUserIdAPI,
-  createProjectAPI
-} from '../../api/project'
+// import { fakeProjectInfo, fakeProjects } from '../../common/sample'
+import { getListByUserIdAPI, createProjectAPI } from '../../api/project'
 
 const project = {
   state: {
     ownProjects: [],
-    projectId: 1,
     projectInfo: {}
   },
   mutations: {
-    setOwnProjects: function(state, data) {
+    setOwnProjects(state, data) {
       state.ownProjects = data
     },
-    setProjectId: function(state, data) {
-      state.projectId = data
-    },
-    setProjectInfo: function(state, data) {
+    setProjectInfo(state, data) {
       state.projectInfo = data
     }
   },
   actions: {
-    getProjectInfo: async ({ commit }, projectId) => {
-      const res = await getProjectInfoAPI(projectId)
-      if (res.status === 200) {
-        commit('setProjectInfo', res.data)
-      } else {
-        console.log('getProjectInfo error')
-      }
-    },
     getListByUserId: async ({ commit }, userId) => {
       const res = await getListByUserIdAPI(userId)
       if (res.status === 200) {
-        commit('setOwnProjects', res.data)
+        const projects = res.data
+        commit('setOwnProjects', projects)
       } else {
         console.log('getListByUserId error')
       }
@@ -42,8 +27,9 @@ const project = {
     createProject: async ({ commit }, data) => {
       const res = await createProjectAPI(data)
       if (res.status === 200) {
-        commit('setProjectInfo', res.data)
-        commit('setProjectId', res.data.projectId)
+        const projectInfo = res.data
+        commit('setProjectInfo', projectInfo)
+        commit('setGraphProjectId', projectInfo.projectId)
       } else if (res.status === 500) {
         return Promise.reject(res.data.msg)
       } else {
@@ -53,7 +39,6 @@ const project = {
   },
   getters: {
     ownProjects: state => state.ownProjects,
-    projectId: state => state.projectId,
     projectInfo: state => state.projectInfo
   }
 }

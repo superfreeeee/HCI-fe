@@ -7,7 +7,7 @@ import {
   graphUpdateNodeAPI,
   graphUpdateRelAPI
 } from '../../api/graph'
-import { exportProjectXmlAPI } from '../../api/project'
+import { exportProjectXmlAPI, getProjectInfoAPI } from '../../api/project'
 import {
   consoleGroup,
   download,
@@ -62,13 +62,29 @@ const graph = {
     addGraphItem(state, item) {
       state.data[`${state.editor.type}s`].push(item)
     },
-    deleteGraphItem(state, id) {
-      const type = state.editor.type
-      const items = state.data[`${type}s`]
-      for (let i = 0; i < items.length; i++) {
-        if (items[i].id === id) {
-          items.splice(i, 1)
-          break
+    deleteGraphItem(state, item) {
+      // console.log('[mutations] deleteGraphItem')
+      const { nodes, links } = state.data
+      const { nodeId, linksId } = item
+      if (linksId.length > 0) {
+        for (let i = 0; i < links.length; i++) {
+          const idx = linksId.indexOf(links[i].id)
+          if (idx >= 0) {
+            links.splice(i, 1)
+            linksId.splice(idx, 1)
+            if (linksId.length === 0) {
+              break
+            }
+            i--
+          }
+        }
+      }
+      if (nodeId != null) {
+        for (let i = 0; i < nodes.length; i++) {
+          if (nodes[i].id === nodeId) {
+            nodes.splice(i, 1)
+            break
+          }
         }
       }
     },
@@ -85,8 +101,17 @@ const graph = {
     }
   },
   actions: {
-    async graphInit({ commit, rootState }) {
-      const projectId = rootState.project.projectId
+    getProjectInfo: async ({ commit, state }) => {
+      const projectId = state.projectId
+      const res = await getProjectInfoAPI(projectId)
+      if (res.status === 200) {
+        commit('setProjectInfo', res.data)
+      } else {
+        console.log('getProjectInfo error')
+      }
+    },
+    async graphInit({ commit, state }) {
+      const projectId = state.projectId
       commit('setGraphProjectId', projectId)
       const res = await getGraphByProjectIdAPI(projectId)
       // const res = { status: 200, data: fakeGraphData }
@@ -168,7 +193,6 @@ const graph = {
       const res = await (type === 'node'
         ? graphUpdateNodeAPI(item)
         : graphUpdateRelAPI(item))
-      console.log(res)
       if (res.status === 200) {
         item = responseItemTranformer(type, res.data)
         item.x = x
@@ -177,38 +201,47 @@ const graph = {
         commit('setEditorEditable', false)
       } else {
         console.log('[action] editorUpdateCommit error, do fake')
-        item = responseItemTranformer(type, item)
-        item.x = x
-        item.y = y
-        commit('updateGraphItem', item)
-        commit('setEditorEditable', false)
+        // item = responseItemTranformer(type, item)
+        // item.x = x
+        // item.y = y
+        // commit('updateGraphItem', item)
+        // commit('setEditorEditable', false)
       }
     },
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
       if (!state.editor.createNew) {
-        // function clearNodes(linkId) {}
-        // function checkNode(nodeId) {}
-        // function clearLinks(nodeId) {
-        //   const links = state.data.links
-        //   for (let i = 0; i < links.length; i++) {
-        //     const { from, to } = links[i]
-        //     if (from === nodeId || to === nodeId) {
-        //       links.splice(i, 1)
-        //       i--
-        //       clearNodes(from === nodeId ? to : from)
-        //     }
-        //   }
-        // }
         const {
           type,
           item: { id }
         } = state.editor
-        let res = await (type === 'node'
-          ? graphDeleteNodeAPI(id)
-          : graphDeleteRelAPI(id))
-        if (res.status === 200) {
-          commit('deleteGraphItem', id)
+        const projectId = state.projectId
+        // get delete items
+        let item
+        if (type === 'node') {
+          const linksId = []
+          for (const link of state.data.links) {
+            if (link.from === id || link.to === id) {
+              linksId.push(link.id)
+            }
+          }
+          item = { nodeId: id, linksId }
+        } else {
+          item = { nodeId: null, linksId: [id] }
+        }
+        // delete requests
+        const requests = []
+        if (item.nodeId != null) {
+          requests.push(() =>
+            graphDeleteNodeAPI({ nodeId: item.nodeId, projectId })
+          )
+        }
+        item.linksId.forEach(relationId => {
+          requests.push(() => graphDeleteRelAPI({ relationId, projectId }))
+        })
+        const res = await Promise.all(requests.map(request => request()))
+        if (res) {
+          commit('deleteGraphItem', item)
           commit('setEditor')
         } else {
           console.log('[action] editorDeleteCommit error')
@@ -246,6 +279,7 @@ const graph = {
     }
   },
   getters: {
+    projectId: state => state.projectId,
     graphData: state => state.data,
     graphNodes: state => {
       const nodes = state.data.nodes

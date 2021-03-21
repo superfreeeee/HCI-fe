@@ -93,10 +93,10 @@ export default {
     ...mapGetters(['ownProjects', 'projectId'])
   },
   methods: {
-    ...mapMutations(['setProjectId']),
+    ...mapMutations(['setGraphProjectId']),
     ...mapActions(['createProject', 'getListByUserId']),
     gotoProject(id) {
-      this.setProjectId(id)
+      this.setGraphProjectId(id)
       this.$router.push(`/graph/${id}`)
     },
     createNewGraph() {
