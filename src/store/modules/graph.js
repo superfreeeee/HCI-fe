@@ -70,14 +70,25 @@ const graph = {
           break
         }
       }
+    },
+    updateGraphItem(state, item) {
+      const type = state.editor.type
+      const items = state.data[`${type}s`]
+      for (let i = 0; i < items.length; i++) {
+        if (items[i].id === item.id) {
+          items.splice(i, 1)
+          break
+        }
+      }
+      items.push(item)
     }
   },
   actions: {
     async graphInit({ commit, rootState }) {
       const projectId = rootState.project.projectId
       commit('setGraphProjectId', projectId)
-      // const res = await getGraphByProjectIdAPI(projectId)
-      const res = { status: 200, data: fakeGraphData }
+      const res = await getGraphByProjectIdAPI(projectId)
+      // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const { nodes, relations } = res.data
         const data = {
@@ -142,20 +153,32 @@ const graph = {
       }
     },
     // 提交 实体/关系 更新
-    async editorUpdateCommit({ state }, item) {
+    async editorUpdateCommit({ state, commit }, item) {
       consoleGroup('[action] editorUpdateCommit', () => {
         console.log({ ...item })
       })
       const type = state.editor.type
+      const { x, y } = item
       // form param item
       item = itemTransformer(type, item)
       // request
       const res = await (type === 'node'
         ? graphUpdateNodeAPI(item)
         : graphUpdateRelAPI(item))
+      console.log(res)
       if (res.status === 200) {
+        item = responseItemTranformer(type, res.data)
+        item.x = x
+        item.y = y
+        commit('updateGraphItem', item)
+        commit('setEditorEditable', false)
       } else {
-        console.log('[action] editorUpdateCommit error')
+        console.log('[action] editorUpdateCommit error, do fake')
+        item = responseItemTranformer(type, item)
+        item.x = x
+        item.y = y
+        commit('updateGraphItem', item)
+        commit('setEditorEditable', false)
       }
     },
     async editorDeleteCommit({ state, commit }) {
