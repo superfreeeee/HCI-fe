@@ -159,6 +159,7 @@ export default {
 }
 
 .box > .title {
+  width: 100%;
   margin: 0 auto;
   /* display: flex;
   justify-content: center;
