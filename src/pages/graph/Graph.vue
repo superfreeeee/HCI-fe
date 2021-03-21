@@ -49,11 +49,10 @@ export default {
     }
   },
   mounted() {
-    console.log('mounted graph', this.projectId)
-    this.getProjectInfo(this.projectId)
+    this.getProjectInfo()
   },
   computed: {
-    ...mapGetters(['graphData', 'projectId', 'projectInfo'])
+    ...mapGetters(['graphData', 'projectInfo'])
   },
   methods: {
     ...mapActions(['getProjectInfo']),
