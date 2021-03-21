@@ -2,6 +2,8 @@
 
 > co$in project frontend code
 
+http://39.97.124.144:8002/
+
 ## Build Setup
 
 ``` bash
