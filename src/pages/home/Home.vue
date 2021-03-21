@@ -1,7 +1,10 @@
 <template>
   <div class="box">
-    <div style="height: 20vh; width: 100vw; text-align: center">
+    <div class="home">
       <h1>欢迎使用 co$in</h1>
+      <el-button class="create" @click="createNewGraph()">
+        新建项目
+      </el-button>
     </div>
     <el-button
       v-for="project in ownProjects"
@@ -12,9 +15,6 @@
       @click="gotoProject(project.projectId)"
     >
       项目：{{ project.name }}
-    </el-button>
-    <el-button style="margin: 0" @click="createNewGraph()">
-      新建项目
     </el-button>
     <el-dialog
       title="新建知识图谱项目"
@@ -34,11 +34,15 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="知识图谱xml" prop="xml">
+          <el-radio-group size="mini" v-model="form.xml">
+            <el-radio label="空项目"></el-radio>
+            <el-radio label="xml导入"></el-radio>
+          </el-radio-group>
           <el-input
             type="textarea"
             placeholder="请输入知识图谱 xml"
             :autosize="{ minRows: 5, maxRows: 12 }"
-            v-model="form.xml"
+            v-if="form.xml === 'xml导入'"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -60,7 +64,7 @@ export default {
       form: {
         name: '',
         description: '',
-        xml: ''
+        xml: '空项目'
       },
       rules: {
         name: [{ required: true, message: '项目名称不能为空!' }],
@@ -96,10 +100,14 @@ export default {
           const projectParam = {
             name: this.form.name,
             description: this.form.description,
-            xml: this.form.xml,
             userId: 1
           }
-          console.log('projectParam', projectParam)
+          if(this.form.xml === '空项目') {
+            projectParam.xml = ''
+          }else {
+            projectParam.xml = this.form.xml
+          }
+          // console.log('projectParam', projectParam)
           this.createProject(projectParam)
             .then(() => {
               this.$router.push(`/graph/${this.projectId}`)
@@ -124,6 +132,20 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
+}
+
+.box > .home {
+  width: 100%; 
+  text-align: center;
+  position: sticky;
+  top: 0;
+  background-color: white;
+}
+
+.box > .home > .create {
+  margin: 0;
+  position: absolute;
+  top: 4vh;
+  right: 25%;
 }
 </style>
