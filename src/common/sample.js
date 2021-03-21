@@ -51,3 +51,56 @@ export const fakeProjects = [
     xml: 'string'
   }
 ]
+
+export const fakeXml = `
+<project>
+  <nodes>
+    <node>
+      <name>小智</name>
+      <group>1</group>
+      <val>6</val>
+    </node>
+    <node>
+      <name>杰尼龟</name>
+      <group>2</group>
+      <val>2</val>
+    </node>
+    <node>
+      <name>皮卡丘</name>
+      <group>2</group>
+      <val>4</val>
+    </node>
+    <node>
+      <name>陈彦泽</name>
+      <group>1</group>
+      <val>4</val>
+    </node>
+  </nodes>
+  <relations>
+    <relation>
+      <name>主人</name>
+      <source>1</source>
+      <target>2</target>
+      <val>2</val>
+    </relation>
+    <relation>
+      <name>主人</name>
+      <source>1</source>
+      <target>3</target>
+      <val>2</val>
+    </relation>
+    <relation>
+      <name>主人</name>
+      <source>2</source>
+      <target>4</target>
+      <val>4</val>
+    </relation>
+    <relation>
+      <name>朋友</name>
+      <source>2</source>
+      <target>3</target>
+      <val>5</val>
+    </relation>
+  </relations>
+</project>
+`

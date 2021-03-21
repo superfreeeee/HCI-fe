@@ -1,7 +1,10 @@
 <template>
   <div class="box">
-    <div style="height: 20vh; width: 100vw; text-align: center">
+    <div class="title">
       <h1>欢迎使用 co$in</h1>
+      <el-button icon="el-icon-plus" class="add" @click="createNewGraph()">
+        新建项目
+      </el-button>
     </div>
     <el-button
       v-for="project in ownProjects"
@@ -12,9 +15,6 @@
       @click="gotoProject(project.projectId)"
     >
       项目：{{ project.name }}
-    </el-button>
-    <el-button style="margin: 0" @click="createNewGraph()">
-      新建项目
     </el-button>
     <el-dialog
       title="新建知识图谱项目"
@@ -119,11 +119,39 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .box {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  text-align: center;
   height: 100vh;
+  padding: 0 32px 32px 32px;
+  box-sizing: border-box;
+  overflow: auto;
+}
+
+.box > .title {
+  margin: 0 auto;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  /* gap: 32px; */
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+}
+
+.box > .title > .add {
+  position: absolute;
+  right: -180px;
+  top: 25px;
+}
+
+.box > .options {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 }
 </style>
