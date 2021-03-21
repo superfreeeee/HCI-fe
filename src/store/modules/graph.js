@@ -13,7 +13,8 @@ import {
   download,
   itemTransformer,
   responseItemTranformer,
-  svgToPng
+  svgToPng,
+  xmlDownload
 } from '../../common/utils'
 import { fakeGraphData } from '../../common/sample'
 import { itemOptions, typeMapper } from '../../common/editor'
@@ -239,25 +240,7 @@ const graph = {
     },
     async saveAsXml(_, projectId) {
       const res = await exportProjectXmlAPI(projectId)
-
-      function stringToXml(xmlString) {
-        var xmlDoc
-        if (typeof xmlString == 'string') {
-          if (document.implementation.createDocument) {
-            var parser = new DOMParser()
-            xmlDoc = parser.parseFromString(xmlString, 'text/xml')
-          } else if (window.ActiveXObject) {
-            xmlDoc = new ActiveXObject('Microsoft.XMLDOM')
-            xmlDoc.async = false
-            xmlDoc.loadXML(xmlString)
-          }
-        } else {
-          xmlDoc = xmlString
-        }
-        return xmlDoc
-      }
-      const xmlObj = stringToXml(res.data.xml)
-      console.log('xmlObj', xmlObj)
+      xmlDownload(res.data.xml, `知识图谱-${projectId}.xml`)
     }
   },
   getters: {

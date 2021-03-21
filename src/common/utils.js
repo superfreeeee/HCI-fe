@@ -51,6 +51,22 @@ export const download = (name, dataUrl) => {
   a.click()
 }
 
+// 导出 xml 文件
+export const xmlDownload = (content, filename) => {
+  // 创建隐藏的可下载链接
+  const eleLink = document.createElement('a');
+  eleLink.download = filename;
+  eleLink.style.display = 'none';
+  // 字符内容转变成blob地址
+  const blob = new Blob([content], {type: "text/xml"});
+  eleLink.href = URL.createObjectURL(blob);
+  // 触发点击
+  document.body.appendChild(eleLink);
+  eleLink.click();
+  // 然后移除
+  document.body.removeChild(eleLink);
+}
+
 // 首字母大写
 export const capitalize = s => {
   if (!s) return ''

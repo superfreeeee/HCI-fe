@@ -45,11 +45,11 @@ export default {
   },
   data() {
     return {
-      showEditor: true
+      showEditor: false
     }
   },
   mounted() {
-    // console.log('mounted graph', this.projectId)
+    console.log('mounted graph', this.projectId)
     this.getProjectInfo(this.projectId)
   },
   computed: {
