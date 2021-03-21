@@ -21,7 +21,12 @@
       :visible.sync="showCreatePanel"
       width="45%"
     >
-      <el-form ref="form" :model="form" label-width="150px" :rules="rules">
+      <el-form 
+          ref="form" 
+          :model="form" 
+          label-width="150px" 
+          :rules="`${xmlInput}`? rulesWithXml : rulesWithoutXml"
+      >
         <el-form-item label="项目名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入项目名称"></el-input>
         </el-form-item>
@@ -34,15 +39,16 @@
           ></el-input>
         </el-form-item>
         <el-form-item label="知识图谱xml" prop="xml">
-          <el-radio-group size="mini" v-model="form.xml">
-            <el-radio label="空项目"></el-radio>
-            <el-radio label="xml导入"></el-radio>
+          <el-radio-group size="mini" v-model="xmlRadio">
+            <el-radio label="空项目" @change="disableXmlInput()"></el-radio>
+            <el-radio label="xml导入" @change="visibleXmlInput()"></el-radio>
           </el-radio-group>
           <el-input
             type="textarea"
             placeholder="请输入知识图谱 xml"
             :autosize="{ minRows: 5, maxRows: 12 }"
-            v-if="form.xml === 'xml导入'"
+            v-if="xmlInput"
+            v-model="form.xml"
           ></el-input>
         </el-form-item>
       </el-form>
@@ -64,12 +70,18 @@ export default {
       form: {
         name: '',
         description: '',
-        xml: '空项目'
+        xml: ''
       },
-      rules: {
+      xmlInput: false,
+      xmlRadio: '空项目',
+      rulesWithXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
         description: [{ required: true, message: '项目描述不能为空!' }],
         xml: [{ required: true, message: '知识图谱 xml 不能为空!' }]
+      },
+      rulesWithoutXml: {
+        name: [{ required: true, message: '项目名称不能为空!' }],
+        description: [{ required: true, message: '项目描述不能为空!' }],
       },
       showCreatePanel: false
     }
@@ -122,6 +134,12 @@ export default {
           console.log('error')
         }
       })
+    },
+    disableXmlInput() {
+      this.xmlInput = false
+    },
+    visibleXmlInput() {
+      this.xmlInput = true
     }
   }
 }
