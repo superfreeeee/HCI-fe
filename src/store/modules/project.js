@@ -24,8 +24,7 @@ const project = {
   },
   actions: {
     getProjectInfo: async ({ commit }, projectId) => {
-      // const res = await getProjectInfoAPI(projectId)
-      const res = { status: 200, data: fakeProjectInfo }
+      const res = await getProjectInfoAPI(projectId)
       if (res.status === 200) {
         commit('setProjectInfo', res.data)
       } else {
