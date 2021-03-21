@@ -135,8 +135,9 @@ const graph = {
         console.log({ ...item })
       })
       const type = state.editor.type
+      const projectId = state.projectId
       // form param item
-      item = itemTransformer(type, item)
+      item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
         ? graphInsertNodeAPI(item)
@@ -159,9 +160,10 @@ const graph = {
         console.log({ ...item })
       })
       const type = state.editor.type
+      const projectId = state.projectId
       const { x, y } = item
       // form param item
-      item = itemTransformer(type, item)
+      item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
         ? graphUpdateNodeAPI(item)
@@ -185,19 +187,19 @@ const graph = {
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
       if (!state.editor.createNew) {
-        function clearNodes(linkId) {}
-        function checkNode(nodeId) {}
-        function clearLinks(nodeId) {
-          const links = state.data.links
-          for (let i = 0; i < links.length; i++) {
-            const { from, to } = links[i]
-            if (from === nodeId || to === nodeId) {
-              links.splice(i, 1)
-              i--
-              clearNodes(from === nodeId ? to : from)
-            }
-          }
-        }
+        // function clearNodes(linkId) {}
+        // function checkNode(nodeId) {}
+        // function clearLinks(nodeId) {
+        //   const links = state.data.links
+        //   for (let i = 0; i < links.length; i++) {
+        //     const { from, to } = links[i]
+        //     if (from === nodeId || to === nodeId) {
+        //       links.splice(i, 1)
+        //       i--
+        //       clearNodes(from === nodeId ? to : from)
+        //     }
+        //   }
+        // }
         const {
           type,
           item: { id }
