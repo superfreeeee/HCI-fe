@@ -3,7 +3,7 @@
 #NODE_LIST="192.168.161.118 192.168.161.117"
 NODE_LIST="39.97.124.144"
 #应用部署到的远程服务器目录
-REMOTE_DIR="/opt/apache-tomcat-9.0.36/webapps/ROOT" 
+REMOTE_DIR="/opt/apache-tomcat-9.0.36/webapps" 
 #需要部署的项目名称（需和maven的project名一样,多个用空格分开）
 #NEED_DEPLOY_PROJECT="user-server user-mgr info-mgr"
 NEED_DEPLOY_PROJECT="coin-web"
@@ -23,6 +23,7 @@ JAR_DIR="/deploy/jar"
 CONFIG_DIR="/deploy/config"
 LOCK_FILE="/tmp/deploy.lock"
 REMOTE_JAVA_HOME="/opt/jdk-14.0.1/bin" 
+WORKSPACE="../"
 usage(){
     echo  $"Usage: $0 [projectJarPath] [ deploy | rollback ]"
 } 
@@ -52,7 +53,7 @@ scp_dist(){
     SOURCE_DIR=${JAR_DIR}/${CDATE}${CTIME}
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
-      scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
+      scp -r ../dist $node:${REMOTE_DIR}
       write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
     done
 } 
