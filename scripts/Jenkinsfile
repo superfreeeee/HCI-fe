@@ -11,6 +11,6 @@ node {
     sh "npm run build"
   }   
   stage('Deploy') {
-      sh "/bin/bash '${workspace}/deploy.sh' ${workspace}"
+      sh "/bin/bash '${workspace}/scripts/deploy.sh' ${workspace}"
   }
 }
