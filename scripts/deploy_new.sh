@@ -53,7 +53,7 @@ scp_dist(){
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
       scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
-      write_log "Scp to ${node} complete."
+      write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
     done
 } 
 # 杀掉远程服务器上正在运行的项目
@@ -71,7 +71,7 @@ cluster_deploy(){
     write_log "Up all project on the cluster..."
     for project in $NEED_DEPLOY_PROJECT;do
       for node in $NODE_LIST;do
-        ssh $node "/opt/apache-tomcat-9.0.36/bin/start.sh"
+        ssh $node "/opt/apache-tomcat-9.0.36/bin/startup.sh"
       done
     done
 } 
