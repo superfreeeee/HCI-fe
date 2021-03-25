@@ -42,8 +42,9 @@ scp_dist(){
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
       scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
-      ssh $node "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT"
       write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
+      ssh $node "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT"
+      write_log "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT complete."
     done
 } 
 # 杀掉远程服务器上正在运行的项目
