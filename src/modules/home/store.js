@@ -1,7 +1,7 @@
 // import { fakeProjectInfo, fakeProjects } from '../../common/sample'
-import { getListByUserIdAPI, createProjectAPI } from '../../api/project'
+import { getListByUserIdAPI, createProjectAPI } from '@/api/project'
 
-const project = {
+const home = {
   state: {
     ownProjects: [],
     projectInfo: {}
@@ -43,4 +43,4 @@ const project = {
   }
 }
 
-export default project
+export default home

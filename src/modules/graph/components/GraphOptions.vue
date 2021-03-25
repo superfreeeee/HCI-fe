@@ -61,6 +61,16 @@ export default {
           handler: () => this.$emit('graph-action', 'unPinNodes')
         },
         {
+          label: '保存布局',
+          type: 'success',
+          handler: () => this.saveLayout()
+        },
+        {
+          label: '恢复布局',
+          type: 'success',
+          handler: () => this.restoreLayout()
+        },
+        {
           label: '保存为 png',
           type: 'warning',
           handler: () => this.saveAsPng()
@@ -74,10 +84,16 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['projectId']),
+    ...mapGetters(['projectId'])
   },
   methods: {
-    ...mapActions(['editorCreate', 'saveAsPng', 'saveAsXml']),
+    ...mapActions([
+      'editorCreate',
+      'saveLayout',
+      'restoreLayout',
+      'saveAsPng',
+      'saveAsXml'
+    ]),
     exportXml() {
       this.saveAsXml(this.projectId)
     }
