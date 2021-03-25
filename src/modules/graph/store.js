@@ -6,18 +6,13 @@ import {
   graphInsertRelAPI,
   graphUpdateNodeAPI,
   graphUpdateRelAPI
-} from '../../api/graph'
-import { exportProjectXmlAPI, getProjectInfoAPI } from '../../api/project'
-import {
-  consoleGroup,
-  download,
-  itemTransformer,
-  responseItemTranformer,
-  svgToPng,
-  xmlDownload
-} from '../../common/utils'
-import { fakeGraphData } from '../../common/sample'
-import { itemOptions, typeMapper } from '../../common/editor'
+} from '@/api/graph'
+import { exportProjectXmlAPI, getProjectInfoAPI } from '@/api/project'
+import { fakeGraphData } from '@/common/sample'
+import { consoleGroup } from '@/common/utils'
+import { itemOptions, typeMapper } from './utils/editor'
+import { svgToPng, download, xmlDownload } from './utils/saving'
+import { itemTransformer, responseItemTranformer } from './utils/item'
 
 const graph = {
   state: {
@@ -255,7 +250,7 @@ const graph = {
       }
     },
     // 布局相关
-    saveLayout({ state }) {
+    saveLayout({ state, commit }) {
       console.log('[action] saveLayout')
       const { nodes, links } = state.data
       console.log([...nodes])
