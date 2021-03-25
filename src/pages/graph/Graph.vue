@@ -49,7 +49,8 @@ export default {
     }
   },
   mounted() {
-    this.getProjectInfo()
+    const projectId = this.$route.params.projectId
+    this.getProjectInfo(projectId)
   },
   computed: {
     ...mapGetters(['graphData', 'projectInfo'])
