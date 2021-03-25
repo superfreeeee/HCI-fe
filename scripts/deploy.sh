@@ -78,7 +78,7 @@ main(){
     # shell_lock;
     touch ${LOCK_FILE}
     cluster_node_remove;
-    scp_dist WORKSPACE;
+    scp_dist ${WORKSPACE};
     cluster_deploy;
     shell_unlock;
     usage;
