@@ -87,22 +87,17 @@ main(){
     fi
     WORKSPACE=$1
     DEPLOY_METHOD=$2
-    init;
-    case $DEPLOY_METHOD in
-    deploy)
-        shell_lock;
-        cluster_node_remove;
-        scp_dist;
-        cluster_deploy;
-        shell_unlock;
-        ;;
-    rollback)
-        shell_lock;
-        rollback;
-        shell_unlock;
-        ;;
-    *)
-        usage;
-    esac 
+    # shell_lock;
+    touch ${LOCK_FILE}
+    cluster_node_remove;
+    # scp_dist;
+    write_log "Scp jar file to remote machine..."
+    for node in $NODE_LIST;do
+      scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
+      write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
+    done
+    cluster_deploy;
+    shell_unlock;
+    usage;
 }
 main $1 $2
