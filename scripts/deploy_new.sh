@@ -53,7 +53,8 @@ scp_dist(){
     SOURCE_DIR=${JAR_DIR}/${CDATE}${CTIME}
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
-      scp -r ../dist $node:${REMOTE_DIR}
+      scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
+      ssh $node "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT"
       write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
     done
 } 
@@ -90,12 +91,7 @@ main(){
     # shell_lock;
     touch ${LOCK_FILE}
     cluster_node_remove;
-    # scp_dist;
-    write_log "Scp jar file to remote machine..."
-    for node in $NODE_LIST;do
-      scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
-      write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
-    done
+    scp_dist WORKSPACE;
     cluster_deploy;
     shell_unlock;
     usage;
