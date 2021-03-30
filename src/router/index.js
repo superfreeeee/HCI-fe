@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '../pages/home/Home.vue'
+import Home from '../views/Home.vue'
 
 Vue.use(Router)
 
@@ -14,7 +14,7 @@ export default new Router({
     {
       path: '/graph/:projectId',
       name: 'Graph',
-      component: () => import('@/pages/graph/Graph.vue')
-    },
+      component: () => import('@/views/Graph.vue')
+    }
   ]
 })

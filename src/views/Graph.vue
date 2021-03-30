@@ -31,9 +31,9 @@
 </template>
 
 <script>
-import GraphBoard from './components/GraphBoard'
-import GraphOptions from './components/GraphOptions'
-import GraphEditor from './components/GraphEditor'
+import GraphBoard from '../modules/graph/components/GraphBoard'
+import GraphOptions from '../modules/graph/components/GraphOptions'
+import GraphEditor from '../modules/graph/components/GraphEditor'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -49,7 +49,8 @@ export default {
     }
   },
   mounted() {
-    this.getProjectInfo()
+    const projectId = this.$route.params.projectId
+    this.getProjectInfo(projectId)
   },
   computed: {
     ...mapGetters(['graphData', 'projectInfo'])

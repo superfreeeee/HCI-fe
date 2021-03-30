@@ -159,20 +159,21 @@ export default {
 }
 
 .box > .title {
-  margin: 0 auto;
   /* display: flex;
   justify-content: center;
   align-items: center; */
   /* gap: 32px; */
   position: sticky;
+  width: 100%;
+  height: 20%;
   top: 0;
   background-color: #ffffff;
 }
 
 .box > .title > .add {
-  position: absolute;
-  right: -180px;
-  top: 25px;
+  position: relative;
+  right: -200px;
+  top: -50px;
 }
 
 .box > .options {
