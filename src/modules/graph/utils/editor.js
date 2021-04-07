@@ -1,3 +1,4 @@
+// 编辑面板属性
 export const itemOptions = {
   node: [
     { label: '实体名称', attr: 'name', holder: '实体名称', type: 'input' },
@@ -12,6 +13,7 @@ export const itemOptions = {
   ]
 }
 
+// 对象映射
 export const typeMapper = {
   node: '实体',
   link: '关系'

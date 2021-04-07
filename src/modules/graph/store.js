@@ -1,26 +1,18 @@
-import {
-  getGraphByProjectIdAPI,
-  graphDeleteNodeAPI,
-  graphDeleteRelAPI,
-  graphInsertNodeAPI,
-  graphInsertRelAPI,
-  graphUpdateNodeAPI,
-  graphUpdateRelAPI
-} from '@/api/graph'
-import { exportProjectXmlAPI, getProjectInfoAPI } from '@/api/project'
-import { fakeGraphData } from '@/common/sample'
+import api from '@/api/dispatcher'
 import { consoleGroup } from '@/common/utils'
+// import { fakeGraphData } from '@/common/sample'
+
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemTransformer, responseItemTranformer } from './utils/item'
+import { saveLayout } from './utils/layout'
 
 const graph = {
   state: {
     projectId: -1,
     data: {
-      // projectId,
-      // nodes,
-      // links
+      nodes: [],
+      links: []
     },
     svg: null,
     editor: {
@@ -38,10 +30,10 @@ const graph = {
     setGraphData(state, data) {
       state.data = data
     },
-    setGraphNodes(state, nodes) {
+    setGraphNodes(state, nodes = []) {
       state.data.nodes = nodes
     },
-    setGraphLinks(state, links) {
+    setGraphLinks(state, links = []) {
       state.data.nodes = links
     },
     setGraphSvg(state, svg) {
@@ -100,21 +92,10 @@ const graph = {
     }
   },
   actions: {
-    getProjectInfo: async ({ commit, state }, projectId) => {
-      if (projectId === state.projectId) return true
-      const res = await getProjectInfoAPI(projectId)
-      if (res.status === 200) {
-        commit('setProjectInfo', res.data)
-        return true
-      } else {
-        console.log('getProjectInfo error')
-        return false
-      }
-    },
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
       commit('setGraphProjectId', projectId)
-      const res = await getGraphByProjectIdAPI(projectId)
+      const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const { nodes, relations } = res.data
@@ -166,8 +147,8 @@ const graph = {
       item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? graphInsertNodeAPI(item)
-        : graphInsertRelAPI(item))
+        ? api.graphInsertNode(item)
+        : api.graphInsertRel(item))
       if (res.status === 200) {
         // solve response item
         item = responseItemTranformer(type, res.data)
@@ -192,8 +173,8 @@ const graph = {
       item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? graphUpdateNodeAPI(item)
-        : graphUpdateRelAPI(item))
+        ? api.graphUpdateNode(item)
+        : api.graphUpdateRel(item))
       if (res.status === 200) {
         item = responseItemTranformer(type, res.data)
         item.x = x
@@ -234,11 +215,11 @@ const graph = {
         const requests = []
         if (item.nodeId != null) {
           requests.push(() =>
-            graphDeleteNodeAPI({ nodeId: item.nodeId, projectId })
+            api.graphDeleteNode({ nodeId: item.nodeId, projectId })
           )
         }
         item.linksId.forEach(relationId => {
-          requests.push(() => graphDeleteRelAPI({ relationId, projectId }))
+          requests.push(() => api.graphDeleteRel({ relationId, projectId }))
         })
         const res = await Promise.all(requests.map(request => request()))
         if (res) {
@@ -250,13 +231,17 @@ const graph = {
       }
     },
     // 布局相关
-    saveLayout({ state, commit }) {
+    async saveLayout({ state, commit }) {
       console.log('[action] saveLayout')
-      const { nodes, links } = state.data
+      const projectId = state.projectId
+
+      const nodes = state.data.nodes
       console.log([...nodes])
-      console.log([...links])
-      const aLayout = { nodes: [] }
-      commit('setRecentLayout', aLayout)
+      const layout = saveLayout(nodes)
+      console.log(layout)
+
+      const res = await api.updateLayout(projectId, layout)
+      if (res) commit('setRecentLayout', aLayout)
     },
     restoreLayout({ state }) {
       console.log('[action] restoreLayout')
@@ -267,28 +252,17 @@ const graph = {
       console.log('[action] saveAsPng')
       const projectId = state.projectId
       const svg = state.svg
-      const width = svg._groups[0][0].width.baseVal.value
-      const height = svg._groups[0][0].height.baseVal.value
-      // const {
-      //   _groups: [
-      //     [
-      //       {
-      //         width: {
-      //           baseVal: { value: width }
-      //         },
-      //         height: {
-      //           baseVal: { value: height }
-      //         }
-      //       }
-      //     ]
-      //   ]
-      // } = svg
+
+      const group = svg._groups[0][0]
+      const width = group.width.baseVal.value
+      const height = group.height.baseVal.value
+
       svgToPng(svg, width, height).then(dataUrl => {
         download(`知识图谱-${projectId}.png`, dataUrl)
       })
     },
     async saveAsXml(_, projectId) {
-      const res = await exportProjectXmlAPI(projectId)
+      const res = await api.exportProjectXml(projectId)
       xmlDownload(res.data.xml, `知识图谱-${projectId}.xml`)
     }
   },
