@@ -36,11 +36,6 @@ export default {
           }
         },
         {
-          label: '批量新增',
-          type: 'primary',
-          handler: () => {}
-        },
-        {
           label: '重置缩放',
           type: 'info',
           handler: () => this.$emit('graph-action', 'zoomReset')

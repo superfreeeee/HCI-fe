@@ -23,6 +23,10 @@ export default {
     graphDeleteRel(relation) {
       return { path: '/deleteRel', method: 'POST', data: relation }
     },
+    /* 级联删除实体 */
+    graphDeleteNodeCascade(node) {
+      return { path: '/cascadeDeleteNode', method: 'POST', data: node }
+    },
 
     /* 更新实体 */
     graphUpdateNode(node) {

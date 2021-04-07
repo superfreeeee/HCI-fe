@@ -1,11 +1,12 @@
 import api from '@/api/dispatcher'
 import { consoleGroup } from '@/common/utils'
+import { $notify, $confirm } from '@/common/message'
 // import { fakeGraphData } from '@/common/sample'
 
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemTransformer, responseItemTranformer } from './utils/item'
-import { saveLayout } from './utils/layout'
+import { restoreLayout, saveLayout } from './utils/layout'
 
 const graph = {
   state: {
@@ -21,13 +22,13 @@ const graph = {
       item: null,
       editable: true
     },
-    recentLayout: null // later change to history layout
+    recentLayout: [] // later change to history layout
   },
   mutations: {
     setGraphProjectId(state, id) {
       state.projectId = id
     },
-    setGraphData(state, data) {
+    setGraphData(state, data = { nodes: [], links: [] }) {
       state.data = data
     },
     setGraphNodes(state, nodes = []) {
@@ -54,19 +55,11 @@ const graph = {
       // console.log('[mutations] deleteGraphItem')
       const { nodes, links } = state.data
       const { nodeId, linksId } = item
+      // 删除关系
       if (linksId.length > 0) {
-        for (let i = 0; i < links.length; i++) {
-          const idx = linksId.indexOf(links[i].id)
-          if (idx >= 0) {
-            links.splice(i, 1)
-            linksId.splice(idx, 1)
-            if (linksId.length === 0) {
-              break
-            }
-            i--
-          }
-        }
+        state.data.links = links.filter(link => !linksId.includes(link.id))
       }
+      // 删除实体
       if (nodeId != null) {
         for (let i = 0; i < nodes.length; i++) {
           if (nodes[i].id === nodeId) {
@@ -157,8 +150,12 @@ const graph = {
         })
         commit('addGraphItem', item)
         dispatch('editorSelect', { type, id: item.id })
+        $notify(`添加${typeMapper[type]}成功`, 'success')
       } else {
-        console.log('[action] editorCreateCommit error')
+        consoleGroup('[action] editorCreateCommit error', () => {
+          console.log(res)
+        })
+        $notify(`添加${typeMapper[type]}失败`, 'error')
       }
     },
     // 提交 实体/关系 更新
@@ -181,25 +178,27 @@ const graph = {
         item.y = y
         commit('updateGraphItem', item)
         commit('setEditorEditable', false)
+        $notify(`修改${typeMapper[type]}成功`, 'success')
       } else {
         console.log('[action] editorUpdateCommit error, do fake')
-        // item = responseItemTranformer(type, item)
-        // item.x = x
-        // item.y = y
-        // commit('updateGraphItem', item)
-        // commit('setEditorEditable', false)
+        $notify(`修改${typeMapper[type]}失败`, 'error')
       }
     },
+    // 提交 实体/关系 删除
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
-      if (!state.editor.createNew) {
+      const type = state.editor.type
+      if (
+        !state.editor.createNew &&
+        (await $confirm(`删除${typeMapper[type]}`, '确定删除？'))
+      ) {
         const {
           type,
           item: { id }
         } = state.editor
         const projectId = state.projectId
         // get delete items
-        let item
+        let item, res
         if (type === 'node') {
           const linksId = []
           for (const link of state.data.links) {
@@ -208,44 +207,47 @@ const graph = {
             }
           }
           item = { nodeId: id, linksId }
+          res = await api.graphDeleteNodeCascade({ nodeId: id, projectId })
         } else {
           item = { nodeId: null, linksId: [id] }
+          res = await api.graphDeleteRel({ relationId: id, projectId })
         }
-        // delete requests
-        const requests = []
-        if (item.nodeId != null) {
-          requests.push(() =>
-            api.graphDeleteNode({ nodeId: item.nodeId, projectId })
-          )
-        }
-        item.linksId.forEach(relationId => {
-          requests.push(() => api.graphDeleteRel({ relationId, projectId }))
-        })
-        const res = await Promise.all(requests.map(request => request()))
         if (res) {
           commit('deleteGraphItem', item)
           commit('setEditor')
+          $notify(`删除${typeMapper[type]}成功`, 'success')
         } else {
           console.log('[action] editorDeleteCommit error')
+          $notify(`删除${typeMapper[type]}失败`, 'error')
         }
       }
     },
-    // 布局相关
+    // 保存布局
     async saveLayout({ state, commit }) {
-      console.log('[action] saveLayout')
       const projectId = state.projectId
-
       const nodes = state.data.nodes
-      console.log([...nodes])
       const layout = saveLayout(nodes)
-      console.log(layout)
+      consoleGroup('[action] saveLayout', () => {
+        console.log('nodes', nodes)
+        console.log('layout', layout)
+      })
+      commit('setRecentLayout', layout)
 
-      const res = await api.updateLayout(projectId, layout)
-      if (res) commit('setRecentLayout', aLayout)
+      // const res = await api.updateLayout(projectId, layout)
+      // if (res) commit('setRecentLayout', layout)
     },
-    restoreLayout({ state }) {
-      console.log('[action] restoreLayout')
-      console.log(state.recentLayout)
+    // 恢复布局
+    restoreLayout({ state, commit }) {
+      const {
+        data: { nodes },
+        recentLayout: layout
+      } = state
+      const newNodes = restoreLayout(nodes, layout)
+      consoleGroup('[action] restoreLayout', () => {
+        console.log('layout', layout)
+        console.log('nodes', newNodes)
+      })
+      commit('setGraphNodes', newNodes)
     },
     // 持久化相关
     saveAsPng({ state }) {
