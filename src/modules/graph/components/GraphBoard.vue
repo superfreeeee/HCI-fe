@@ -357,6 +357,7 @@ export default {
     }
   },
   mounted() {
+    console.log('graph mounted')
     const projectId = this.$route.params.projectId
     console.log(`[GraphBoard] mounted, projectId = ${projectId}`)
     this.graphInit(projectId).then(() => this.init())

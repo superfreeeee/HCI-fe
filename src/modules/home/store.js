@@ -1,6 +1,5 @@
 // import { fakeProjectInfo, fakeProjects } from '../../common/sample'
 import api from '@/api/dispatcher'
-console.log(api)
 
 const home = {
   state: {

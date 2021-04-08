@@ -241,6 +241,7 @@
 ```ts
 {
     "projectId": Number,
+    "type": String, // 'force' | 'grid' | 'free'
     "nodes": [
         {
             "nodeId": Number,

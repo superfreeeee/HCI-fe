@@ -1,9 +1,21 @@
+import { responseItemTranformer } from '../../modules/graph/utils/item'
+
 export default {
   prefix: '/graph',
   configs: {
     /* 获取图谱 */
     getGraphByProjectId(projectId) {
-      return { path: `/${projectId}` }
+      return {
+        path: `/${projectId}`,
+        mapper(data) {
+          const { nodes, relations, ...rest } = data
+          return {
+            ...rest,
+            nodes: nodes.map(n => responseItemTranformer('node', n)),
+            links: relations.map(r => responseItemTranformer('link', r))
+          }
+        }
+      }
     },
 
     /* 插入实体 */

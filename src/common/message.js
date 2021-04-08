@@ -1,10 +1,11 @@
 import { Notification, MessageBox } from 'element-ui'
 
-export const $notify = (
+export const $notify = ({
   title = '通知 Title',
   type = 'info',
+  message = '',
   duration = 3000
-) => {
+} = {}) => {
   Notification({
     title,
     duration,

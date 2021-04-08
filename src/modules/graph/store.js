@@ -19,6 +19,7 @@ const graph = {
     editor: {
       type: '', // 'node' | 'link' | ''
       createNew: true,
+      select: '',
       item: null,
       editable: true
     },
@@ -35,18 +36,35 @@ const graph = {
       state.data.nodes = nodes
     },
     setGraphLinks(state, links = []) {
-      state.data.nodes = links
+      state.data.links = links
     },
     setGraphSvg(state, svg) {
       state.svg = svg
     },
-    setEditor(state, { type = '', item = null, createNew = true } = {}) {
+    setEditor(
+      state,
+      { type = '', item = null, createNew = true, select = '' } = {}
+    ) {
       state.editor.type = type
       state.editor.item = item
+      state.editor.select = select
       state.editor.createNew = createNew
+    },
+    setEditorSelect(state, select = '') {
+      if (state.editor.select === select) {
+        select = ''
+      }
+      console.log(`select = '${select}'`)
+      state.editor.select = select
+      if (select !== '') {
+        $notify({ title: '点击目标实体', message: '再次点击取消选择' })
+      }
     },
     setEditorEditable(state, bool) {
       state.editor.editable = bool
+    },
+    setEditorItem(state, item) {
+      state.editor.item = item
     },
     addGraphItem(state, item) {
       state.data[`${state.editor.type}s`].push(item)
@@ -91,11 +109,8 @@ const graph = {
       const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        const { nodes, relations } = res.data
-        const data = {
-          nodes: nodes.map(n => responseItemTranformer('node', n)),
-          links: relations.map(r => responseItemTranformer('link', r))
-        }
+        const data = res.data
+        console.log('graph init', data)
         commit('setGraphData', data)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
@@ -110,14 +125,21 @@ const graph = {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
-      const items = state.data[`${type}s`]
-      const rest = items.filter(item => item.id === id)
-      // console.log(rest)
-      if (rest.length > 0) {
-        commit('setEditor', { type, item: { ...rest[0] }, createNew: false })
-        commit('setEditorEditable', false)
+      const { select: selection, item } = state.editor
+      if (selection) {
+        if (type === 'node') {
+          commit('setEditorItem', { ...item, [selection]: id })
+          commit('setEditorSelect', '')
+        }
       } else {
-        console.log(`[action] editorSelect, id = ${id} not found`)
+        const items = state.data[`${type}s`]
+        const target = items.filter(item => item.id === id)[0]
+        if (target) {
+          commit('setEditor', { type, item: { ...target }, createNew: false })
+          commit('setEditorEditable', false)
+        } else {
+          console.log(`[action] editorSelect, id = ${id} not found`)
+        }
       }
     },
     // 创建 实体/关系
@@ -130,12 +152,14 @@ const graph = {
       commit('setEditorEditable', true)
     },
     // 提交 实体/关系 创建
-    async editorCreateCommit({ state, commit, dispatch }, item) {
+    async editorCreateCommit({ state, commit, dispatch }) {
+      let {
+        projectId,
+        editor: { item, type }
+      } = state
       consoleGroup('[action] editorCreateCommit', () => {
         console.log({ ...item })
       })
-      const type = state.editor.type
-      const projectId = state.projectId
       // form param item
       item = itemTransformer(type, item, projectId)
       // request
@@ -150,21 +174,23 @@ const graph = {
         })
         commit('addGraphItem', item)
         dispatch('editorSelect', { type, id: item.id })
-        $notify(`添加${typeMapper[type]}成功`, 'success')
+        $notify({ title: `添加${typeMapper[type]}成功`, type: 'success' })
       } else {
         consoleGroup('[action] editorCreateCommit error', () => {
           console.log(res)
         })
-        $notify(`添加${typeMapper[type]}失败`, 'error')
+        $notify({ title: `添加${typeMapper[type]}失败`, type: 'error' })
       }
     },
     // 提交 实体/关系 更新
-    async editorUpdateCommit({ state, commit }, item) {
+    async editorUpdateCommit({ state, commit }) {
+      let {
+        projectId,
+        editor: { item, type }
+      } = state
       consoleGroup('[action] editorUpdateCommit', () => {
         console.log({ ...item })
       })
-      const type = state.editor.type
-      const projectId = state.projectId
       const { x, y } = item
       // form param item
       item = itemTransformer(type, item, projectId)
@@ -178,10 +204,10 @@ const graph = {
         item.y = y
         commit('updateGraphItem', item)
         commit('setEditorEditable', false)
-        $notify(`修改${typeMapper[type]}成功`, 'success')
+        $notify({ title: `修改${typeMapper[type]}成功`, type: 'success' })
       } else {
         console.log('[action] editorUpdateCommit error, do fake')
-        $notify(`修改${typeMapper[type]}失败`, 'error')
+        $notify({ title: `修改${typeMapper[type]}失败`, type: 'error' })
       }
     },
     // 提交 实体/关系 删除
@@ -215,10 +241,10 @@ const graph = {
         if (res) {
           commit('deleteGraphItem', item)
           commit('setEditor')
-          $notify(`删除${typeMapper[type]}成功`, 'success')
+          $notify({ title: `删除${typeMapper[type]}成功`, type: 'success' })
         } else {
           console.log('[action] editorDeleteCommit error')
-          $notify(`删除${typeMapper[type]}失败`, 'error')
+          $notify({ title: `删除${typeMapper[type]}失败`, type: 'error' })
         }
       }
     },
@@ -271,14 +297,8 @@ const graph = {
   getters: {
     projectId: state => state.projectId,
     graphData: state => state.data,
-    graphNodes: state => {
-      const nodes = state.data.nodes
-      return nodes ? nodes : []
-    },
-    graphLinks: state => {
-      const links = state.data.links
-      return links ? links : []
-    },
+    graphNodes: state => state.data.nodes,
+    graphLinks: state => state.data.links,
     graphSvg: state => state.svg,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
@@ -293,6 +313,7 @@ const graph = {
       !state.editor.type ? [] : itemOptions[state.editor.type],
     graphEditorItem: state => state.editor.item,
     graphEditorCreateNew: state => state.editor.createNew,
+    graphEditorSelect: state => state.editor.select,
     graphEditorEditable: state => state.editor.editable
   }
 }
