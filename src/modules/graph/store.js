@@ -1,59 +1,70 @@
-import {
-  getGraphByProjectIdAPI,
-  graphDeleteNodeAPI,
-  graphDeleteRelAPI,
-  graphInsertNodeAPI,
-  graphInsertRelAPI,
-  graphUpdateNodeAPI,
-  graphUpdateRelAPI
-} from '@/api/graph'
-import { exportProjectXmlAPI, getProjectInfoAPI } from '@/api/project'
-import { fakeGraphData } from '@/common/sample'
+import api from '@/api/dispatcher'
 import { consoleGroup } from '@/common/utils'
+import { $notify, $confirm } from '@/common/message'
+// import { fakeGraphData } from '@/common/sample'
+
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemTransformer, responseItemTranformer } from './utils/item'
+import { restoreLayout, saveLayout } from './utils/layout'
 
 const graph = {
   state: {
     projectId: -1,
     data: {
-      // projectId,
-      // nodes,
-      // links
+      nodes: [],
+      links: []
     },
     svg: null,
     editor: {
       type: '', // 'node' | 'link' | ''
       createNew: true,
+      select: '',
       item: null,
       editable: true
     },
-    recentLayout: null // later change to history layout
+    recentLayout: [] // later change to history layout
   },
   mutations: {
     setGraphProjectId(state, id) {
       state.projectId = id
     },
-    setGraphData(state, data) {
+    setGraphData(state, data = { nodes: [], links: [] }) {
       state.data = data
     },
-    setGraphNodes(state, nodes) {
+    setGraphNodes(state, nodes = []) {
       state.data.nodes = nodes
     },
-    setGraphLinks(state, links) {
-      state.data.nodes = links
+    setGraphLinks(state, links = []) {
+      state.data.links = links
     },
     setGraphSvg(state, svg) {
       state.svg = svg
     },
-    setEditor(state, { type = '', item = null, createNew = true } = {}) {
+    setEditor(
+      state,
+      { type = '', item = null, createNew = true, select = '' } = {}
+    ) {
       state.editor.type = type
       state.editor.item = item
+      state.editor.select = select
       state.editor.createNew = createNew
+    },
+    setEditorSelect(state, select = '') {
+      if (state.editor.select === select) {
+        select = ''
+      }
+      console.log(`select = '${select}'`)
+      state.editor.select = select
+      if (select !== '') {
+        $notify({ title: '点击目标实体', message: '再次点击取消选择' })
+      }
     },
     setEditorEditable(state, bool) {
       state.editor.editable = bool
+    },
+    setEditorItem(state, item) {
+      state.editor.item = item
     },
     addGraphItem(state, item) {
       state.data[`${state.editor.type}s`].push(item)
@@ -62,19 +73,11 @@ const graph = {
       // console.log('[mutations] deleteGraphItem')
       const { nodes, links } = state.data
       const { nodeId, linksId } = item
+      // 删除关系
       if (linksId.length > 0) {
-        for (let i = 0; i < links.length; i++) {
-          const idx = linksId.indexOf(links[i].id)
-          if (idx >= 0) {
-            links.splice(i, 1)
-            linksId.splice(idx, 1)
-            if (linksId.length === 0) {
-              break
-            }
-            i--
-          }
-        }
+        state.data.links = links.filter(link => !linksId.includes(link.id))
       }
+      // 删除实体
       if (nodeId != null) {
         for (let i = 0; i < nodes.length; i++) {
           if (nodes[i].id === nodeId) {
@@ -100,28 +103,14 @@ const graph = {
     }
   },
   actions: {
-    getProjectInfo: async ({ commit, state }, projectId) => {
-      if (projectId === state.projectId) return true
-      const res = await getProjectInfoAPI(projectId)
-      if (res.status === 200) {
-        commit('setProjectInfo', res.data)
-        return true
-      } else {
-        console.log('getProjectInfo error')
-        return false
-      }
-    },
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
       commit('setGraphProjectId', projectId)
-      const res = await getGraphByProjectIdAPI(projectId)
+      const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        const { nodes, relations } = res.data
-        const data = {
-          nodes: nodes.map(n => responseItemTranformer('node', n)),
-          links: relations.map(r => responseItemTranformer('link', r))
-        }
+        const data = res.data
+        console.log('graph init', data)
         commit('setGraphData', data)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
@@ -136,14 +125,21 @@ const graph = {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
-      const items = state.data[`${type}s`]
-      const rest = items.filter(item => item.id === id)
-      // console.log(rest)
-      if (rest.length > 0) {
-        commit('setEditor', { type, item: { ...rest[0] }, createNew: false })
-        commit('setEditorEditable', false)
+      const { select: selection, item } = state.editor
+      if (selection) {
+        if (type === 'node') {
+          commit('setEditorItem', { ...item, [selection]: id })
+          commit('setEditorSelect', '')
+        }
       } else {
-        console.log(`[action] editorSelect, id = ${id} not found`)
+        const items = state.data[`${type}s`]
+        const target = items.filter(item => item.id === id)[0]
+        if (target) {
+          commit('setEditor', { type, item: { ...target }, createNew: false })
+          commit('setEditorEditable', false)
+        } else {
+          console.log(`[action] editorSelect, id = ${id} not found`)
+        }
       }
     },
     // 创建 实体/关系
@@ -156,18 +152,20 @@ const graph = {
       commit('setEditorEditable', true)
     },
     // 提交 实体/关系 创建
-    async editorCreateCommit({ state, commit, dispatch }, item) {
+    async editorCreateCommit({ state, commit, dispatch }) {
+      let {
+        projectId,
+        editor: { item, type }
+      } = state
       consoleGroup('[action] editorCreateCommit', () => {
         console.log({ ...item })
       })
-      const type = state.editor.type
-      const projectId = state.projectId
       // form param item
       item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? graphInsertNodeAPI(item)
-        : graphInsertRelAPI(item))
+        ? api.graphInsertNode(item)
+        : api.graphInsertRel(item))
       if (res.status === 200) {
         // solve response item
         item = responseItemTranformer(type, res.data)
@@ -176,49 +174,57 @@ const graph = {
         })
         commit('addGraphItem', item)
         dispatch('editorSelect', { type, id: item.id })
+        $notify({ title: `添加${typeMapper[type]}成功`, type: 'success' })
       } else {
-        console.log('[action] editorCreateCommit error')
+        consoleGroup('[action] editorCreateCommit error', () => {
+          console.log(res)
+        })
+        $notify({ title: `添加${typeMapper[type]}失败`, type: 'error' })
       }
     },
     // 提交 实体/关系 更新
-    async editorUpdateCommit({ state, commit }, item) {
+    async editorUpdateCommit({ state, commit }) {
+      let {
+        projectId,
+        editor: { item, type }
+      } = state
       consoleGroup('[action] editorUpdateCommit', () => {
         console.log({ ...item })
       })
-      const type = state.editor.type
-      const projectId = state.projectId
       const { x, y } = item
       // form param item
       item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? graphUpdateNodeAPI(item)
-        : graphUpdateRelAPI(item))
+        ? api.graphUpdateNode(item)
+        : api.graphUpdateRel(item))
       if (res.status === 200) {
         item = responseItemTranformer(type, res.data)
         item.x = x
         item.y = y
         commit('updateGraphItem', item)
         commit('setEditorEditable', false)
+        $notify({ title: `修改${typeMapper[type]}成功`, type: 'success' })
       } else {
         console.log('[action] editorUpdateCommit error, do fake')
-        // item = responseItemTranformer(type, item)
-        // item.x = x
-        // item.y = y
-        // commit('updateGraphItem', item)
-        // commit('setEditorEditable', false)
+        $notify({ title: `修改${typeMapper[type]}失败`, type: 'error' })
       }
     },
+    // 提交 实体/关系 删除
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
-      if (!state.editor.createNew) {
+      const type = state.editor.type
+      if (
+        !state.editor.createNew &&
+        (await $confirm(`删除${typeMapper[type]}`, '确定删除？'))
+      ) {
         const {
           type,
           item: { id }
         } = state.editor
         const projectId = state.projectId
         // get delete items
-        let item
+        let item, res
         if (type === 'node') {
           const linksId = []
           for (const link of state.data.links) {
@@ -227,82 +233,72 @@ const graph = {
             }
           }
           item = { nodeId: id, linksId }
+          res = await api.graphDeleteNodeCascade({ nodeId: id, projectId })
         } else {
           item = { nodeId: null, linksId: [id] }
+          res = await api.graphDeleteRel({ relationId: id, projectId })
         }
-        // delete requests
-        const requests = []
-        if (item.nodeId != null) {
-          requests.push(() =>
-            graphDeleteNodeAPI({ nodeId: item.nodeId, projectId })
-          )
-        }
-        item.linksId.forEach(relationId => {
-          requests.push(() => graphDeleteRelAPI({ relationId, projectId }))
-        })
-        const res = await Promise.all(requests.map(request => request()))
         if (res) {
           commit('deleteGraphItem', item)
           commit('setEditor')
+          $notify({ title: `删除${typeMapper[type]}成功`, type: 'success' })
         } else {
           console.log('[action] editorDeleteCommit error')
+          $notify({ title: `删除${typeMapper[type]}失败`, type: 'error' })
         }
       }
     },
-    // 布局相关
-    saveLayout({ state, commit }) {
-      console.log('[action] saveLayout')
-      const { nodes, links } = state.data
-      console.log([...nodes])
-      console.log([...links])
-      const aLayout = { nodes: [] }
-      commit('setRecentLayout', aLayout)
+    // 保存布局
+    async saveLayout({ state, commit }) {
+      const projectId = state.projectId
+      const nodes = state.data.nodes
+      const layout = saveLayout(nodes)
+      consoleGroup('[action] saveLayout', () => {
+        console.log('nodes', nodes)
+        console.log('layout', layout)
+      })
+      commit('setRecentLayout', layout)
+
+      // const res = await api.updateLayout(projectId, layout)
+      // if (res) commit('setRecentLayout', layout)
     },
-    restoreLayout({ state }) {
-      console.log('[action] restoreLayout')
-      console.log(state.recentLayout)
+    // 恢复布局
+    restoreLayout({ state, commit }) {
+      const {
+        data: { nodes },
+        recentLayout: layout
+      } = state
+      const newNodes = restoreLayout(nodes, layout)
+      consoleGroup('[action] restoreLayout', () => {
+        console.log('layout', layout)
+        console.log('nodes', newNodes)
+      })
+      commit('setGraphNodes', newNodes)
     },
     // 持久化相关
     saveAsPng({ state }) {
       console.log('[action] saveAsPng')
       const projectId = state.projectId
       const svg = state.svg
-      const width = svg._groups[0][0].width.baseVal.value
-      const height = svg._groups[0][0].height.baseVal.value
-      // const {
-      //   _groups: [
-      //     [
-      //       {
-      //         width: {
-      //           baseVal: { value: width }
-      //         },
-      //         height: {
-      //           baseVal: { value: height }
-      //         }
-      //       }
-      //     ]
-      //   ]
-      // } = svg
+
+      const group = svg._groups[0][0]
+      const width = group.width.baseVal.value
+      const height = group.height.baseVal.value
+
       svgToPng(svg, width, height).then(dataUrl => {
         download(`知识图谱-${projectId}.png`, dataUrl)
       })
     },
     async saveAsXml(_, projectId) {
-      const res = await exportProjectXmlAPI(projectId)
+      const res = await api.exportProjectXml(projectId)
       xmlDownload(res.data.xml, `知识图谱-${projectId}.xml`)
     }
   },
   getters: {
     projectId: state => state.projectId,
     graphData: state => state.data,
-    graphNodes: state => {
-      const nodes = state.data.nodes
-      return nodes ? nodes : []
-    },
-    graphLinks: state => {
-      const links = state.data.links
-      return links ? links : []
-    },
+    graphNodes: state => state.data.nodes,
+    graphLinks: state => state.data.links,
     graphSvg: state => state.svg,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
@@ -317,6 +313,7 @@ const graph = {
       !state.editor.type ? [] : itemOptions[state.editor.type],
     graphEditorItem: state => state.editor.item,
     graphEditorCreateNew: state => state.editor.createNew,
+    graphEditorSelect: state => state.editor.select,
     graphEditorEditable: state => state.editor.editable
   }
 }

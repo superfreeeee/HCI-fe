@@ -24,7 +24,7 @@
         >
       </div>
       <!-- 实体/关系属性编辑 -->
-      <el-form ref="editorItem" :model="item" label-width="80px">
+      <el-form ref="editorItem" :model="graphEditorItem" label-width="80px">
         <el-form-item
           v-for="option in graphEditorOptions"
           :key="option.attr"
@@ -36,23 +36,36 @@
             clearable
             :disabled="!graphEditorEditable"
             :placeholder="option.holder"
-            v-model="item[option.attr]"
+            v-model="graphEditorItem[option.attr]"
           ></el-input>
           <!-- 下拉框(source/target in link) -->
-          <el-select
-            v-else
-            clearable
-            :disabled="!graphEditorEditable"
-            :placeholder="option.holder"
-            v-model="item[option.attr]"
-          >
-            <el-option
-              v-for="node in graphNodes"
-              :key="node.id"
-              :label="node.name"
-              :value="node.id"
-            ></el-option>
-          </el-select>
+          <div v-else>
+            <el-select
+              clearable
+              :disabled="!graphEditorEditable"
+              :placeholder="option.holder"
+              v-model="graphEditorItem[option.attr]"
+              style="width: 170px"
+            >
+              <el-option
+                v-for="node in graphNodes"
+                :key="node.id"
+                :label="node.name"
+                :value="node.id"
+              ></el-option>
+            </el-select>
+            <el-button
+              title="点击选择目标节点"
+              :disabled="!graphEditorEditable"
+              :icon="
+                graphEditorSelect === option.attr
+                  ? 'el-icon-close'
+                  : 'el-icon-thumb'
+              "
+              @click="setEditorSelect(option.attr)"
+              @blur="setEditorSelect('')"
+            ></el-button>
+          </div>
         </el-form-item>
         <!-- 属性可选操作 -->
         <el-form-item class="options">
@@ -70,15 +83,12 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { itemOptions, typeMapper } from '../utils/editor'
+import { typeMapper } from '../utils/editor'
 
 export default {
   name: 'GraphEditor',
   data() {
-    return {
-      item: {},
-      itemOptions
-    }
+    return {}
   },
   computed: {
     ...mapGetters([
@@ -88,7 +98,8 @@ export default {
       'graphEditorTitle',
       'graphEditorOptions',
       'graphEditorCreateNew',
-      'graphEditorEditable'
+      'graphEditorEditable',
+      'graphEditorSelect'
     ]),
     typeStr() {
       return typeMapper[this.graphEditorType]
@@ -122,18 +133,18 @@ export default {
           : () =>
               this.editorSelect({
                 type: this.graphEditorType,
-                id: this.item.id
+                id: this.graphEditorItem.id
               })
       }
     }
   },
-  watch: {
-    graphEditorItem(item) {
-      this.item = { ...item }
-    }
-  },
   methods: {
-    ...mapMutations(['setEditor', 'setEditorEditable']),
+    ...mapMutations([
+      'setEditor',
+      'setEditorEditable',
+      'setEditorSelect',
+      'setEditorItem'
+    ]),
     ...mapActions([
       'editorSelect',
       'editorCreateCommit',
@@ -141,9 +152,11 @@ export default {
       'editorDeleteCommit'
     ]),
     resetItem() {
-      for (const prop in this.item) {
-        this.item[prop] = ''
-      }
+      const item = {}
+      this.graphEditorOptions.forEach(({ attr }) => {
+        item[attr] = ''
+      })
+      this.setEditorItem(item)
     },
     deleteCommit() {
       this.setEditor()

@@ -1,5 +1,5 @@
 // import { fakeProjectInfo, fakeProjects } from '../../common/sample'
-import { getListByUserIdAPI, createProjectAPI } from '@/api/project'
+import api from '@/api/dispatcher'
 
 const home = {
   state: {
@@ -16,7 +16,7 @@ const home = {
   },
   actions: {
     getListByUserId: async ({ commit }, userId) => {
-      const res = await getListByUserIdAPI(userId)
+      const res = await api.getListByUserId(userId)
       if (res.status === 200) {
         const projects = res.data
         commit('setOwnProjects', projects)
@@ -24,8 +24,19 @@ const home = {
         console.log('getListByUserId error')
       }
     },
+    getProjectInfo: async ({ commit, state }, projectId) => {
+      if (projectId === state.projectId) return true
+      const res = await api.getProjectInfo(projectId)
+      if (res.status === 200) {
+        commit('setProjectInfo', res.data)
+        return true
+      } else {
+        console.log('getProjectInfo error')
+        return false
+      }
+    },
     createProject: async ({ commit }, data) => {
-      const res = await createProjectAPI(data)
+      const res = await api.createProject(data)
       if (res.status === 200) {
         const projectInfo = res.data
         commit('setProjectInfo', projectInfo)
