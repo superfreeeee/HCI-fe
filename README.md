@@ -22,6 +22,8 @@ yarn test
 
 ## TODO
 
+### graph
+
 - [x] 实体/关系展示
 - [x] png 导出
 - [x] 实体/关系添加、更新、删除
@@ -31,6 +33,12 @@ yarn test
 - [x] 实体高亮
 - [x] 关系端点直接点击实体
 - [x] 实体/关系选中取消
-- [ ] 实体/关系修改状态保存提示
+- [x] 实体/关系修改状态保存提示
+- [ ] 布局保存/恢复
+- [ ] 
+
+### home
+
+### user
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
