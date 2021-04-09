@@ -6,6 +6,7 @@ import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemTransformer, responseItemTranformer } from './utils/item'
 import { restoreLayout, saveLayout } from './utils/layout'
+import { fakeGraphData } from '../../common/sample'
 
 const graph = {
   state: {
@@ -49,12 +50,13 @@ const graph = {
     },
     setEditor(
       state,
-      { type = '', item = null, createNew = true, select = '' } = {}
+      { type = '', item = null, createNew = true, select = '', focus = false } = {}
     ) {
       state.editor.type = type
       state.editor.item = item
       state.editor.select = select
       state.editor.createNew = createNew
+      state.board.focus = focus
     },
     setEditorSelect(state, select = '') {
       if (state.editor.select === select) {
@@ -76,7 +78,6 @@ const graph = {
       state.data[`${state.editor.type}s`].push(item)
     },
     deleteGraphItem(state, item) {
-      // console.log('[mutations] deleteGraphItem')
       const { nodes, links } = state.data
       const { nodeId, linksId } = item
       // 删除关系
@@ -112,14 +113,14 @@ const graph = {
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
       commit('setGraphProjectId', projectId)
-      const res = await api.getGraphByProjectId(projectId)
+      // const res = await api.getGraphByProjectId(projectId)
+      const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const data = res.data
-        console.log('graph init', data)
         commit('setGraphData', data)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
-          console.log({ ...data })
+          console.log('data', { ...data })
         })
       } else {
         console.log('error')
@@ -134,6 +135,12 @@ const graph = {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
+      if (type === 'cancel') {
+        if (state.editor.type) {
+          commit('setEditor')
+        }
+        return
+      }
       const { select, item } = state.editor
       if (select) {
         if (type === 'node') {

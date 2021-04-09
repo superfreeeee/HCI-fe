@@ -179,7 +179,6 @@ export default {
         .selectAll('circle')
         .data(graphNodes)
         .join('circle')
-        .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
         .attr('fill', d => scale(d.group))
         .attr('data-id', d => d.id)
@@ -201,13 +200,14 @@ export default {
         .style('fill', '#ffffff')
         .style('font', font)
         .style('user-select', 'none')
-        .style('pointer-events', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
         .attr('data-id', d => d.id)
         .text(d => d.name)
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
+        .on('mouseover', focus)
+        .on('mouseout', () => unfocus())
 
       /**
        * store selection
@@ -373,7 +373,7 @@ export default {
     },
     unfocus() {
       const { focusNode, graphBoardFocus, setFocus } = this
-      focusNode.remove()
+      if (focusNode) focusNode.remove()
       if (graphBoardFocus) {
         setFocus(graphBoardFocus)
       }
@@ -398,10 +398,14 @@ export default {
     },
     selectItemHandler(type) {
       return e => {
+        e.stopPropagation()
         const id = Number(e.target.attributes['data-id'].value)
         this.editorSelect({ type, id })
         this.$emit('editor-open')
       }
+    },
+    selectItemCanel() {
+      this.editorSelect({ type: 'cancel' })
     },
     /********** GraphOptions **********/
     backCenter() {
@@ -452,6 +456,10 @@ export default {
     const projectId = this.$route.params.projectId
     console.log(`[GraphBoard] mounted, projectId = ${projectId}`)
     this.graphInit(projectId).then(() => this.init())
+    this.$el.addEventListener('click', this.selectItemCanel)
+  },
+  destroyed() {
+    this.$el.removeEventListener('click', this.selectItemCanel)
   }
 }
 </script>

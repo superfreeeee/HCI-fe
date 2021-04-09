@@ -9,7 +9,7 @@
             type="text"
             size="small"
             icon="el-icon-arrow-left"
-            @click="setEditor()"
+            @click="editorSelect({ type: 'cancel' })"
             >返回</el-button
           >
           <h3>{{ graphEditorTitle }}</h3>

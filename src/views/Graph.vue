@@ -50,7 +50,7 @@ export default {
   },
   mounted() {
     const projectId = this.$route.params.projectId
-    this.getProjectInfo(projectId)
+    // this.getProjectInfo(projectId)
   },
   computed: {
     ...mapGetters(['graphData', 'projectInfo'])
