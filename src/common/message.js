@@ -9,19 +9,23 @@ export const $notify = ({
   Notification({
     title,
     duration,
+    message,
     type,
     position: 'bottom-left'
   })
 }
 
-export const $confirm = (
+export const $confirm = ({
   title = '确认框 Title',
-  message = '确认框 Message'
-) => {
+  message = '确认框 Message',
+  type = 'info',
+  confirmText = '确定',
+  cancelText = '再想想'
+}) => {
   return MessageBox.confirm(message, title, {
-    confirmButtonText: '确定',
-    cancelButtonText: '再想想',
-    type: 'warning'
+    confirmButtonText: confirmText,
+    cancelButtonText: cancelText,
+    type
   })
     .then(() => true)
     .catch(() => false)

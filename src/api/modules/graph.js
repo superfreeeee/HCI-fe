@@ -1,4 +1,7 @@
-import { responseItemTranformer } from '../../modules/graph/utils/item'
+import {
+  responseItemTranformer,
+  itemTransformer
+} from '@/modules/graph/utils/item'
 
 export default {
   prefix: '/graph',
@@ -19,44 +22,73 @@ export default {
     },
 
     /* 插入实体 */
-    graphInsertNode(node) {
-      return { path: '/insertNode', method: 'POST', data: node }
+    graphInsertNode(node, projectId) {
+      return {
+        path: '/insertNode',
+        method: 'POST',
+        data: itemTransformer('node', node, projectId)
+      }
     },
     /* 插入关系 */
-    graphInsertRel(relation) {
-      return { path: '/insertRel', method: 'POST', data: relation }
+    graphInsertRel(relation, projectId) {
+      return {
+        path: '/insertRel',
+        method: 'POST',
+        data: itemTransformer('link', relation, projectId)
+      }
     },
 
     /* 删除实体 */
-    graphDeleteNode(node) {
-      return { path: '/deleteNode', method: 'POST', data: node }
+    graphDeleteNode(nodeId, projectId) {
+      return {
+        path: '/deleteNode',
+        method: 'POST',
+        data: { nodeId, projectId }
+      }
     },
     /* 删除关系 */
-    graphDeleteRel(relation) {
-      return { path: '/deleteRel', method: 'POST', data: relation }
+    graphDeleteRel(relationId, projectId) {
+      return {
+        path: '/deleteRel',
+        method: 'POST',
+        data: { relationId, projectId }
+      }
     },
     /* 级联删除实体 */
-    graphDeleteNodeCascade(node) {
-      return { path: '/cascadeDeleteNode', method: 'POST', data: node }
+    graphDeleteNodeCascade(nodeId, projectId) {
+      return {
+        path: '/cascadeDeleteNode',
+        method: 'POST',
+        data: { nodeId, projectId }
+      }
     },
 
     /* 更新实体 */
-    graphUpdateNode(node) {
-      return { path: '/updateNode', method: 'POST', data: node }
+    graphUpdateNode(node, projectId) {
+      return {
+        path: '/updateNode',
+        method: 'POST',
+        data: itemTransformer('node', node, projectId)
+      }
     },
     /* 更新关系 */
-    graphUpdateRel(relation) {
-      return { path: '/updateRel', method: 'POST', data: relation }
+    graphUpdateRel(relation, projectId) {
+      return {
+        path: '/updateRel',
+        method: 'POST',
+        data: itemTransformer('link', relation, projectId)
+      }
     },
 
     /* 保存布局 */
-    updateLayout(projectId, layout) {
+    updateLayout(layout, type, projectId) {
       return {
         path: '/updateLayout',
         medhot: 'POST',
         data: {
+          nodes: layout,
           projectId,
-          nodes: layout
+          type
         }
       }
     }

@@ -1,26 +1,38 @@
-// g6 item 转 后端 item
+// d3 item 转 后端 item
 export const itemTransformer = (type, item, projectId) => {
-  if (type === 'node') {
-    // node
-    const { id: nodeId, name, group, radius: val } = item
-    return { projectId, nodeId, name, group, val }
-  } else {
-    // edge
-    const { id: relationId, name, from: source, to: target, value: val } = item
-    return { projectId, relationId, name, source, target, val }
-  }
+  return {
+    node({ id: nodeId, ...rest }) {
+      return { projectId, nodeId, ...rest }
+    },
+    link({ name, id: relationId, from: source, to: target, value: width }) {
+      return { projectId, relationId, name, source, target, width }
+    }
+  }[type](item)
 }
 
-// 后端 item 转 g6 item
+// 后端 item 转 d3 item
 export const responseItemTranformer = (type, item) => {
-  if (type === 'node') {
-    // node
-    const { nodeId: id, name, group, val: radius } = item
-    return { id, name, group, radius: Number(radius) }
-  } else {
-    // edge
-    const { relationId: id, name, source, target, val: value } = item
-    const [from, to] = [source, target]
-    return { id, name, source, target, from, to, value: Number(value) }
-  }
+  return {
+    node({ nodeId: id, projectId, ...rest }) {
+      return { id, ...rest }
+    },
+    link({ name, relationId: id, source, target, width: value }) {
+      return { name, id, source, target, value, from: source, to: target }
+    }
+  }[type](item)
+}
+
+export const itemVarify = (type, item) => {
+  return {
+    node({ radius, ...rest }) {
+      radius = +radius
+      return { radius, ...rest, properties: {} }
+    },
+    link({ width, from, to, ...rest }) {
+      width = +width
+      from = +from
+      to = +to
+      return { width, from, to, ...rest }
+    }
+  }[type](item)
 }

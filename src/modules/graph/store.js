@@ -4,9 +4,13 @@ import { $notify, $confirm } from '@/common/message'
 
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
-import { itemTransformer, responseItemTranformer } from './utils/item'
+import {
+  itemTransformer,
+  itemVarify,
+  responseItemTranformer
+} from './utils/item'
 import { restoreLayout, saveLayout } from './utils/layout'
-import { fakeGraphData } from '../../common/sample'
+// import { fakeGraphData } from '../../common/sample'
 
 const graph = {
   state: {
@@ -17,7 +21,8 @@ const graph = {
     },
     board: {
       svg: null,
-      focus: false
+      focus: false,
+      type: 'FORCE' // 'FORCE' | ''GRID | 'FREE'
     },
     svg: null,
     editor: {
@@ -27,7 +32,12 @@ const graph = {
       item: null,
       editable: true
     },
-    recentLayout: [] // later change to history layout
+    layouts: {
+      // later change to history layout
+      FORCE: [],
+      GRID: [],
+      FREE: []
+    }
   },
   mutations: {
     setGraphProjectId(state, id) {
@@ -50,7 +60,13 @@ const graph = {
     },
     setEditor(
       state,
-      { type = '', item = null, createNew = true, select = '', focus = false } = {}
+      {
+        type = '',
+        item = null,
+        createNew = true,
+        select = '',
+        focus = false
+      } = {}
     ) {
       state.editor.type = type
       state.editor.item = item
@@ -105,16 +121,16 @@ const graph = {
       }
       items.push(item)
     },
-    setRecentLayout(state, layout) {
-      state.recentLayout = layout
+    setLayout(state, { type = 'FORCE', layout }) {
+      state.layouts[type] = layout
     }
   },
   actions: {
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
       commit('setGraphProjectId', projectId)
-      // const res = await api.getGraphByProjectId(projectId)
-      const res = { status: 200, data: fakeGraphData }
+      const res = await api.getGraphByProjectId(projectId)
+      // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const data = res.data
         commit('setGraphData', data)
@@ -129,15 +145,40 @@ const graph = {
           type: 'error'
         })
       }
+      return res.status === 200
     },
     // 选取 实体/关系
-    editorSelect({ state, commit }, { type, id }) {
+    editorSelect({ state, commit, dispatch }, { type, id }) {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
       if (type === 'cancel') {
-        if (state.editor.type) {
-          commit('setEditor')
+        const { type: t, editable, item } = state.editor
+        if (t) {
+          if (editable) {
+            $confirm({
+              title: '当前物件修改未保存',
+              message: '是否保存修改?',
+              type: 'warning',
+              confirmText: '保存',
+              cancelText: '不保存'
+            }).then(confirmed => {
+              if (confirmed) {
+                console.log('确定修改', item, t)
+                dispatch(`editor${item.id ? 'Update' : 'Create'}Commit`).then(
+                  success => {
+                    if (success) {
+                      commit('setEditor')
+                    }
+                  }
+                )
+              } else {
+                commit('setEditor')
+              }
+            })
+          } else {
+            commit('setEditor')
+          }
         }
         return
       }
@@ -181,18 +222,17 @@ const graph = {
         projectId,
         editor: { item, type }
       } = state
+      item = itemVarify(type, item)
       consoleGroup('[action] editorCreateCommit', () => {
         console.log({ ...item })
       })
-      // form param item
-      item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? api.graphInsertNode(item)
-        : api.graphInsertRel(item))
+        ? api.graphInsertNode(item, projectId)
+        : api.graphInsertRel(item, projectId))
       if (res.status === 200) {
+        item.id = type === 'node' ? res.data.nodeId : res.data.relationId
         // solve response item
-        item = responseItemTranformer(type, res.data)
         consoleGroup('[action] editorCreateCommit', () => {
           console.log(item)
         })
@@ -205,6 +245,7 @@ const graph = {
         })
         $notify({ title: `添加${typeMapper[type]}失败`, type: 'error' })
       }
+      return res.status === 200
     },
     // 提交 实体/关系 更新
     async editorUpdateCommit({ state, commit }) {
@@ -212,27 +253,28 @@ const graph = {
         projectId,
         editor: { item, type }
       } = state
+      item = itemVarify(type, item)
       consoleGroup('[action] editorUpdateCommit', () => {
         console.log({ ...item })
       })
       const { x, y } = item
-      // form param item
-      item = itemTransformer(type, item, projectId)
       // request
       const res = await (type === 'node'
-        ? api.graphUpdateNode(item)
-        : api.graphUpdateRel(item))
+        ? api.graphUpdateNode(item, projectId)
+        : api.graphUpdateRel(item, projectId))
       if (res.status === 200) {
-        item = responseItemTranformer(type, res.data)
         item.x = x
         item.y = y
         commit('updateGraphItem', item)
         commit('setEditorEditable', false)
         $notify({ title: `修改${typeMapper[type]}成功`, type: 'success' })
       } else {
-        console.log('[action] editorUpdateCommit error, do fake')
+        consoleGroup('[action] editorUpdateCommit error', () => {
+          console.log(res)
+        })
         $notify({ title: `修改${typeMapper[type]}失败`, type: 'error' })
       }
+      return res.status === 200
     },
     // 提交 实体/关系 删除
     async editorDeleteCommit({ state, commit }) {
@@ -240,7 +282,11 @@ const graph = {
       const type = state.editor.type
       if (
         !state.editor.createNew &&
-        (await $confirm(`删除${typeMapper[type]}`, '确定删除？'))
+        (await $confirm({
+          title: `删除${typeMapper[type]}`,
+          message: '确定删除？',
+          type: 'warning'
+        }))
       ) {
         const {
           type,
@@ -257,12 +303,12 @@ const graph = {
             }
           }
           item = { nodeId: id, linksId }
-          res = await api.graphDeleteNodeCascade({ nodeId: id, projectId })
+          res = await api.graphDeleteNodeCascade(id, projectId)
         } else {
           item = { nodeId: null, linksId: [id] }
-          res = await api.graphDeleteRel({ relationId: id, projectId })
+          res = await api.graphDeleteRel(id, projectId)
         }
-        if (res) {
+        if (res.status === 200) {
           commit('deleteGraphItem', item)
           commit('setEditor')
           $notify({ title: `删除${typeMapper[type]}成功`, type: 'success' })
@@ -270,30 +316,36 @@ const graph = {
           console.log('[action] editorDeleteCommit error')
           $notify({ title: `删除${typeMapper[type]}失败`, type: 'error' })
         }
+        return res.status === 200
       }
     },
     // 保存布局
     async saveLayout({ state, commit }) {
-      const projectId = state.projectId
-      const nodes = state.data.nodes
+      const {
+        projectId,
+        data: { nodes },
+        board: { type }
+      } = state
       const layout = saveLayout(nodes)
       consoleGroup('[action] saveLayout', () => {
         console.log('nodes', nodes)
         console.log('layout', layout)
       })
-      commit('setRecentLayout', layout)
+      commit('setLayout', { type, layout })
 
       // const res = await api.updateLayout(projectId, layout)
       // if (res) commit('setRecentLayout', layout)
     },
     // 恢复布局
     restoreLayout({ state, commit }) {
+      const type = state.board.type
       const {
         data: { nodes },
-        recentLayout: layout
+        layouts: { [type]: layout }
       } = state
       const newNodes = restoreLayout(nodes, layout)
       consoleGroup('[action] restoreLayout', () => {
+        console.log('type', type)
         console.log('layout', layout)
         console.log('nodes', newNodes)
       })
