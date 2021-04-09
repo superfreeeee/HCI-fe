@@ -84,7 +84,7 @@ export default {
             message: res,
             type: 'success'
           })
-          // this.$router.push('/home')
+          this.$router.push('/home')
         })
         .catch(err => {
           this.$message({

@@ -1,13 +1,16 @@
 import api from '@/api/dispatcher'
-import { dispatch } from 'd3-dispatch'
 
 const user = {
     state: {
-        userInfo: {}
+        userInfo: {},
+        loginMsg: '',
     },
     mutations: {
         setUserInfo(state, data) {
             state.userInfo = data
+        },
+        setLoginMsg(state, data) {
+            state.loginMsg = data
         }
     },
     actions: {
@@ -21,18 +24,18 @@ const user = {
                 return ret
             }
             const res = await api.login(payload2Formdata(data))
-            // console.log('userLogin res', res)
+            commit('setLoginMsg', res.data.msg)
             if(res.status === 200) {
                 dispatch('getUserInfo')
-                return Promise.resolve(res.data.msg)
+                return Promise.resolve(this.loginMsg)
             } else {
-                return Promise.reject(res.data.msg)
+                return Promise.reject(this.loginMsg)
             }
         },
         getUserInfo: async({ commit }) => {
             const res = await api.userInfo()
-            // 這邊有問題，拿得到 res 可是裡面的 data 很怪
             // console.log('getUserInfo res', res)
+            commit('setUserInfo', res.data)
         },
         logout: async () => {
 

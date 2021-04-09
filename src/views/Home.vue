@@ -87,7 +87,7 @@ export default {
     }
   },
   mounted() {
-    this.getListByUserId(1)
+    this.getListByUserId(this.userInfo.id)
   },
   computed: {
     ...mapGetters(['ownProjects', 'projectId', 'userInfo'])
