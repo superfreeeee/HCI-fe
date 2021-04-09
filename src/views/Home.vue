@@ -90,7 +90,7 @@ export default {
     this.getListByUserId(1)
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId'])
+    ...mapGetters(['ownProjects', 'projectId', 'userInfo'])
   },
   methods: {
     ...mapMutations(['setGraphProjectId']),

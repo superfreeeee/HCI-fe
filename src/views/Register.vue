@@ -1,7 +1,18 @@
 <template>
   <div class="box">
-    <div class="login">
-      <div class="login-title">Register</div>
+    <div class="register">
+      <div class="register-title">
+        <span class="backLogin">
+          <el-button 
+          icon="el-icon-arrow-left" 
+          style="border: none"
+          circle
+          @click="gotoLogin()"
+          >
+          </el-button>
+        </span>
+        Register
+      </div>
       <el-form :model="ruleForm" 
                 status-icon :rules="rules" 
                 ref="ruleForm" 
@@ -126,6 +137,9 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
+    },
+    gotoLogin() {
+      this.$router.push('/')
     }
   }
 }
@@ -137,7 +151,8 @@ export default {
   justify-content: center;
 }
 
-.box > .login {
+.box > .register {
+  position: relative;
   width: 40vw;
   height: 60vh;
   position: fixed;
@@ -148,12 +163,17 @@ export default {
   padding: 10px;
 }
 
-.box > .login > .login-title {
+.box > .register > .register-title {
   text-align: center;
   font-size: 25px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;
+}
+
+.box > .register > .register-title > .backLogin {
+  position: absolute;
+  left: 10px;
 }
 </style>

@@ -34,6 +34,8 @@
 </template>
 
 <script>
+import { mapMutations, mapActions } from 'vuex'
+
 export default {
   name: 'Login',
   data() {
@@ -70,8 +72,26 @@ export default {
     };
   },
   methods: {
+    ...mapActions(['userLogin']),
     login() {
-      console.log('login')
+      const userInfo = {
+        username: this.ruleForm.username,
+        password: this.ruleForm.password
+      }
+      this.userLogin(userInfo)
+        .then(res => {
+          this.$message({
+            message: res,
+            type: 'success'
+          })
+          // this.$router.push('/home')
+        })
+        .catch(err => {
+          this.$message({
+            message: err,
+            type: 'error'
+          })
+        })
     },
     register() {
       this.$router.push('/register')
