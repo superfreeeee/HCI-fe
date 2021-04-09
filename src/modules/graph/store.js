@@ -1,12 +1,12 @@
 import api from '@/api/dispatcher'
 import { consoleGroup } from '@/common/utils'
 import { $notify, $confirm } from '@/common/message'
-// import { fakeGraphData } from '@/common/sample'
 
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemTransformer, responseItemTranformer } from './utils/item'
 import { restoreLayout, saveLayout } from './utils/layout'
+import { fakeGraphData } from '../../common/sample'
 
 const graph = {
   state: {
@@ -14,6 +14,10 @@ const graph = {
     data: {
       nodes: [],
       links: []
+    },
+    board: {
+      svg: null,
+      focus: false
     },
     svg: null,
     editor: {
@@ -38,17 +42,21 @@ const graph = {
     setGraphLinks(state, links = []) {
       state.data.links = links
     },
-    setGraphSvg(state, svg) {
-      state.svg = svg
+    setGraphBoardSvg(state, svg) {
+      state.board.svg = svg
+    },
+    setGraphBoardFocus(state, focus) {
+      state.board.focus = focus
     },
     setEditor(
       state,
-      { type = '', item = null, createNew = true, select = '' } = {}
+      { type = '', item = null, createNew = true, select = '', focus = false } = {}
     ) {
       state.editor.type = type
       state.editor.item = item
       state.editor.select = select
       state.editor.createNew = createNew
+      state.board.focus = focus
     },
     setEditorSelect(state, select = '') {
       if (state.editor.select === select) {
@@ -70,7 +78,6 @@ const graph = {
       state.data[`${state.editor.type}s`].push(item)
     },
     deleteGraphItem(state, item) {
-      // console.log('[mutations] deleteGraphItem')
       const { nodes, links } = state.data
       const { nodeId, linksId } = item
       // 删除关系
@@ -106,18 +113,21 @@ const graph = {
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
       commit('setGraphProjectId', projectId)
-      const res = await api.getGraphByProjectId(projectId)
-      // const res = { status: 200, data: fakeGraphData }
+      // const res = await api.getGraphByProjectId(projectId)
+      const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const data = res.data
-        console.log('graph init', data)
         commit('setGraphData', data)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
-          console.log({ ...data })
+          console.log('data', { ...data })
         })
       } else {
         console.log('error')
+        $notify({
+          title: '图谱初始化异常',
+          type: 'error'
+        })
       }
     },
     // 选取 实体/关系
@@ -125,10 +135,16 @@ const graph = {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
-      const { select: selection, item } = state.editor
-      if (selection) {
+      if (type === 'cancel') {
+        if (state.editor.type) {
+          commit('setEditor')
+        }
+        return
+      }
+      const { select, item } = state.editor
+      if (select) {
         if (type === 'node') {
-          commit('setEditorItem', { ...item, [selection]: id })
+          commit('setEditorItem', { ...item, [select]: id })
           commit('setEditorSelect', '')
         }
       } else {
@@ -137,8 +153,16 @@ const graph = {
         if (target) {
           commit('setEditor', { type, item: { ...target }, createNew: false })
           commit('setEditorEditable', false)
+          if (type === 'node') {
+            commit('setGraphBoardFocus', id)
+          }
         } else {
           console.log(`[action] editorSelect, id = ${id} not found`)
+          $notify({
+            title: '实体选择异常',
+            message: `实体 Id: ${id} Not found`,
+            type: 'error'
+          })
         }
       }
     },
@@ -279,7 +303,7 @@ const graph = {
     saveAsPng({ state }) {
       console.log('[action] saveAsPng')
       const projectId = state.projectId
-      const svg = state.svg
+      const svg = state.boardsvg
 
       const group = svg._groups[0][0]
       const width = group.width.baseVal.value
@@ -299,7 +323,8 @@ const graph = {
     graphData: state => state.data,
     graphNodes: state => state.data.nodes,
     graphLinks: state => state.data.links,
-    graphSvg: state => state.svg,
+    graphBoardSvg: state => state.board.svg,
+    graphBoardFocus: state => state.board.focus,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const body = typeMapper[state.editor.type]
