@@ -19,9 +19,9 @@ const user = {
     userLogin: async ({ commit, dispatch }, data) => {
       function payload2Formdata(data) {
         let ret = ''
-        for (let it in data) {
+        for (let item in data) {
           ret +=
-            encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+            encodeURIComponent(item) + '=' + encodeURIComponent(data[item]) + '&'
         }
         ret = ret.substring(0, ret.lastIndexOf('&'))
         return ret
