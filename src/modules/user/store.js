@@ -5,7 +5,6 @@ const user = {
     userInfo: {
       id: 1 // fake userId
     },
-    loginMsg: ''
   },
   mutations: {
     setUserInfo(state, data) {
@@ -27,12 +26,13 @@ const user = {
         return ret
       }
       const res = await api.login(payload2Formdata(data))
+      // console.log('userLogin res', res)
       commit('setLoginMsg', res.data.msg)
       if (res.status === 200) {
         dispatch('getUserInfo')
-        return Promise.resolve(this.loginMsg)
+        return Promise.resolve(res.data.msg)
       } else {
-        return Promise.reject(this.loginMsg)
+        return Promise.reject(res.data.msg)
       }
     },
     getUserInfo: async ({ commit }) => {

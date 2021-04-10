@@ -182,20 +182,20 @@ export default {
         password: this.loginForm.password,
       }
       console.log(userInfo)
-    //   this.userLogin(userInfo)
-    //     .then((res) => {
-    //       this.$message({
-    //         message: res,
-    //         type: 'success',
-    //       })
-    //       this.$router.push('/home')
-    //     })
-    //     .catch((err) => {
-    //       this.$message({
-    //         message: err,
-    //         type: 'error',
-    //       })
-    //     })
+      this.userLogin(userInfo)
+        .then((res) => {
+          this.$message({
+            message: res,
+            type: 'success',
+          })
+          this.$router.push('/home')
+        })
+        .catch((err) => {
+          this.$message({
+            message: err,
+            type: 'error',
+          })
+        })
     },
     submit() {
         const userInfo = {
