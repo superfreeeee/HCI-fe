@@ -28,7 +28,7 @@
         <el-form-item>
           <el-button type="success" @click="login()">登录</el-button>
           <el-button @click="resetForm('loginForm')">重置</el-button>
-          <el-button type="warning" @click="register()">还没注册？</el-button>
+          <el-button type="warning" @click="gotoRegister()">还没注册？</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -110,7 +110,12 @@ export default {
       function emailFormat(email) {
         if (email != '') {
           let reg = /^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/
-          return reg.test(email)
+          let isok = reg.test(email)
+          if(isok) {
+              return true
+          } else {
+              return false
+          }
         }
       }
       if (value === '') {
@@ -124,11 +129,6 @@ export default {
     const validateLoginPassword = (rule, value, callback) => {
       if (value === '') {
         callback(new Error('请输入密码'))
-      } else {
-        if (this.loginForm.checkPassword !== '') {
-          this.$refs.loginForm.validateField('password')
-        }
-        callback()
       }
     }
     const validateRegisterPassword = (rule, value, callback) => {
@@ -181,25 +181,34 @@ export default {
         username: this.loginForm.username,
         password: this.loginForm.password,
       }
-      this.userLogin(userInfo)
-        .then((res) => {
-          this.$message({
-            message: res,
-            type: 'success',
-          })
-          this.$router.push('/home')
-        })
-        .catch((err) => {
-          this.$message({
-            message: err,
-            type: 'error',
-          })
-        })
+      console.log(userInfo)
+    //   this.userLogin(userInfo)
+    //     .then((res) => {
+    //       this.$message({
+    //         message: res,
+    //         type: 'success',
+    //       })
+    //       this.$router.push('/home')
+    //     })
+    //     .catch((err) => {
+    //       this.$message({
+    //         message: err,
+    //         type: 'error',
+    //       })
+    //     })
+    },
+    submit() {
+        const userInfo = {
+            email: this.registerForm.email,
+            username: this.registerForm.username,
+            password: this.registerForm.password
+        }
+        console.log(userInfo)
     },
     toggle_showLogin() {
       this.showLogin = !this.showLogin
     },
-    register() {
+    gotoRegister() {
       this.toggle_showLogin()
     },
     gotoLogin() {
