@@ -1,5 +1,13 @@
 <template>
   <div class="box">
+    <div class="logo">
+      <img 
+        src="../assets/coin.jpg" 
+        alt="coin logo" 
+        width="100px" 
+        height="100%"
+      >
+    </div>
     <div class="login" v-show="showLogin">
       <div class="login-title">Sign in</div>
       <el-form
@@ -236,16 +244,24 @@ export default {
 </script>
 
 <style>
+.logo {
+  height: 10vh;
+  width: 100%;
+  text-align: center;
+  border-bottom: 2px groove;
+}
+
 .box {
   display: flex;
   justify-content: center;
+  height: 100vh;
 }
 
 .box > .login {
   width: 40vw;
   height: 40vh;
   position: fixed;
-  top: 10%;
+  top: 20%;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px slategray;
   background-color: #ffffff;
@@ -255,8 +271,7 @@ export default {
 .box > .login > .login-title {
   text-align: center;
   font-size: 25px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: cursive;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;
@@ -267,7 +282,7 @@ export default {
   width: 40vw;
   height: 60vh;
   position: fixed;
-  top: 10%;
+  top: 20%;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px slategray;
   background-color: #ffffff;
@@ -277,8 +292,7 @@ export default {
 .box > .register > .register-title {
   text-align: center;
   font-size: 25px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: cursive;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;
