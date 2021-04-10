@@ -85,7 +85,7 @@
           </el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="success" @click="submit()">注册</el-button>
+          <el-button type="success" @click="register()">注册</el-button>
           <el-button @click="resetForm('registerForm')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -175,7 +175,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['userLogin']),
+    ...mapActions(['userLogin', 'register']),
     login() {
       const userInfo = {
         username: this.loginForm.username,
@@ -197,13 +197,27 @@ export default {
           })
         })
     },
-    submit() {
+    register() {
         const userInfo = {
             email: this.registerForm.email,
             username: this.registerForm.username,
             password: this.registerForm.password
         }
         console.log(userInfo)
+        this.register(userInfo)
+          .then((res) => {
+            this.$message({
+              message: res,
+              type: 'success',
+            })
+            this.gotoLogin()
+          })
+          .catch((err) => {
+            this.$message({
+              message: err,
+              type: 'error',
+            })
+          })
     },
     toggle_showLogin() {
       this.showLogin = !this.showLogin

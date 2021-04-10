@@ -41,7 +41,15 @@ const user = {
       commit('setUserInfo', res.data)
     },
     logout: async () => {},
-    register: async () => {}
+    register: async ({ commit }, data) => {
+      const res = await api.register(data)
+      // console.log('register res', res)
+      if(res.status === 200) {
+        return Promise.resolve(res.data.msg)
+      } else {
+        return Promise.reject(res.data.msg)
+      }
+    }
   },
   getters: {
     userInfo: state => state.userInfo
