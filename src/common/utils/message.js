@@ -1,5 +1,6 @@
 import { Notification, MessageBox } from 'element-ui'
 
+// 通知框
 export const $notify = ({
   title = '通知 Title',
   type = 'info',
@@ -15,6 +16,7 @@ export const $notify = ({
   })
 }
 
+// 确认框
 export const $confirm = ({
   title = '确认框 Title',
   message = '确认框 Message',
@@ -25,8 +27,16 @@ export const $confirm = ({
   return MessageBox.confirm(message, title, {
     confirmButtonText: confirmText,
     cancelButtonText: cancelText,
+    distinguishCancelAndClose: true,
     type
   })
-    .then(() => true)
-    .catch(() => false)
+    .then(confirm => confirm) // 'confirm'
+    .catch(cancel => cancel) // 'cancel'(不保存) | 'close'(取消)
+}
+
+// 组输出
+export const consoleGroup = function(name, cb) {
+  console.group(name)
+  cb()
+  console.groupEnd(name)
 }

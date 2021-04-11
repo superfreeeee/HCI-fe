@@ -1,16 +1,11 @@
 import api from '@/api/dispatcher'
-import { consoleGroup } from '@/common/utils'
-import { $notify, $confirm } from '@/common/message'
+import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
 import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
-import {
-  itemTransformer,
-  itemVarify,
-  responseItemTranformer
-} from './utils/item'
+import { itemVarify } from './utils/item'
 import { restoreLayout, saveLayout } from './utils/layout'
-// import { fakeGraphData } from '../../common/sample'
+// import { fakeGraphData } from '@/common/entity'
 
 const graph = {
   state: {
@@ -30,7 +25,7 @@ const graph = {
       createNew: true,
       select: '',
       item: null,
-      editable: true
+      editable: false
     },
     layouts: {
       // later change to history layout
@@ -64,6 +59,7 @@ const graph = {
         type = '',
         item = null,
         createNew = true,
+        editable = false,
         select = '',
         focus = false
       } = {}
@@ -72,6 +68,7 @@ const graph = {
       state.editor.item = item
       state.editor.select = select
       state.editor.createNew = createNew
+      state.editor.editable = editable
       state.board.focus = focus
     },
     setEditorSelect(state, select = '') {
@@ -148,41 +145,35 @@ const graph = {
       return res.status === 200
     },
     // 选取 实体/关系
-    editorSelect({ state, commit, dispatch }, { type, id }) {
+    async editorSelect({ state, commit, dispatch }, { type, id }) {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
-      if (type === 'cancel') {
-        const { type: t, editable, item } = state.editor
-        if (t) {
-          if (editable) {
-            $confirm({
-              title: '当前物件修改未保存',
-              message: '是否保存修改?',
-              type: 'warning',
-              confirmText: '保存',
-              cancelText: '不保存'
-            }).then(confirmed => {
-              if (confirmed) {
-                console.log('确定修改', item, t)
-                dispatch(`editor${item.id ? 'Update' : 'Create'}Commit`).then(
-                  success => {
-                    if (success) {
-                      commit('setEditor')
-                    }
-                  }
-                )
-              } else {
-                commit('setEditor')
-              }
-            })
-          } else {
-            commit('setEditor')
-          }
+      const { type: t, editable, select, item } = state.editor
+      if (!select && editable) {
+        const confirm = await $confirm({
+          title: '当前物件修改未保存',
+          message: '是否保存修改?',
+          type: 'warning',
+          confirmText: '保存',
+          cancelText: '不保存'
+        })
+        let doNext = false
+        if (confirm === 'confirm') {
+          doNext = await dispatch(
+            `editor${item.id ? 'Update' : 'Create'}Commit`
+          )
+        } else if (confirm === 'cancel') {
+          doNext = true
+        } else if (confirm === 'close') {
+          doNext = false
         }
-        return
+        if (!doNext) return false
       }
-      const { select, item } = state.editor
+      if (type === 'cancel') {
+        commit('setEditor')
+        return true
+      }
       if (select) {
         if (type === 'node') {
           commit('setEditorItem', { ...item, [select]: id })
@@ -237,7 +228,12 @@ const graph = {
           console.log(item)
         })
         commit('addGraphItem', item)
-        dispatch('editorSelect', { type, id: item.id })
+        commit('setEditor', {
+          type,
+          item,
+          createNew: false,
+          focus: item.id
+        })
         $notify({ title: `添加${typeMapper[type]}成功`, type: 'success' })
       } else {
         consoleGroup('[action] editorCreateCommit error', () => {
@@ -279,15 +275,15 @@ const graph = {
     // 提交 实体/关系 删除
     async editorDeleteCommit({ state, commit }) {
       console.log('[action] editorDeleteCommit')
-      const type = state.editor.type
-      if (
-        !state.editor.createNew &&
-        (await $confirm({
-          title: `删除${typeMapper[type]}`,
+      if (!state.editor.createNew) {
+        const confirm = await $confirm({
+          title: `删除${typeMapper[state.editor.type]}`,
           message: '确定删除？',
           type: 'warning'
-        }))
-      ) {
+        })
+        if (confirm !== 'confirm') {
+          return false
+        }
         const {
           type,
           item: { id }
@@ -318,6 +314,7 @@ const graph = {
         }
         return res.status === 200
       }
+      return false
     },
     // 保存布局
     async saveLayout({ state, commit }) {
@@ -352,22 +349,23 @@ const graph = {
       commit('setGraphNodes', newNodes)
     },
     // 持久化相关
-    saveAsPng({ state }) {
+    saveAsPng({ state, getters }) {
       console.log('[action] saveAsPng')
-      const projectId = state.projectId
-      const svg = state.boardsvg
+      const name = getters.projectInfo.name
+      const svg = state.board.svg
 
       const group = svg._groups[0][0]
       const width = group.width.baseVal.value
       const height = group.height.baseVal.value
 
       svgToPng(svg, width, height).then(dataUrl => {
-        download(`知识图谱-${projectId}.png`, dataUrl)
+        download(`知识图谱-${name}.png`, dataUrl)
       })
     },
-    async saveAsXml(_, projectId) {
+    async saveAsXml({ getters }, projectId) {
       const res = await api.exportProjectXml(projectId)
-      xmlDownload(res.data.xml, `知识图谱-${projectId}.xml`)
+      const name = getters.projectInfo.name
+      xmlDownload(res.data.xml, `知识图谱-${name}.xml`)
     }
   },
   getters: {

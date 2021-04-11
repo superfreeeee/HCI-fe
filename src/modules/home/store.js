@@ -1,4 +1,4 @@
-// import { fakeProjectInfo, fakeProjects } from '../../common/sample'
+// import { fakeProjectInfo, fakeProjects } from '@/common/entity'
 import api from '@/api/dispatcher'
 
 const home = {
