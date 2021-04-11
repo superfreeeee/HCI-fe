@@ -40,7 +40,13 @@ const user = {
       // console.log('getUserInfo res', res)
       commit('setUserInfo', res.data)
     },
-    logout: async () => {},
+    logout: async ({ commit }) => {
+      const res = await api.logout()
+      // console.log('logout res', res)
+      if(res.status === 200) {
+        
+      }
+    },
     register: async ({ commit }, data) => {
       const res = await api.register(data)
       // console.log('register res', res)

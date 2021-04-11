@@ -5,7 +5,7 @@ export default {
             return { path: '/login', method: 'POST', data: userInfo }
         },
         logout() {
-            return { path: '/logout', method: 'POST' }
+            return { path: '/logout', method: 'GET' }
         },
         userInfo() {
             return { path: '/info' }

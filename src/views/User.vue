@@ -103,6 +103,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
+import { message } from '../common/message.js'
 
 export default {
   name: 'User',
@@ -189,20 +190,13 @@ export default {
         username: this.loginForm.username,
         password: this.loginForm.password,
       }
-      console.log(userInfo)
       this.userLogin(userInfo)
         .then((res) => {
-          this.$message({
-            message: res,
-            type: 'success',
-          })
+          message(res, 'success')
           this.$router.push('/home')
         })
         .catch((err) => {
-          this.$message({
-            message: err,
-            type: 'error',
-          })
+          message(err, 'error')
         })
     },
     register() {
@@ -214,17 +208,11 @@ export default {
         console.log(userInfo)
         this.register(userInfo)
           .then((res) => {
-            this.$message({
-              message: res,
-              type: 'success',
-            })
+            message(res, success)
             this.gotoLogin()
           })
           .catch((err) => {
-            this.$message({
-              message: err,
-              type: 'error',
-            })
+            message(err, 'error')
           })
     },
     toggle_showLogin() {

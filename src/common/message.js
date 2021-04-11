@@ -1,4 +1,4 @@
-import { Notification, MessageBox } from 'element-ui'
+import { Notification, MessageBox, Message } from 'element-ui'
 
 export const $notify = ({
   title = '通知 Title',
@@ -29,4 +29,29 @@ export const $confirm = ({
   })
     .then(() => true)
     .catch(() => false)
+}
+
+export const message = (msg, type) => {
+  const options = { 
+    message: msg,
+    type: type
+  }
+  console.log('options', options)
+  switch(options.type) {
+    case 'success':
+      Message.success(options)
+      break
+    case 'error':
+      Message.error(options)
+      break
+    case 'info':
+      Message.info(options)
+      break
+    case 'warning':
+      Message.warning(options)
+      break
+    default:
+      console.log('Not found command')
+      break
+  }
 }

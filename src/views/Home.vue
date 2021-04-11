@@ -5,6 +5,18 @@
       <el-button icon="el-icon-plus" class="add" @click="createNewGraph()">
         新建项目
       </el-button>
+      <el-popover
+        placement="bottom"
+        trigger="click"
+        class="user" 
+      >
+      <div style="font-size: 20px">admin</div>
+      <div class="userinfo-email">123@qq.com</div>
+      <el-button style="width: 100%; border: none" @click="logout()">
+        登出
+      </el-button>
+      <el-button icon="el-icon-user-solid" circle slot="reference"></el-button>
+      </el-popover>
     </div>
     <el-button
       v-for="project in ownProjects"
@@ -62,6 +74,7 @@
 
 <script>
 import { mapMutations, mapActions, mapGetters } from 'vuex'
+import { message } from '../common/message.js'
 
 export default {
   name: 'Home',
@@ -122,10 +135,7 @@ export default {
               this.$router.push(`/graph/${this.projectId}`)
             })
             .catch(msg => {
-              this.$message({
-                message: msg,
-                type: 'error'
-              })
+              message(msg, 'error')
             })
         } else {
           console.log('error')
@@ -137,6 +147,9 @@ export default {
     },
     visibleXmlInput() {
       this.xmlInput = true
+    },
+    logout() {
+      console.log('logout')
     }
   },
   mounted() {
@@ -169,5 +182,18 @@ export default {
   position: relative;
   top: -60px;
   right: -200px;
+}
+
+.box > .title > .user {
+  position: fixed;
+  top: 25px;
+  right: 50px;
+}
+
+.userinfo-email {
+  font-size: 15px; 
+  border-bottom: 1px solid black; 
+  padding-bottom: 5px; 
+  margin-bottom: 5px
 }
 </style>
