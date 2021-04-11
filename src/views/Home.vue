@@ -86,9 +86,6 @@ export default {
       showCreatePanel: false
     }
   },
-  mounted() {
-    this.getListByUserId(this.userInfo.id)
-  },
   computed: {
     ...mapGetters(['ownProjects', 'projectId', 'userInfo'])
   },
@@ -141,7 +138,10 @@ export default {
     visibleXmlInput() {
       this.xmlInput = true
     }
-  }
+  },
+  mounted() {
+    this.getListByUserId(this.userInfo.id)
+  },
 }
 </script>
 
@@ -159,26 +159,15 @@ export default {
 }
 
 .box > .title {
-  /* display: flex;
-  justify-content: center;
-  align-items: center; */
-  /* gap: 32px; */
   position: sticky;
   width: 100%;
-  height: 20%;
   top: 0;
   background-color: #ffffff;
 }
 
 .box > .title > .add {
   position: relative;
+  top: -60px;
   right: -200px;
-  top: -50px;
-}
-
-.box > .options {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
 }
 </style>
