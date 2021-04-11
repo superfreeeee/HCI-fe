@@ -48,10 +48,6 @@ export default {
       showEditor: false
     }
   },
-  mounted() {
-    const projectId = this.$route.params.projectId
-    this.getProjectInfo(projectId)
-  },
   computed: {
     ...mapGetters(['graphData', 'projectInfo'])
   },
@@ -73,7 +69,11 @@ export default {
         position: 'bottom-left'
       })
     }
-  }
+  },
+  mounted() {
+    const projectId = this.$route.params.projectId
+    this.getProjectInfo(projectId)
+  },
 }
 </script>
 

@@ -65,10 +65,12 @@ export default {
         drag,
         zoom,
         focus,
+        tick,
         unfocus,
         selectItemHandler,
         $d3: d3,
-        $el
+        $el,
+        setGraphBoardSvg
       } = this
       let simulation,
         boundDrag,
@@ -163,8 +165,6 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('data-id', d => d.id)
         .text(d => d.name)
-        // .attr('x', d => (d.source.x + d.target.x) / 2)
-        // .attr('y', d => (d.source.y + d.target.y) / 2)
         .on('click', selectItemHandler('link'))
 
       /**
@@ -185,7 +185,7 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', () => unfocus())
+        .on('mouseout', unfocus)
       nodes.append('title').text(d => d.name)
 
       /**
@@ -207,17 +207,17 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', () => unfocus())
+        .on('mouseout', unfocus)
 
       /**
        * store selection
        */
-      this.setGraphBoardSvg(svg)
+      setGraphBoardSvg(svg)
 
       /**
        * bind simulation tick
        */
-      simulation.on('tick', this.tick)
+      simulation.on('tick', tick)
       this.initialized = true
 
       this.simulation = simulation
@@ -235,36 +235,47 @@ export default {
     /********** d3 graph update **********/
     reload() {
       console.log('[GraphBoard] reload')
-      const { baseRadius, font } = this.config
-      const d3 = this.$d3
+      const {
+        config: { baseRadius, font },
+        $d3: d3,
+        selectItemHandler,
+        graphNodes,
+        graphLinks,
+        simulation,
+        scale,
+        boundDrag,
+        focus,
+        unfocus,
+        tick
+      } = this
+      let { links, linksText, nodes, nodesText } = this
 
-      this.simulation.stop()
-      this.links.remove()
-      this.linksText.remove()
-      this.nodes.remove()
-      this.nodesText.remove()
+      simulation.stop()
+      links.remove()
+      linksText.remove()
+      nodes.remove()
+      nodesText.remove()
 
-      for (const link of this.graphLinks) {
+      for (const link of graphLinks) {
         link.source = link.from
         link.target = link.to
       }
 
-      this.links = d3
+      links = d3
         .select('.links')
         .selectAll('line')
-        .data(this.graphLinks)
+        .data(graphLinks)
         .join('line')
         .attr('stroke-width', d => d.value * 5)
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
-        // .merge(this.links)
-        .on('click', this.selectItemHandler('link'))
-      this.links.append('title').text(d => d.name)
+        .on('click', selectItemHandler('link'))
+      links.append('title').text(d => d.name)
 
-      this.linksText = d3
+      linksText = d3
         .select('.links_text')
         .selectAll('text')
-        .data(this.graphLinks)
+        .data(graphLinks)
         .join('text')
         .style('fill', '#000000')
         .style('font', font)
@@ -273,30 +284,30 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('data-id', d => d.id)
         .text(d => d.name)
-        // .merge(this.linksText)
-        .on('click', this.selectItemHandler('link'))
+        .on('click', selectItemHandler('link'))
 
-      this.nodes = d3
+      nodes = d3
         .select('.nodes')
         .selectAll('circle')
-        .data(this.graphNodes)
+        .data(graphNodes)
         .enter()
         .append('circle')
         .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
-        .attr('fill', d => this.scale(d.group))
+        .attr('fill', d => scale(d.group))
         .attr('data-id', d => d.id)
         .attr('x', d => d.x)
         .attr('y', d => d.y)
-        // .merge(this.nodes)
-        .call(this.boundDrag)
-        .on('click', this.selectItemHandler('node'))
-      this.nodes.append('title').text(d => d.name)
+        .call(boundDrag)
+        .on('click', selectItemHandler('node'))
+        .on('mouseover', focus)
+        .on('mouseout', unfocus)
+      nodes.append('title').text(d => d.name)
 
-      this.nodesText = d3
+      nodesText = d3
         .select('.nodes_text')
         .selectAll('text')
-        .data(this.graphNodes)
+        .data(graphNodes)
         .join('text')
         .style('fill', '#ffffff')
         .style('font', font)
@@ -305,14 +316,20 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('data-id', d => d.id)
         .text(d => d.name)
-        // .merge(this.nodesText)
-        .call(this.boundDrag)
-        .on('click', this.selectItemHandler('node'))
+        .call(boundDrag)
+        .on('click', selectItemHandler('node'))
+        .on('mouseover', focus)
+        .on('mouseout', unfocus)
 
-      this.simulation.nodes(this.graphNodes)
-      this.simulation.force('link').links(this.graphLinks)
-      this.simulation.on('tick', this.tick)
-      this.simulation.alpha(1).restart()
+      simulation.nodes(graphNodes)
+      simulation.force('link').links(graphLinks)
+      simulation.on('tick', tick)
+      simulation.alpha(1).restart()
+
+      this.links = links
+      this.linksText = linksText
+      this.nodes = nodes
+      this.nodesText = nodesText
     },
     /********** d3 gesture **********/
     drag(simulation) {
@@ -354,11 +371,12 @@ export default {
     setFocus(nodeId) {
       const {
         config: { baseRadius },
-        graphNodes
+        graphNodes,
+        root
       } = this
       let { focusNode } = this
       const node = graphNodes.filter(node => node.id === nodeId)[0]
-      focusNode = this.root
+      focusNode = root
         .select('.focus')
         .selectAll('circle')
         .data([node])
@@ -409,18 +427,27 @@ export default {
     },
     /********** GraphOptions **********/
     backCenter() {
-      this.graphBoardSvg.select('g').remove()
+      const {
+        graphBoardSvg,
+        graphNodes,
+        graphLinks,
+        init,
+        setFocus,
+        graphBoardFocus
+      } = this
+      graphBoardSvg.select('g').remove()
       this.pinned = false
-      for (const node of this.graphNodes) {
+      for (const node of graphNodes) {
         node.x = node.y = 0
         node.vx = node.vy = 0
         node.fx = node.fy = null
       }
-      for (const link of this.graphLinks) {
+      for (const link of graphLinks) {
         link.source = link.from
         link.target = link.to
       }
-      this.init()
+      init()
+      setFocus(graphBoardFocus)
     },
     zoomReset() {
       const { root, boundZoom, $d3 } = this

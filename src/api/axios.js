@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { baseURL } from './config'
-import { consoleGroup } from '../common/utils.js'
+import { consoleGroup } from '@/common/utils/'
 
 const instance = axios.create({ baseURL, withCredentials: true })
 
