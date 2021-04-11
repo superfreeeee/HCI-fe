@@ -5,6 +5,7 @@ const user = {
     userInfo: {
       id: 1 // fake userId
     },
+    showLogin: true,
   },
   mutations: {
     setUserInfo(state, data) {
@@ -12,6 +13,9 @@ const user = {
     },
     setLoginMsg(state, data) {
       state.loginMsg = data
+    },
+    setShowLogin(state, data) {
+      state.showLogin = data
     }
   },
   actions: {
@@ -58,7 +62,8 @@ const user = {
     }
   },
   getters: {
-    userInfo: state => state.userInfo
+    userInfo: state => state.userInfo,
+    showLogin: state => state.showLogin
   }
 }
 

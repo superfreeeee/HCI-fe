@@ -74,7 +74,7 @@
 
 <script>
 import { mapMutations, mapActions, mapGetters } from 'vuex'
-import { message } from '../common/message.js'
+import { message } from '../common/utils/message.js'
 
 export default {
   name: 'Home',
