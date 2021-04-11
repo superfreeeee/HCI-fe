@@ -10,8 +10,8 @@
         trigger="click"
         class="user" 
       >
-      <div style="font-size: 20px">admin</div>
-      <div class="userinfo-email">123@qq.com</div>
+      <div style="font-size: 20px">{{ userInfo.username }}</div>
+      <div class="userinfo-email">{{ userInfo.email }}</div>
       <el-button style="width: 100%; border: none" @click="logout()">
         登出
       </el-button>
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { mapMutations, mapActions, mapGetters } from 'vuex'
+import {  mapGetters, mapMutations, mapActions } from 'vuex'
 import { message } from '../common/utils/message.js'
 
 export default {
@@ -104,7 +104,7 @@ export default {
   },
   methods: {
     ...mapMutations(['setGraphProjectId']),
-    ...mapActions(['createProject', 'getListByUserId']),
+    ...mapActions(['createProject', 'getListByUserId', 'userLogout', 'getUserInfo']),
     gotoProject(id) {
       this.setGraphProjectId(id)
       this.$router.push(`/graph/${id}`)
@@ -149,11 +149,14 @@ export default {
       this.xmlInput = true
     },
     logout() {
-      console.log('logout')
+      localStorage.removeItem('token')
+      this.$router.push('/user')
     }
   },
   mounted() {
-    this.getListByUserId(this.userInfo.id)
+    this.getUserInfo().then(() => {
+      this.getListByUserId(this.userInfo.id)
+    })
   },
 }
 </script>

@@ -2,17 +2,12 @@ import api from '@/api/dispatcher'
 
 const user = {
   state: {
-    userInfo: {
-      id: 1 // fake userId
-    },
+    userInfo: {},
     showLogin: true,
   },
   mutations: {
     setUserInfo(state, data) {
       state.userInfo = data
-    },
-    setLoginMsg(state, data) {
-      state.loginMsg = data
     },
     setShowLogin(state, data) {
       state.showLogin = data
@@ -30,10 +25,9 @@ const user = {
         return ret
       }
       const res = await api.login(payload2Formdata(data))
-      // console.log('userLogin res', res)
-      commit('setLoginMsg', res.data.msg)
+      const token = res.headers['coin-token']
+      localStorage.setItem('token', token)
       if (res.status === 200) {
-        dispatch('getUserInfo')
         return Promise.resolve(res.data.msg)
       } else {
         return Promise.reject(res.data.msg)
@@ -41,19 +35,10 @@ const user = {
     },
     getUserInfo: async ({ commit }) => {
       const res = await api.userInfo()
-      // console.log('getUserInfo res', res)
       commit('setUserInfo', res.data)
     },
-    logout: async ({ commit }) => {
-      const res = await api.logout()
-      // console.log('logout res', res)
-      if(res.status === 200) {
-        
-      }
-    },
-    register: async ({ commit }, data) => {
+    userRegister: async ({ commit }, data) => {
       const res = await api.register(data)
-      // console.log('register res', res)
       if(res.status === 200) {
         return Promise.resolve(res.data.msg)
       } else {

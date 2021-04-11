@@ -126,15 +126,14 @@ export default {
   },
   methods: {
     ...mapMutations(['setShowLogin']),
-    ...mapActions(['register']),
+    ...mapActions(['userRegister']),
     register() {
       const userInfo = {
         email: this.registerForm.email,
         username: this.registerForm.username,
         password: this.registerForm.password,
       }
-      console.log(userInfo)
-      this.register(userInfo)
+      this.userRegister(userInfo)
         .then((res) => {
           message(res, success)
           this.gotoLogin()
@@ -157,7 +156,6 @@ export default {
 .register {
   position: relative;
   width: 40vw;
-  height: 60vh;
   position: fixed;
   top: 20%;
   border-radius: 20px;

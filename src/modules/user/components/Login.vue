@@ -74,7 +74,7 @@ export default {
       this.userLogin(userInfo)
         .then((res) => {
           message(res, 'success')
-          this.$router.push('/home')
+          this.$router.push('/')
         })
         .catch((err) => {
           message(err, 'error')
@@ -93,7 +93,6 @@ export default {
 <style>
 .login {
   width: 40vw;
-  height: 40vh;
   position: fixed;
   top: 20%;
   border-radius: 20px;

@@ -40,7 +40,6 @@ export const message = (msg, type) => {
     message: msg,
     type: type
   }
-  console.log('options', options)
   switch(options.type) {
     case 'success':
       Message.success(options)

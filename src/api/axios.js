@@ -6,6 +6,9 @@ const instance = axios.create({ baseURL, withCredentials: true })
 
 instance.interceptors.request.use(
   config => {
+    if(localStorage.token) {
+      config.headers['coin-token'] = localStorage.token
+    }
     consoleGroup(`[axios.request] ${config.url}`, () => {
       console.log(config)
     })

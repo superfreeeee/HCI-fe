@@ -11,7 +11,7 @@ export default {
             return { path: '/info' }
         },
         register(userInfo) {
-            return { path: 'register', method: 'POST', data: userInfo }
+            return { path: '/register', method: 'POST', data: userInfo }
         }
     }
 }
