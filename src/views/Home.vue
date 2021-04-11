@@ -5,17 +5,17 @@
       <el-button icon="el-icon-plus" class="add" @click="createNewGraph()">
         新建项目
       </el-button>
-      <el-popover
-        placement="bottom"
-        trigger="click"
-        class="user" 
-      >
-      <div style="font-size: 20px">{{ userInfo.username }}</div>
-      <div class="userinfo-email">{{ userInfo.email }}</div>
-      <el-button style="width: 100%; border: none" @click="logout()">
-        登出
-      </el-button>
-      <el-button icon="el-icon-user-solid" circle slot="reference"></el-button>
+      <el-popover placement="bottom" trigger="click" class="user">
+        <div style="font-size: 20px">{{ userInfo.username }}</div>
+        <div class="userinfo-email">{{ userInfo.email }}</div>
+        <el-button style="width: 100%; border: none" @click="logout()">
+          登出
+        </el-button>
+        <el-button
+          icon="el-icon-user-solid"
+          circle
+          slot="reference"
+        ></el-button>
       </el-popover>
     </div>
     <el-button
@@ -33,11 +33,11 @@
       :visible.sync="showCreatePanel"
       width="45%"
     >
-      <el-form 
-          ref="form" 
-          :model="form" 
-          label-width="150px" 
-          :rules="`${xmlInput}`? rulesWithXml : rulesWithoutXml"
+      <el-form
+        ref="form"
+        :model="form"
+        label-width="150px"
+        :rules="`${xmlInput}` ? rulesWithXml : rulesWithoutXml"
       >
         <el-form-item label="项目名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入项目名称"></el-input>
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import {  mapGetters, mapMutations, mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { message } from '../common/utils/message.js'
 
 export default {
@@ -83,28 +83,33 @@ export default {
       form: {
         name: '',
         description: '',
-        xml: ''
+        xml: '',
       },
       xmlInput: false,
       xmlRadio: '空项目',
       rulesWithXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
         description: [{ required: true, message: '项目描述不能为空!' }],
-        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }]
+        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }],
       },
       rulesWithoutXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
         description: [{ required: true, message: '项目描述不能为空!' }],
       },
-      showCreatePanel: false
+      showCreatePanel: false,
     }
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo'])
+    ...mapGetters(['ownProjects', 'projectId', 'userInfo']),
   },
   methods: {
     ...mapMutations(['setGraphProjectId']),
-    ...mapActions(['createProject', 'getListByUserId', 'userLogout', 'getUserInfo']),
+    ...mapActions([
+      'createProject',
+      'getListByUserId',
+      'userLogout',
+      'getUserInfo',
+    ]),
     gotoProject(id) {
       this.setGraphProjectId(id)
       this.$router.push(`/graph/${id}`)
@@ -116,17 +121,17 @@ export default {
       this.$refs.form.resetFields()
     },
     doneCreate() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
           // 把数据传向后端
           const projectParam = {
             name: this.form.name,
             description: this.form.description,
-            userId: 1
+            userId: 1,
           }
-          if(this.form.xml === '空项目') {
+          if (this.form.xml === '空项目') {
             projectParam.xml = ''
-          }else {
+          } else {
             projectParam.xml = this.form.xml
           }
           // console.log('projectParam', projectParam)
@@ -134,7 +139,7 @@ export default {
             .then(() => {
               this.$router.push(`/graph/${this.projectId}`)
             })
-            .catch(msg => {
+            .catch((msg) => {
               message(msg, 'error')
             })
         } else {
@@ -151,12 +156,16 @@ export default {
     logout() {
       localStorage.removeItem('token')
       this.$router.push('/user')
-    }
+    },
   },
   mounted() {
-    this.getUserInfo().then(() => {
-      this.getListByUserId(this.userInfo.id)
-    })
+    if (!localStorage.token) {
+      this.$router.push('/user')
+    } else {
+      this.getUserInfo().then(() => {
+        this.getListByUserId(this.userInfo.id)
+      })
+    }
   },
 }
 </script>
@@ -194,9 +203,9 @@ export default {
 }
 
 .userinfo-email {
-  font-size: 15px; 
-  border-bottom: 1px solid black; 
-  padding-bottom: 5px; 
-  margin-bottom: 5px
+  font-size: 15px;
+  border-bottom: 1px solid black;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
 }
 </style>
