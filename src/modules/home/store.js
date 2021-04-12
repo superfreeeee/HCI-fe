@@ -4,7 +4,8 @@ import api from '@/api/dispatcher'
 const home = {
   state: {
     ownProjects: [],
-    projectInfo: {}
+    projectInfo: {},
+    showCreatePanel: false,
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -12,6 +13,9 @@ const home = {
     },
     setProjectInfo(state, data) {
       state.projectInfo = data
+    },
+    setShowCreatePanel(state, data) {
+      state.showCreatePanel = data
     }
   },
   actions: {
@@ -50,7 +54,8 @@ const home = {
   },
   getters: {
     ownProjects: state => state.ownProjects,
-    projectInfo: state => state.projectInfo
+    projectInfo: state => state.projectInfo,
+    showCreatePanel: state => state.showCreatePanel
   }
 }
 

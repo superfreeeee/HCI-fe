@@ -3,11 +3,15 @@ import api from '@/api/dispatcher'
 const user = {
   state: {
     userInfo: {},
+    userId: '',
     showLogin: true,
   },
   mutations: {
     setUserInfo(state, data) {
       state.userInfo = data
+    },
+    setUserId(state, data) {
+      state.userId = data
     },
     setShowLogin(state, data) {
       state.showLogin = data
@@ -36,6 +40,7 @@ const user = {
     getUserInfo: async ({ commit }) => {
       const res = await api.userInfo()
       commit('setUserInfo', res.data)
+      commit('setUserId', res.data.id)
     },
     userRegister: async ({ commit }, data) => {
       const res = await api.register(data)
@@ -48,6 +53,7 @@ const user = {
   },
   getters: {
     userInfo: state => state.userInfo,
+    userId: state => state.userId,
     showLogin: state => state.showLogin
   }
 }
