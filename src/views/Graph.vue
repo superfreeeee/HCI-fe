@@ -19,6 +19,7 @@
         @graph-action="actionDispatch"
         @editor-open="showEditor = true"
       ></graph-options>
+      <graph-layout></graph-layout>
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
       <graph-editor></graph-editor>
@@ -33,6 +34,7 @@
 <script>
 import GraphBoard from '../modules/graph/components/GraphBoard'
 import GraphOptions from '../modules/graph/components/GraphOptions'
+import GraphLayout from '../modules/graph/components/GraphLayout'
 import GraphEditor from '../modules/graph/components/GraphEditor'
 import { mapGetters, mapActions } from 'vuex'
 
@@ -41,6 +43,7 @@ export default {
   components: {
     GraphBoard,
     GraphOptions,
+    GraphLayout,
     GraphEditor
   },
   data() {

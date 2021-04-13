@@ -53,7 +53,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations(['setGraphBoardSvg']),
+    ...mapMutations(['setGraphBoardSvg', 'setGraphBoardFocus']),
     ...mapActions(['graphInit', 'editorSelect']),
     /********** d3 graph init **********/
     init() {
@@ -249,7 +249,8 @@ export default {
         focus,
         unfocus,
         setFocus,
-        tick
+        tick,
+        setGraphBoardFocus
       } = this
       let { links, linksText, nodes, nodesText } = this
 
@@ -258,7 +259,8 @@ export default {
       linksText.remove()
       nodes.remove()
       nodesText.remove()
-      unfocus()
+      const recentFocus = graphBoardFocus
+      setGraphBoardFocus(false)
 
       for (const link of graphLinks) {
         link.source = link.from
@@ -329,7 +331,7 @@ export default {
       simulation.force('link').links(graphLinks)
       simulation.on('tick', tick)
       simulation.alpha(1).restart()
-      setFocus(graphBoardFocus)
+      setGraphBoardFocus(recentFocus)
 
       this.links = links
       this.linksText = linksText
@@ -377,10 +379,15 @@ export default {
       const {
         config: { baseRadius },
         graphNodes,
-        root
+        root,
+        setGraphBoardFocus
       } = this
       let { focusNode } = this
       const node = graphNodes.filter(node => node.id === nodeId)[0]
+      if (!node) {
+        setGraphBoardFocus(false)
+        return
+      }
       focusNode = root
         .select('.focus')
         .selectAll('circle')
