@@ -4,7 +4,7 @@ export const itemOptions = {
     { label: '实体名称', attr: 'name', holder: '实体名称', type: 'input' },
     { label: '实体类别', attr: 'group', holder: '实体类别', type: 'input' },
     { label: '实体权重', attr: 'radius', holder: '1~20', type: 'input' },
-    { label: '实体颜色', attr: 'color', holder: '实体颜色', type: 'input' },
+    { label: '实体颜色', attr: 'color', holder: '实体颜色', type: 'color' },
     { label: '实体形状', attr: 'figure', holder: '实体形状', type: 'input' },
     { label: '字体大小', attr: 'textSize', holder: 'px', type: 'input' }
   ],

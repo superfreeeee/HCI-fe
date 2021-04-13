@@ -30,16 +30,8 @@
           :key="option.attr"
           :label="option.label"
         >
-          <!-- 输入框 -->
-          <el-input
-            v-if="option.type === 'input'"
-            clearable
-            :disabled="!graphEditorEditable"
-            :placeholder="option.holder"
-            v-model="graphEditorItem[option.attr]"
-          ></el-input>
           <!-- 下拉框(source/target in link) -->
-          <div v-else>
+          <div v-if="option.type === 'select'">
             <el-select
               clearable
               :disabled="!graphEditorEditable"
@@ -66,6 +58,33 @@
               @blur="setEditorSelect('')"
             ></el-button>
           </div>
+          <div v-else-if="option.type === 'color'">
+            <el-radio-group
+              :disabled="!graphEditorEditable"
+              v-model="useGroupColor"
+            >
+              <el-radio :label="true" style="margin-bottom: 10px"
+                >按默认分组颜色</el-radio
+              >
+              <el-radio :label="false">自定义颜色</el-radio>
+            </el-radio-group>
+            <el-input
+              style="padding-top: 10px"
+              v-if="!useGroupColor"
+              type="color"
+              :disabled="!graphEditorEditable"
+              v-model="graphEditorItem[option.attr]"
+            ></el-input>
+          </div>
+          <!-- 其他输入框 -->
+          <el-input
+            v-else
+            :type="option.type"
+            clearable
+            :disabled="!graphEditorEditable"
+            :placeholder="option.holder"
+            v-model="graphEditorItem[option.attr]"
+          ></el-input>
         </el-form-item>
         <!-- 属性可选操作 -->
         <el-form-item class="options">
@@ -88,7 +107,9 @@ import { typeMapper } from '../utils/editor'
 export default {
   name: 'GraphEditor',
   data() {
-    return {}
+    return {
+      useGroupColor: false
+    }
   },
   computed: {
     ...mapGetters([
@@ -135,6 +156,17 @@ export default {
                 type: this.graphEditorType,
                 id: this.graphEditorItem.id
               })
+      }
+    }
+  },
+  watch: {
+    graphEditorItem(item) {
+      const color = item == null ? '' : item.color
+      this.useGroupColor = !color
+    },
+    useGroupColor(bool) {
+      if (bool) {
+        this.graphEditorItem.color = ''
       }
     }
   },

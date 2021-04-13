@@ -12,7 +12,8 @@ export default {
         width: 1000,
         height: 750,
         baseRadius: 25,
-        font: '20px Arial'
+        font: 'Arial',
+        fontSize: 20
       },
       initialized: false,
       simulation: null,
@@ -59,7 +60,7 @@ export default {
       console.log('[GraphBoard] init')
       this.initialized = false
       const {
-        config: { width, height, baseRadius, font },
+        config: { width, height, baseRadius, font, fontSize },
         graphNodes,
         graphLinks,
         drag,
@@ -159,7 +160,7 @@ export default {
         .data(graphLinks)
         .join('text')
         .style('fill', '#000000')
-        .style('font', font)
+        .style('font', `${fontSize}px ${font}`)
         .style('user-select', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
@@ -180,7 +181,7 @@ export default {
         .data(graphNodes)
         .join('circle')
         .attr('r', d => baseRadius + d.radius * 10)
-        .attr('fill', d => scale(d.group))
+        .attr('fill', d => (d.color ? d.color : scale(d.group)))
         .attr('data-id', d => d.id)
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
@@ -198,7 +199,7 @@ export default {
         .data(graphNodes)
         .join('text')
         .style('fill', '#ffffff')
-        .style('font', font)
+        .style('font', d => `${d.textSize}px ${font}`)
         .style('user-select', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
@@ -236,16 +237,18 @@ export default {
     reload() {
       console.log('[GraphBoard] reload')
       const {
-        config: { baseRadius, font },
+        config: { baseRadius, font, fontSize },
         $d3: d3,
         selectItemHandler,
         graphNodes,
         graphLinks,
+        graphBoardFocus,
         simulation,
         scale,
         boundDrag,
         focus,
         unfocus,
+        setFocus,
         tick
       } = this
       let { links, linksText, nodes, nodesText } = this
@@ -255,6 +258,7 @@ export default {
       linksText.remove()
       nodes.remove()
       nodesText.remove()
+      unfocus()
 
       for (const link of graphLinks) {
         link.source = link.from
@@ -278,7 +282,7 @@ export default {
         .data(graphLinks)
         .join('text')
         .style('fill', '#000000')
-        .style('font', font)
+        .style('font', `${fontSize}px ${font}`)
         .style('user-select', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
@@ -294,7 +298,7 @@ export default {
         .append('circle')
         .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
-        .attr('fill', d => scale(d.group))
+        .attr('fill', d => (d.color ? d.color : scale(d.group)))
         .attr('data-id', d => d.id)
         .attr('x', d => d.x)
         .attr('y', d => d.y)
@@ -310,7 +314,7 @@ export default {
         .data(graphNodes)
         .join('text')
         .style('fill', '#ffffff')
-        .style('font', font)
+        .style('font', d => `${d.textSize}px ${font}`)
         .style('user-select', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
@@ -325,6 +329,7 @@ export default {
       simulation.force('link').links(graphLinks)
       simulation.on('tick', tick)
       simulation.alpha(1).restart()
+      setFocus(graphBoardFocus)
 
       this.links = links
       this.linksText = linksText
