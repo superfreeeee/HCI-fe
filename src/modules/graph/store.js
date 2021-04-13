@@ -17,7 +17,8 @@ const graph = {
     board: {
       svg: null,
       focus: false,
-      type: 'FORCE' // 'FORCE' | ''GRID | 'FREE'
+      modeLabel: '力导图模式',
+      modeType: 'FORCE' // 'FORCE' | 'GRID' | 'FREE'
     },
     svg: null,
     editor: {
@@ -52,6 +53,10 @@ const graph = {
     },
     setGraphBoardFocus(state, focus) {
       state.board.focus = focus
+    },
+    setGraphBoardMode(state, { label, type }) {
+      state.board.modeLabel = label
+      state.board.modeType = type
     },
     setEditor(
       state,
@@ -316,12 +321,18 @@ const graph = {
       }
       return false
     },
+    switchLayoutMode({ commit }, mode /* { label, type } */) {
+      consoleGroup('[switchLayoutMode] set mode', () => {
+        console.log(mode)
+      })
+      commit('setGraphBoardMode', mode)
+    },
     // 保存布局
     async saveLayout({ state, commit }) {
       const {
         projectId,
         data: { nodes },
-        board: { type }
+        board: { modeType: type }
       } = state
       const layout = saveLayout(nodes)
       consoleGroup('[action] saveLayout', () => {
@@ -335,7 +346,7 @@ const graph = {
     },
     // 恢复布局
     restoreLayout({ state, commit }) {
-      const type = state.board.type
+      const type = state.board.modeType
       const {
         data: { nodes },
         layouts: { [type]: layout }
@@ -375,6 +386,8 @@ const graph = {
     graphLinks: state => state.data.links,
     graphBoardSvg: state => state.board.svg,
     graphBoardFocus: state => state.board.focus,
+    graphBoardModeLabel: state => state.board.modeLabel,
+    graphBoardModeType: state => state.board.modeType,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const body = typeMapper[state.editor.type]

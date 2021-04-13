@@ -32,7 +32,8 @@ export default {
       'graphNodes',
       'graphLinks',
       'graphBoardSvg',
-      'graphBoardFocus'
+      'graphBoardFocus',
+      'graphBoardModeType'
     ])
   },
   watch: {
@@ -50,6 +51,19 @@ export default {
       if (!focus) {
         this.unfocus()
       }
+    },
+    graphBoardModeType(type) {
+      console.log(`[GraphBoard] switch mode type: ${type}`)
+      const { unPinNodes, pinNodes } = this
+      ;({
+        force() {
+          unPinNodes()
+        },
+        grid() {},
+        fixed() {
+          pinNodes()
+        }
+      }[type.toLowerCase()]())
     }
   },
   methods: {

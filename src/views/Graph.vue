@@ -19,7 +19,7 @@
         @graph-action="actionDispatch"
         @editor-open="showEditor = true"
       ></graph-options>
-      <graph-layout></graph-layout>
+      <graph-layout @graph-action="actionDispatch"></graph-layout>
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
       <graph-editor></graph-editor>
