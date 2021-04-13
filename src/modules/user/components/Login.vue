@@ -107,8 +107,7 @@ export default {
   position: fixed;
   left: 15%;
   top: 30%;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
-    'Lucida Sans', Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .login-box > .project-text > div {
@@ -129,7 +128,7 @@ export default {
 .login-box > .login > .login-title {
   text-align: center;
   font-size: 25px;
-  font-family: cursive;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;

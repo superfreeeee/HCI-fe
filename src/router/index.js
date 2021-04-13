@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import { $message } from '../common/utils' 
-import { local } from 'd3-selection'
 
 Vue.use(Router)
 
