@@ -19,7 +19,7 @@
         :rules="loginRules"
         ref="loginForm"
         label-width="80px"
-        style="margin-top: 40px; text-align: center"
+        style="margin-top: 40px"
       >
         <el-form-item label="用户名" prop="username">
           <el-input
@@ -139,7 +139,7 @@ export default {
 }
 
 .login-btn {
-  width: 90%;
+  width: 100%;
   margin-bottom: 10px;
 }
 
@@ -149,5 +149,6 @@ export default {
   margin-bottom: 10px;
   cursor: pointer;
   color: royalblue;
+  text-align: center;
 }
 </style>
