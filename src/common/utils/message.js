@@ -35,28 +35,8 @@ export const $confirm = ({
 }
 
 // 消息提示
-export const message = (msg, type) => {
-  const options = { 
-    message: msg,
-    type: type
-  }
-  switch(options.type) {
-    case 'success':
-      Message.success(options)
-      break
-    case 'error':
-      Message.error(options)
-      break
-    case 'info':
-      Message.info(options)
-      break
-    case 'warning':
-      Message.warning(options)
-      break
-    default:
-      console.log('Not found command')
-      break
-  }
+export const $message = (message, type = 'info') => {
+  Message[type]({ message })
 }
 // 组输出
 export const consoleGroup = function(name, cb) {

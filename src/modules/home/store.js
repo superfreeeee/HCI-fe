@@ -5,7 +5,7 @@ const home = {
   state: {
     ownProjects: [],
     projectInfo: {},
-    showCreatePanel: false,
+    showCreatePanel: false
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -44,11 +44,12 @@ const home = {
       if (res.status === 200) {
         const projectInfo = res.data
         commit('setProjectInfo', projectInfo)
-        commit('setGraphProjectId', projectInfo.projectId)
+        return projectInfo.projectId
       } else if (res.status === 500) {
         return Promise.reject(res.data.msg)
       } else {
-        console.log('createProject error')
+        console.log('[home/store/createProject] createProject error')
+        return Promise.reject('unknown error')
       }
     }
   },

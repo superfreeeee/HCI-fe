@@ -54,7 +54,7 @@ export default {
   methods: {
     ...mapActions(['getProjectInfo']),
     back() {
-      this.$router.back()
+      this.$router.push('/')
     },
     actionDispatch(name, ...args) {
       // console.log(`[GraphAction] ${name}`)
@@ -73,7 +73,7 @@ export default {
   mounted() {
     const projectId = this.$route.params.projectId
     this.getProjectInfo(projectId)
-  },
+  }
 }
 </script>
 

@@ -34,59 +34,53 @@
 </template>
 
 <script>
-import { mapMutations, mapActions } from 'vuex'
-import { message } from '../../../common/utils/message'
+import { mapActions } from 'vuex'
+import { $message } from '@/common/utils'
+
+const validateUsername = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入用户名'))
+  } else {
+    callback()
+  }
+}
+const validateLoginPassword = (rule, value, callback) => {
+  if (value === '') {
+    callback(new Error('请输入密码'))
+  }
+}
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入用户名'))
-      } else {
-        callback()
-      }
-    }
-    const validateLoginPassword = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'))
-      }
-    }
     return {
       loginForm: {
         username: '',
-        password: '',
+        password: ''
       },
       loginRules: {
         username: [{ validator: validateUsername, trigger: 'blur' }],
-        password: [{ validator: validateLoginPassword, trigger: 'blur' }],
-      },
+        password: [{ validator: validateLoginPassword, trigger: 'blur' }]
+      }
     }
   },
   methods: {
-    ...mapMutations(['setShowLogin']),
     ...mapActions(['userLogin']),
     login() {
-      const userInfo = {
-        username: this.loginForm.username,
-        password: this.loginForm.password,
-      }
-      this.userLogin(userInfo)
-        .then((res) => {
-          message(res, 'success')
+      const userInfo = { ...this.loginForm }
+      this.userLogin(userInfo).then(success => {
+        if (success) {
           this.$router.push('/')
-        })
-        .catch((err) => {
-          message(err, 'error')
-        })
+        }
+      })
     },
     gotoRegister() {
-      this.setShowLogin(false)
+      this.$router.push('/user/register')
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 

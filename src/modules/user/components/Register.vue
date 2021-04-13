@@ -57,7 +57,7 @@
 
 <script>
 import { mapMutations, mapActions } from 'vuex'
-import { message } from '../../../common/utils/message'
+import { $message } from '@/common/utils'
 
 export default {
   name: 'Register',
@@ -114,41 +114,34 @@ export default {
         username: '',
         email: '',
         password: '',
-        checkPassword: '',
+        checkPassword: ''
       },
       registerRules: {
         username: [{ validator: validateUsername, trigger: 'blur' }],
         email: [{ validator: validateEmail, trigger: 'blur' }],
         password: [{ validator: validateRegisterPassword, trigger: 'blur' }],
-        checkPassword: [{ validator: validatePasswordSame, trigger: 'blur' }],
-      },
+        checkPassword: [{ validator: validatePasswordSame, trigger: 'blur' }]
+      }
     }
   },
   methods: {
     ...mapMutations(['setShowLogin']),
     ...mapActions(['userRegister']),
     register() {
-      const userInfo = {
-        email: this.registerForm.email,
-        username: this.registerForm.username,
-        password: this.registerForm.password,
-      }
-      this.userRegister(userInfo)
-        .then((res) => {
-          message(res, success)
-          this.gotoLogin()
-        })
-        .catch((err) => {
-          message(err, 'error')
-        })
+      const userInfo = { ...this.registerForm }
+      this.userRegister(userInfo).then(success => {
+        if (success) {
+          this.$router.push('/user')
+        }
+      })
     },
     gotoLogin() {
-      this.setShowLogin(true)
+      this.$router.back()
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
-    },
-  },
+    }
+  }
 }
 </script>
 

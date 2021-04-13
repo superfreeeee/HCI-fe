@@ -9,7 +9,7 @@
       ref="form"
       :model="form"
       label-width="150px"
-      :rules="`${xmlInput}` ? rulesWithXml : rulesWithoutXml"
+      :rules="xmlInput ? rulesWithXml : rulesWithoutXml"
     >
       <el-form-item label="项目名称" prop="name">
         <el-input v-model="form.name" placeholder="请输入项目名称"></el-input>
@@ -45,7 +45,7 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import { message } from '../../../common/utils/message'
+import { $message } from '@/common/utils'
 
 export default {
   name: 'NewProjectPanel',
@@ -54,47 +54,47 @@ export default {
       form: {
         name: '',
         description: '',
-        xml: '',
+        xml: ''
       },
       xmlInput: false,
       xmlRadio: '空项目',
       rulesWithXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
         description: [{ required: true, message: '项目描述不能为空!' }],
-        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }],
+        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }]
       },
       rulesWithoutXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
-        description: [{ required: true, message: '项目描述不能为空!' }],
-      },
+        description: [{ required: true, message: '项目描述不能为空!' }]
+      }
     }
   },
   computed: {
-    ...mapGetters(['showCreatePanel', 'userId']),
+    ...mapGetters(['showCreatePanel', 'userId'])
   },
   methods: {
     ...mapMutations(['setShowCreatePanel']),
     ...mapActions(['createProject']),
     doneCreate() {
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(valid => {
         if (valid) {
+          const { name, description, xml } = this.form
           const projectParam = {
-            name: this.form.name,
-            description: this.form.description,
-            userId: Number(this.userId)
-          }
-          if (this.form.xml === '空项目') {
-            projectParam.xml = ''
-          } else {
-            projectParam.xml = this.form.xml
+            name,
+            description,
+            userId: Number(this.userId),
+            xml: xml === '空项目' ? '' : xml
           }
           console.log('projectParam', projectParam)
           this.createProject(projectParam)
-            .then(() => {
-              this.$router.push(`/graph/${this.projectId}`)
+            .catch(msg => {
+              $message(msg, 'error')
             })
-            .catch((msg) => {
-              message(msg, 'error')
+            .then(projectId => {
+              this.$router.push(`/graph/${projectId}`)
+            })
+            .catch(msg => {
+              $message('router fail')
             })
         } else {
           console.log('error')
@@ -113,9 +113,8 @@ export default {
     resetForm() {
       this.$refs.form.resetFields()
     }
-  },
+  }
 }
 </script>
 
-<style>
-</style>
+<style></style>

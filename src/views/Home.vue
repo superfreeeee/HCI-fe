@@ -39,15 +39,13 @@ import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel,
+    NewProjectPanel
   },
   data() {
-    return {
-      
-    }
+    return {}
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel']),
+    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel'])
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
@@ -62,9 +60,10 @@ export default {
     logout() {
       localStorage.removeItem('token')
       this.$router.push('/user')
-    },
+    }
   },
   mounted() {
+    console.log(localStorage.getItem('token'))
     if (!localStorage.token) {
       this.$router.push('/user')
     } else {
@@ -72,7 +71,7 @@ export default {
         this.getListByUserId(this.userInfo.id)
       })
     }
-  },
+  }
 }
 </script>
 
