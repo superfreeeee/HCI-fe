@@ -4,8 +4,7 @@
       <img
         src="../assets/coin.png"
         alt="coin logo"
-        width="15%"
-        height="100%"
+        width="200px"
       />
     </div>
     <router-view></router-view>
@@ -20,7 +19,6 @@ export default {
 
 <style>
 .logo {
-  height: 10vh;
   width: 100vw;
   text-align: center;
   border-bottom: 2px groove;
