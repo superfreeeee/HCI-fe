@@ -99,7 +99,9 @@ export default {
 <style scoped>
 .options {
   background-color: #ffffff;
-  padding: 5px;
+  max-height: calc(100% - 100px);
+  overflow: auto;
+  padding: 0 5px 5px;
   border: 1px groove;
   border-right: none;
   position: absolute;
@@ -111,8 +113,13 @@ export default {
   gap: 5px;
 }
 h3 {
+  position: sticky;
+  top: 0;
+  background-color: #fff;
   text-align: center;
+  padding-top: 5px;
   margin: 0;
+  border-bottom: 1px solid #bbbbbb;
 }
 .el-button {
   margin: 0;
