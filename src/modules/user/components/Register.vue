@@ -147,9 +147,9 @@ export default {
 
 <style>
 .register {
-  position: relative;
   width: 40vw;
   position: fixed;
+  left: 29%;
   top: 20%;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px slategray;
