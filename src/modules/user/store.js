@@ -23,7 +23,7 @@ const user = {
         data: { msg }
       } = await api.login(objectToHttpQuery(data))
       const token = headers['coin-token']
-      localStorage.setItem('token', token)
+      localStorage.setItem('coin-token', token)
 
       $message(msg, status === 200 ? 'success' : 'error')
       return status === 200
