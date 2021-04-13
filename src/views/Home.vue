@@ -63,7 +63,6 @@ export default {
     }
   },
   mounted() {
-    console.log(localStorage.getItem('token'))
     if (!localStorage.token) {
       this.$router.push('/user')
     } else {
