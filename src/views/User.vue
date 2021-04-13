@@ -4,7 +4,7 @@
       <img
         src="../assets/coin.jpg"
         alt="coin logo"
-        width="90px"
+        width="6%"
         height="100%"
       />
     </div>

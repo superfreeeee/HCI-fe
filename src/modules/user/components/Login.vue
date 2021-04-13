@@ -2,11 +2,14 @@
   <div class="login-box">
     <div class="project-text">
       <div style="font-size: 50px; color: black">co$in</div>
-      <div style="font-size: 25px; color: black">System for Constructing and <br />Visualizing Knowledge Graph</div>
+      <div style="font-size: 25px; color: black">
+        System for Constructing and <br />Visualizing Knowledge Graph
+      </div>
       <div style="color: gray">
-        This project aims to build a system platform, through visualized measures to provide 
-        an online editor to edit graph tuples, create an airtight complete structure, a comprehensive
-        service coverage, and the ability to reason knowledge graphs in fundamental aspects.
+        This project aims to build a system platform, through visualized
+        measures to provide an online editor to edit graph tuples, create an
+        airtight complete structure, a comprehensive service coverage, and the
+        ability to reason knowledge graphs in fundamental aspects.
       </div>
     </div>
     <div class="login">
@@ -16,7 +19,7 @@
         :rules="loginRules"
         ref="loginForm"
         label-width="80px"
-        style="margin-top: 40px"
+        style="margin-top: 40px; text-align: center"
       >
         <el-form-item label="用户名" prop="username">
           <el-input
@@ -34,13 +37,12 @@
           >
           </el-input>
         </el-form-item>
-        <el-form-item>
-          <el-button type="success" @click="login()">登录</el-button>
-          <el-button @click="resetForm('loginForm')">重置</el-button>
-          <el-button type="warning" @click="gotoRegister()"
-            >还没注册？</el-button
-          >
-        </el-form-item>
+        <el-button type="success" @click="login()" class="login-btn">
+          登录
+        </el-button>
+        <a type="warning" @click="gotoRegister()" class="register-btn">
+          还没注册？
+        </a>
       </el-form>
     </div>
   </div>
@@ -90,9 +92,6 @@ export default {
     gotoRegister() {
       this.$router.push('/user/register')
     },
-    resetForm(formName) {
-      this.$refs[formName].resetFields()
-    },
   },
 }
 </script>
@@ -108,7 +107,8 @@ export default {
   position: fixed;
   left: 15%;
   top: 20%;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
+    'Lucida Sans', Arial, sans-serif;
 }
 
 .login-box > .project-text > div {
@@ -137,5 +137,18 @@ export default {
 
 .el-input {
   width: 90%;
+}
+
+.login-btn {
+  width: 90%;
+  margin-bottom: 10px;
+}
+
+.register-btn {
+  display: block;
+  font-size: 15px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  color: royalblue;
 }
 </style>
