@@ -160,7 +160,7 @@ export default {
 .register > .register-title {
   text-align: center;
   font-size: 25px;
-  font-family: cursive;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;
