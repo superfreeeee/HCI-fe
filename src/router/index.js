@@ -4,7 +4,7 @@ import Home from '@/views/Home.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       path: '/user',
@@ -20,7 +20,18 @@ export default new Router({
           name: 'Register',
           component: () => import('@/modules/user/components/Register.vue')
         }
-      ]
+      ],
+      beforeEnter: (to, from, next) => {
+        if(to.name === 'Graph') {
+          if(!localStorage.token) {
+            next(false)
+          } else {
+            next(true)
+          }
+        } else {
+          next(true)
+        }
+      }
     },
     {
       path: '/',
@@ -34,3 +45,5 @@ export default new Router({
     }
   ]
 })
+
+export default router

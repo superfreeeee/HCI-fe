@@ -2,9 +2,9 @@
   <div class="box">
     <div class="logo">
       <img
-        src="../assets/coin.jpg"
+        src="../assets/coin.png"
         alt="coin logo"
-        width="6%"
+        width="15%"
         height="100%"
       />
     </div>

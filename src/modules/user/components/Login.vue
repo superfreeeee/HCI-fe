@@ -106,7 +106,7 @@ export default {
   width: 30%;
   position: fixed;
   left: 15%;
-  top: 20%;
+  top: 30%;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande',
     'Lucida Sans', Arial, sans-serif;
 }
@@ -119,7 +119,7 @@ export default {
   width: 30vw;
   position: fixed;
   right: 15%;
-  top: 35%;
+  top: 30%;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px slategray;
   background-color: #ffffff;
