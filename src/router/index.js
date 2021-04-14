@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
-import { $message, consoleGroup } from '../common/utils'
+import { $message } from '../common/utils'
 
 Vue.use(Router)
 
@@ -26,51 +26,60 @@ const router = new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: Home,
+      meta: {
+        requireLogin: true
+      }
     },
     {
       path: '/graph/:projectId',
       name: 'Graph',
-      component: () => import('@/views/Graph.vue')
+      component: () => import('@/views/Graph.vue'),
+      meta: {
+        requireLogin: true
+      }
     }
   ]
 })
 
-const whiteList = ['/user', '/user/register']
-
 let recentRoute = null
 
-export const setRecentRoute = () => {
-  recentRoute = router.currentRoute
+export const setRecentRoute = to => {
+  recentRoute = to || router.currentRoute
+  console.log('set recentRoute', recentRoute)
 }
 
 router.beforeEach((to, from, next) => {
-  // consoleGroup('[router.beforeEach] start', () => {
-  //   console.log('from', from)
-  //   console.log('to', to)
-  // })
-  if (!whiteList.includes(to.path)) {
-    // not on whiteList
-    // console.log('guard', to)
+  if (to.meta.requireLogin) {
+    // neet login
     const token = localStorage.getItem('coin-token')
     if (token) {
       // has token(login before)
       // token 过期由 axios 拦截器进行拦截并跳转
       if (recentRoute) {
-        next(recentRoute)
+        const target = recentRoute
         recentRoute = null
+        next(target)
       } else {
         next()
       }
     } else {
       // no token
+      setRecentRoute(to)
       $message('请先完成登陆', 'error')
       next('/user')
     }
   } else {
-    // on whiteList, directly pass
+    // no need login
     next()
   }
 })
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location, onResolve, onReject) {
+  if (onResolve || onReject)
+    return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch(err => err)
+}
 
 export default router

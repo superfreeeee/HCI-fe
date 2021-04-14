@@ -2,6 +2,7 @@ import axios from 'axios'
 import { baseURL } from './config'
 import { consoleGroup } from '@/common/utils/'
 import router, { setRecentRoute } from '@/router'
+import { $message } from '../common/utils'
 
 const instance = axios.create({ baseURL, withCredentials: true })
 
@@ -47,6 +48,7 @@ instance.interceptors.response.use(
     if (response.status === 403) {
       // 未登入 or token 过期
       setRecentRoute()
+      $message('登入已过期，请重新登入', 'error')
       router.push('/user')
     }
     return response
