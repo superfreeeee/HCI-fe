@@ -200,7 +200,7 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', unfocus)
+        .on('mouseout', () => unfocus(true))
       nodes.append('title').text(d => d.name)
 
       /**
@@ -222,7 +222,7 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', unfocus)
+        .on('mouseout', () => unfocus(true))
 
       /**
        * store selection
@@ -263,18 +263,16 @@ export default {
         focus,
         unfocus,
         setFocus,
-        tick,
-        setGraphBoardFocus
+        tick
       } = this
       let { links, linksText, nodes, nodesText } = this
 
+      unfocus(false)
       simulation.stop()
       links.remove()
       linksText.remove()
       nodes.remove()
       nodesText.remove()
-      const recentFocus = graphBoardFocus
-      setGraphBoardFocus(false)
 
       for (const link of graphLinks) {
         link.source = link.from
@@ -321,7 +319,7 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', unfocus)
+        .on('mouseout', () => unfocus(true))
       nodes.append('title').text(d => d.name)
 
       nodesText = d3
@@ -339,13 +337,13 @@ export default {
         .call(boundDrag)
         .on('click', selectItemHandler('node'))
         .on('mouseover', focus)
-        .on('mouseout', unfocus)
+        .on('mouseout', () => unfocus(true))
 
       simulation.nodes(graphNodes)
       simulation.force('link').links(graphLinks)
       simulation.on('tick', tick)
       simulation.alpha(1).restart()
-      setGraphBoardFocus(recentFocus)
+      setFocus(graphBoardFocus)
 
       this.links = links
       this.linksText = linksText
@@ -394,31 +392,39 @@ export default {
         config: { baseRadius },
         graphNodes,
         root,
-        setGraphBoardFocus
+        setGraphBoardFocus,
+        unfocus
       } = this
       let { focusNode } = this
-      const node = graphNodes.filter(node => node.id === nodeId)[0]
-      if (!node) {
-        setGraphBoardFocus(false)
-        return
+      unfocus(false)
+      if (nodeId) {
+        const node = graphNodes.filter(node => node.id === nodeId)[0]
+        if (!node) {
+          setGraphBoardFocus(false) // nodeId notfound
+          return
+        }
+        focusNode = root
+          .select('.focus')
+          .selectAll('circle')
+          .data([node])
+          .join('circle')
+          .attr('r', d => baseRadius + d.radius * 10 + 5)
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+        this.focusNode = focusNode
       }
-      focusNode = root
-        .select('.focus')
-        .selectAll('circle')
-        .data([node])
-        .join('circle')
-        .attr('r', d => baseRadius + d.radius * 10 + 5)
-        .attr('cx', d => d.x)
-        .attr('cy', d => d.y)
-      this.focusNode = focusNode
     },
     focus(e) {
-      this.setFocus(Number(e.target.attributes['data-id'].value))
+      const nodeId = Number(e.target.attributes['data-id'].value)
+      this.setFocus(nodeId)
     },
-    unfocus() {
+    unfocus(refocus) {
       const { focusNode, graphBoardFocus, setFocus } = this
-      if (focusNode) focusNode.remove()
-      if (graphBoardFocus) {
+      if (focusNode) {
+        focusNode.remove()
+        this.focusNode = null
+      }
+      if (refocus) {
         setFocus(graphBoardFocus)
       }
     },
@@ -483,6 +489,7 @@ export default {
         .call(boundZoom.transform, $d3.zoomIdentity)
     },
     pinNodes() {
+      console.log(this)
       if (!this.pinned) {
         this.pinned = true
         this.simulation.stop()
