@@ -11,11 +11,12 @@ export default {
       return {
         path: `/${projectId}`,
         mapper(data) {
-          const { nodes, relations, ...rest } = data
+          const { projectId, nodes, relations, layout } = data
           return {
-            ...rest,
+            projectId,
             nodes: nodes.map(n => responseItemTranformer('node', n)),
-            links: relations.map(r => responseItemTranformer('link', r))
+            links: relations.map(r => responseItemTranformer('link', r)),
+            layouts: layout
           }
         }
       }

@@ -24,7 +24,7 @@ export const layoutModes = [
  * 图谱布局相关
  */
 
-// 保存图谱布局
+// 保存图谱布局(nodes 数据 -> layout 格式)
 export const saveLayout = nodes => {
   const layout = []
   nodes.forEach(({ id, x, y }) => {
@@ -37,13 +37,30 @@ export const saveLayout = nodes => {
   return layout
 }
 
+// 恢复布局(nodes 数据 <- layout 格式)
 export const restoreLayout = (mode, nodes, layout) => {
   const pos = {}
-  layout.forEach(node => {
-    pos[node.nodeId] = [node.xaxis, node.yaxis]
+  layout.forEach(({ nodeId, xaxis, yaxis }) => {
+    pos[nodeId] = [xaxis, yaxis]
   })
   return nodes.map(node => {
     const [x, y] = Reflect.has(pos, node.id) ? pos[node.id] : Array(2)
     return mode === 'FORCE' ? { ...node, x, y } : { ...node, fx: x, fy: y }
   })
+}
+
+// 计算排版模式布局
+export const getGridLayout = nodes => {
+  const groupsObj = {}
+  nodes.forEach(({ group, id, radius }) => {
+    const node = { id, radius }
+    if (!Reflect.has(groupsObj, group)) {
+      groupsObj[group] = []
+    }
+    groupsObj[group].push(node)
+  })
+  const groups = Reflect.ownKeys(groupsObj).length
+  
+
+  return saveLayout(nodes)
 }

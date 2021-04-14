@@ -87,7 +87,8 @@ export default {
         selectItemHandler,
         $d3: d3,
         $el,
-        setGraphBoardSvg
+        setGraphBoardSvg,
+        restoreLayout
       } = this
       let simulation,
         boundDrag,
@@ -235,6 +236,7 @@ export default {
        * bind simulation tick
        */
       simulation.on('tick', tick)
+      restoreLayout()
       this.initialized = true
 
       this.simulation = simulation
@@ -506,9 +508,6 @@ export default {
     }
   },
   mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    console.log(`[GraphBoard] mounted, projectId = ${projectId}`)
-    this.graphInit(projectId).then(() => this.init())
     this.$el.addEventListener('click', this.selectItemCanel)
   },
   destroyed() {

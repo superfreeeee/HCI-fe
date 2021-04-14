@@ -73,9 +73,17 @@ export default {
       })
     }
   },
-  mounted() {
+  async mounted() {
+    console.log(`[Graph] mounted, projectId = ${projectId}`)
     const projectId = Number(this.$route.params.projectId)
-    this.getProjectInfo(projectId)
+
+    console.log(`[Graph] getProjectInfo`)
+    if (!(await this.getProjectInfo(projectId))) return
+
+    console.log(`[Graph] graphInit`)
+    const board = this.$refs.board
+    if (!(await board.graphInit(projectId))) return
+    board.init()
   }
 }
 </script>

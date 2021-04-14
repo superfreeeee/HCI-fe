@@ -3,7 +3,7 @@ import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemVarify, itemOptions, typeMapper } from './utils/item'
-import { restoreLayout, saveLayout } from './utils/layout'
+import { getGridLayout, restoreLayout, saveLayout } from './utils/layout'
 // import { fakeGraphData } from '@/common/entity'
 
 const graph = {
@@ -126,6 +126,11 @@ const graph = {
       }
       items.push(item)
     },
+    setLayouts(state, layouts) {
+      layouts.forEach(({ type, nodes }) => {
+        state.layouts[type] = nodes
+      })
+    },
     setLayout(state, { mode = 'FORCE', layout }) {
       state.layouts[mode] = layout
     },
@@ -143,26 +148,33 @@ const graph = {
     }
   },
   actions: {
-    async graphInit({ commit, state }, projectId) {
+    async graphInit({ commit, state, getters }, projectId) {
       if (projectId === state.projectId) return true
       const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        const data = res.data
+        const mode = getters.projectInfo.layoutStatus
+        const { projectId, nodes, links, layouts } = res.data
         commit('setGraphProjectId', projectId)
-        commit('setGraphData', data)
+        commit('setGraphBoardMode', mode)
+        commit('setGraphData', { nodes, links })
+        commit('setLayouts', layouts)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
-          console.log('data', { ...data })
+          console.log('projectId', projectId)
+          console.log('nodes', nodes)
+          console.log('links', links)
+          console.log('layouts', layouts)
         })
+        return true
       } else {
         console.log('[action] graphInit.error')
         $notify({
           title: '图谱初始化异常',
           type: 'error'
         })
+        return false
       }
-      return res.status === 200
     },
     // 选取 实体/关系
     async editorSelect({ state, commit, dispatch }, { type, id }) {
@@ -336,8 +348,10 @@ const graph = {
       }
       return false
     },
-    switchLayoutMode({ state, commit, dispatch }, mode) {
+    // 布局模式转换
+    async switchLayoutMode({ state, commit, dispatch }, mode) {
       const {
+        data: { nodes },
         board: { mode: currentMode },
         layoutConfirm: { ignore, dirty }
       } = state
@@ -346,28 +360,34 @@ const graph = {
         console.log('ignore', ignore)
         console.log('dirty', dirty)
       })
+      let doNext = true
+      // 非排版模式提示保存布局
       if (currentMode !== 'GRID' && !ignore && dirty) {
-        // 排版模式不需要提醒
-        $confirm({
+        const option = await $confirm({
           title: '保存布局',
           message: '是否保存当前布局？',
           confirmText: '保存',
           cancelText: '不保存'
-        }).then(option => {
-          ;({
-            confirm() {
-              dispatch('saveLayout')
-              commit('setGraphBoardMode', mode)
-            },
-            cancel() {
-              commit('setGraphBoardMode', mode)
-            },
-            close() {}
-          }[option]())
         })
-      } else {
-        commit('setGraphBoardMode', mode)
+        ;({
+          confirm() {
+            dispatch('saveLayout')
+            commit('setGraphBoardMode', mode)
+          },
+          cancel() {
+            commit('setGraphBoardMode', mode)
+          },
+          close() {
+            doNext = false
+          }
+        }[option]())
       }
+      if (!doNext) return
+      if (mode === 'GRID') {
+        const layout = getGridLayout(nodes)
+        commit('setLayout', { mode: 'GRID', layout })
+      }
+      commit('setGraphBoardMode', mode)
     },
     // 保存布局
     async saveLayout({ state, commit }) {
