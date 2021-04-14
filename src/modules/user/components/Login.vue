@@ -50,7 +50,6 @@
 
 <script>
 import { mapActions } from 'vuex'
-import { $message } from '@/common/utils'
 
 const validateUsername = (rule, value, callback) => {
   if (value === '') {
@@ -71,19 +70,19 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: '',
+        password: ''
       },
       loginRules: {
         username: [{ validator: validateUsername, trigger: 'blur' }],
-        password: [{ validator: validateLoginPassword, trigger: 'blur' }],
-      },
+        password: [{ validator: validateLoginPassword, trigger: 'blur' }]
+      }
     }
   },
   methods: {
     ...mapActions(['userLogin']),
     login() {
       const userInfo = { ...this.loginForm }
-      this.userLogin(userInfo).then((success) => {
+      this.userLogin(userInfo).then(success => {
         if (success) {
           this.$router.push('/')
         }
@@ -91,8 +90,8 @@ export default {
     },
     gotoRegister() {
       this.$router.push('/user/register')
-    },
-  },
+    }
+  }
 }
 </script>
 
@@ -107,7 +106,8 @@ export default {
   position: fixed;
   left: 15%;
   top: 30%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 .login-box > .project-text > div {
@@ -128,7 +128,8 @@ export default {
 .login-box > .login > .login-title {
   text-align: center;
   font-size: 25px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin-bottom: 20px;
   padding-bottom: 10px;
   border-bottom: 2px outset royalblue;

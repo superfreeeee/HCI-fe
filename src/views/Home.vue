@@ -39,13 +39,13 @@ import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel,
+    NewProjectPanel
   },
   data() {
     return {}
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel']),
+    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel'])
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
@@ -59,13 +59,15 @@ export default {
     logout() {
       localStorage.removeItem('coin-token')
       this.$router.push('/user')
-    },
+    }
   },
   mounted() {
-    this.getUserInfo().then(() => {
-      this.getListByUserId(this.userInfo.id)
+    this.getUserInfo().then(success => {
+      if (success) {
+        this.getListByUserId(this.userInfo.id)
+      }
     })
-  },
+  }
 }
 </script>
 

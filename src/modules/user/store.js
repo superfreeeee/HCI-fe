@@ -38,8 +38,12 @@ const user = {
     },
     getUserInfo: async ({ commit }) => {
       const res = await api.userInfo()
-      commit('setUserInfo', res.data)
-      commit('setUserId', res.data.id)
+      if (res.status === 200) {
+        commit('setUserInfo', res.data)
+        commit('setUserId', res.data.id)
+        return true
+      }
+      return false
     }
   },
   getters: {
