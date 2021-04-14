@@ -102,7 +102,7 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
-import { typeMapper } from '../utils/editor'
+import { typeMapper } from '../utils/item'
 
 export default {
   name: 'GraphEditor',

@@ -1,3 +1,35 @@
+/**
+ * 编辑面板属性列
+ */
+
+// 编辑面板属性
+export const itemOptions = {
+  node: [
+    { label: '实体名称', attr: 'name', holder: '实体名称', type: 'input' },
+    { label: '实体类别', attr: 'group', holder: '实体类别', type: 'input' },
+    { label: '实体权重', attr: 'radius', holder: '1~20', type: 'input' },
+    { label: '实体颜色', attr: 'color', holder: '实体颜色', type: 'color' },
+    { label: '实体形状', attr: 'figure', holder: '实体形状', type: 'input' },
+    { label: '字体大小', attr: 'textSize', holder: 'px', type: 'input' }
+  ],
+  link: [
+    { label: '关系名称', attr: 'name', holder: '关系名称', type: 'input' },
+    { label: '关系实体1', attr: 'from', holder: '实体名称', type: 'select' },
+    { label: '关系实体2', attr: 'to', holder: '实体名称', type: 'select' },
+    { label: '关系权重', attr: 'value', holder: '1~20', type: 'input' }
+  ]
+}
+
+// 对象映射
+export const typeMapper = {
+  node: '实体',
+  link: '关系'
+}
+
+/**
+ * 图谱图元持久化转换 / 映射
+ */
+
 // d3 item 转 后端 item
 export const itemTransformer = (type, item, projectId) => {
   return {
@@ -22,6 +54,7 @@ export const responseItemTranformer = (type, item) => {
   }[type](item)
 }
 
+// 转换格式
 export const itemVarify = (type, item) => {
   return {
     node({ radius, ...rest }) {

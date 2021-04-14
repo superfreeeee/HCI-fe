@@ -45,26 +45,6 @@ export default {
           type: 'danger',
           handler: () => this.$emit('graph-action', 'backCenter')
         },
-        // {
-        //   label: '固定实体',
-        //   type: 'danger',
-        //   handler: () => this.$emit('graph-action', 'pinNodes')
-        // },
-        // {
-        //   label: '取消固定',
-        //   type: 'danger',
-        //   handler: () => this.$emit('graph-action', 'unPinNodes')
-        // },
-        // {
-        //   label: '保存布局',
-        //   type: 'success',
-        //   handler: () => this.saveLayout()
-        // },
-        // {
-        //   label: '恢复布局',
-        //   type: 'success',
-        //   handler: () => this.restoreLayout()
-        // },
         {
           label: '保存为 png',
           type: 'warning',

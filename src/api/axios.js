@@ -35,9 +35,15 @@ instance.interceptors.response.use(
   },
   err => {
     const response = err.response
-    consoleGroup(`[axios.response.error] ${response.config.url}`, () => {
-      console.log(response)
-    })
+    const config = response.config
+    consoleGroup(
+      `[axios.response.error] ${
+        config ? config.url : response.request.responseURL
+      }`,
+      () => {
+        console.log(response)
+      }
+    )
     if (response.status === 403) {
       // 未登入 or token 过期
       setRecentRoute()

@@ -1,9 +1,8 @@
 import api from '@/api/dispatcher'
 import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
-import { itemOptions, typeMapper } from './utils/editor'
 import { svgToPng, download, xmlDownload } from './utils/saving'
-import { itemVarify } from './utils/item'
+import { itemVarify, itemOptions, typeMapper } from './utils/item'
 import { restoreLayout, saveLayout } from './utils/layout'
 // import { fakeGraphData } from '@/common/entity'
 
@@ -17,8 +16,8 @@ const graph = {
     board: {
       svg: null,
       focus: false,
-      modeLabel: '力导图模式',
-      modeType: 'FORCE' // 'FORCE' | 'GRID' | 'FREE'
+      mode: 'FORCE', // 'FORCE' | 'GRID' | 'FREE'
+      modeLabel: '力导图模式'
     },
     svg: null,
     editor: {
@@ -32,7 +31,7 @@ const graph = {
       // later change to history layout
       FORCE: [],
       GRID: [],
-      FREE: []
+      FIXED: []
     }
   },
   mutations: {
@@ -54,9 +53,9 @@ const graph = {
     setGraphBoardFocus(state, focus) {
       state.board.focus = focus
     },
-    setGraphBoardMode(state, { label, type }) {
+    setGraphBoardMode(state, { label, mode }) {
+      state.board.mode = mode
       state.board.modeLabel = label
-      state.board.modeType = type
     },
     setEditor(
       state,
@@ -123,8 +122,8 @@ const graph = {
       }
       items.push(item)
     },
-    setLayout(state, { type = 'FORCE', layout }) {
-      state.layouts[type] = layout
+    setLayout(state, { mode = 'FORCE', layout }) {
+      state.layouts[mode] = layout
     }
   },
   actions: {
@@ -321,7 +320,7 @@ const graph = {
       }
       return false
     },
-    switchLayoutMode({ commit }, mode /* { label, type } */) {
+    switchLayoutMode({ commit }, mode /* { label, mode } */) {
       consoleGroup('[switchLayoutMode] set mode', () => {
         console.log(mode)
       })
@@ -332,28 +331,28 @@ const graph = {
       const {
         projectId,
         data: { nodes },
-        board: { modeType: type }
+        board: { mode }
       } = state
       const layout = saveLayout(nodes)
       consoleGroup('[action] saveLayout', () => {
         console.log('nodes', nodes)
         console.log('layout', layout)
       })
-      commit('setLayout', { type, layout })
+      commit('setLayout', { mode, layout })
 
-      // const res = await api.updateLayout(projectId, layout)
-      // if (res) commit('setRecentLayout', layout)
+      const res = await api.updateLayout(mode, layout, projectId)
+      console.log(res)
     },
     // 恢复布局
     restoreLayout({ state, commit }) {
-      const type = state.board.modeType
       const {
         data: { nodes },
-        layouts: { [type]: layout }
+        board: { mode }
       } = state
-      const newNodes = restoreLayout(nodes, layout)
+      const layout = state.layouts[mode]
+      const newNodes = restoreLayout(mode, nodes, layout)
       consoleGroup('[action] restoreLayout', () => {
-        console.log('type', type)
+        console.log('mode', mode)
         console.log('layout', layout)
         console.log('nodes', newNodes)
       })
@@ -386,8 +385,8 @@ const graph = {
     graphLinks: state => state.data.links,
     graphBoardSvg: state => state.board.svg,
     graphBoardFocus: state => state.board.focus,
+    graphBoardMode: state => state.board.mode,
     graphBoardModeLabel: state => state.board.modeLabel,
-    graphBoardModeType: state => state.board.modeType,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const body = typeMapper[state.editor.type]

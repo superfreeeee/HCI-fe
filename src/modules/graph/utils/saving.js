@@ -1,3 +1,7 @@
+/**
+ * 图谱导出相关
+ */
+
 // svg 元素转为 png 图像
 export const svgToPng = (svg, pngWidth, pngHeight) => {
   return new Promise((resolve, reject) => {

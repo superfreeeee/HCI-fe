@@ -28,27 +28,13 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { layoutModes } from '../utils/layout'
+
 export default {
   name: 'GraphLayout',
   data() {
     return {
-      modes: [
-        {
-          type: 'primary',
-          label: '力导图模式',
-          mode: 'FORCE'
-        },
-        {
-          type: 'danger',
-          label: '排版模式',
-          mode: 'GRID'
-        },
-        {
-          type: 'warning',
-          label: '定点模式',
-          mode: 'FIXED'
-        }
-      ],
+      modes: layoutModes,
       actions: [
         {
           label: '保存布局',
@@ -67,7 +53,7 @@ export default {
   methods: {
     ...mapActions(['switchLayoutMode', 'saveLayout', 'restoreLayout']),
     switchMode({ label, mode }) {
-      this.switchLayoutMode({ label, type: mode })
+      this.switchLayoutMode({ label, mode })
     }
   }
 }

@@ -33,7 +33,7 @@ export default {
       'graphLinks',
       'graphBoardSvg',
       'graphBoardFocus',
-      'graphBoardModeType'
+      'graphBoardMode'
     ])
   },
   watch: {
@@ -52,18 +52,20 @@ export default {
         this.unfocus()
       }
     },
-    graphBoardModeType(type) {
-      console.log(`[GraphBoard] switch mode type: ${type}`)
+    graphBoardMode(mode) {
+      console.log(`[GraphBoard] switch mode: ${mode}`)
       const { unPinNodes, pinNodes } = this
       ;({
         force() {
           unPinNodes()
         },
-        grid() {},
+        grid() {
+          
+        },
         fixed() {
           pinNodes()
         }
-      }[type.toLowerCase()]())
+      }[mode.toLowerCase()]())
     }
   },
   methods: {
@@ -489,30 +491,30 @@ export default {
         .call(boundZoom.transform, $d3.zoomIdentity)
     },
     pinNodes() {
-      console.log(this)
-      if (!this.pinned) {
+      const { simulation, graphNodes, pinned } = this
+      if (!pinned) {
         this.pinned = true
-        this.simulation.stop()
-        for (const node of this.graphNodes) {
+        simulation.stop()
+        for (const node of graphNodes) {
           node.fx = node.x
           node.fy = node.y
         }
       }
     },
     unPinNodes() {
-      if (this.pinned) {
+      const { simulation, graphNodes, pinned } = this
+      if (pinned) {
         this.pinned = false
-        for (const node of this.graphNodes) {
+        for (const node of graphNodes) {
           node.fx = null
           node.fy = null
         }
-        const simulation = this.simulation
         simulation.alpha(1).restart()
       }
     }
   },
   mounted() {
-    const projectId = this.$route.params.projectId
+    const projectId = Number(this.$route.params.projectId)
     console.log(`[GraphBoard] mounted, projectId = ${projectId}`)
     this.graphInit(projectId).then(() => this.init())
     // this.graphInit(projectId)

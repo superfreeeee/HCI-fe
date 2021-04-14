@@ -81,7 +81,7 @@ export default {
     },
 
     /* 保存布局 */
-    updateLayout(layout, type, projectId) {
+    updateLayout(type, layout, projectId) {
       return {
         path: '/updateLayout',
         medhot: 'POST',
