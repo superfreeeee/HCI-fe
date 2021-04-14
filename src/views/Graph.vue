@@ -74,7 +74,7 @@ export default {
     }
   },
   mounted() {
-    const projectId = this.$route.params.projectId
+    const projectId = Number(this.$route.params.projectId)
     this.getProjectInfo(projectId)
   }
 }

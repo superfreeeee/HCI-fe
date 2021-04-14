@@ -45,13 +45,13 @@ export const setRecentRoute = () => {
 }
 
 router.beforeEach((to, from, next) => {
-  consoleGroup('[router.beforeEach] start', () => {
-    console.log('from', from)
-    console.log('to', to)
-  })
+  // consoleGroup('[router.beforeEach] start', () => {
+  //   console.log('from', from)
+  //   console.log('to', to)
+  // })
   if (!whiteList.includes(to.path)) {
     // not on whiteList
-    console.log('guard', to)
+    // console.log('guard', to)
     const token = localStorage.getItem('coin-token')
     if (token) {
       // has token(login before)

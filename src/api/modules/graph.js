@@ -84,7 +84,7 @@ export default {
     updateLayout(type, layout, projectId) {
       return {
         path: '/updateLayout',
-        medhot: 'POST',
+        method: 'POST',
         data: {
           nodes: layout,
           projectId,

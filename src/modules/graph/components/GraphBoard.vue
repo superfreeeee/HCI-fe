@@ -509,7 +509,6 @@ export default {
     const projectId = Number(this.$route.params.projectId)
     console.log(`[GraphBoard] mounted, projectId = ${projectId}`)
     this.graphInit(projectId).then(() => this.init())
-    // this.graphInit(projectId)
     this.$el.addEventListener('click', this.selectItemCanel)
   },
   destroyed() {

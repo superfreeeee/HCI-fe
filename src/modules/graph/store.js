@@ -16,8 +16,13 @@ const graph = {
     board: {
       svg: null,
       focus: false,
-      mode: 'FORCE', // 'FORCE' | 'GRID' | 'FREE'
-      modeLabel: '力导图模式'
+      mode: 'FORCE' // 'FORCE' | 'GRID' | 'FREE'
+    },
+    layoutConfirm: {
+      // 布局保存提示
+      ignore: false, // 不再提醒
+      dirty: true, // 需要提醒
+      timer: null
     },
     svg: null,
     editor: {
@@ -53,9 +58,8 @@ const graph = {
     setGraphBoardFocus(state, focus) {
       state.board.focus = focus
     },
-    setGraphBoardMode(state, { label, mode }) {
+    setGraphBoardMode(state, mode) {
       state.board.mode = mode
-      state.board.modeLabel = label
     },
     setEditor(
       state,
@@ -124,23 +128,35 @@ const graph = {
     },
     setLayout(state, { mode = 'FORCE', layout }) {
       state.layouts[mode] = layout
+    },
+    setLayoutConfirm(state) {
+      const { ignore, timer } = state.layoutConfirm
+      clearTimeout(timer)
+      state.layoutConfirm.timer = null
+      if (!ignore) {
+        state.layoutConfirm.dirty = false
+        state.layoutConfirm.timer = setTimeout(() => {
+          state.layoutConfirm.dirty = true
+          state.layoutConfirm.timer = null
+        }, 5000)
+      }
     }
   },
   actions: {
     async graphInit({ commit, state }, projectId) {
       if (projectId === state.projectId) return true
-      commit('setGraphProjectId', projectId)
       const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
         const data = res.data
+        commit('setGraphProjectId', projectId)
         commit('setGraphData', data)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
           console.log('data', { ...data })
         })
       } else {
-        console.log('error')
+        console.log('[action] graphInit.error')
         $notify({
           title: '图谱初始化异常',
           type: 'error'
@@ -212,7 +228,7 @@ const graph = {
       commit('setEditorEditable', true)
     },
     // 提交 实体/关系 创建
-    async editorCreateCommit({ state, commit, dispatch }) {
+    async editorCreateCommit({ state, commit }) {
       let {
         projectId,
         editor: { item, type }
@@ -320,11 +336,38 @@ const graph = {
       }
       return false
     },
-    switchLayoutMode({ commit, dispatch }, mode /* { label, mode } */) {
-      consoleGroup('[switchLayoutMode] set mode', () => {
-        console.log(mode)
+    switchLayoutMode({ state, commit, dispatch }, mode) {
+      const {
+        board: { mode: currentMode },
+        layoutConfirm: { ignore, dirty }
+      } = state
+      consoleGroup('[action] switchLayoutMode', () => {
+        console.log('mode', mode)
+        console.log('ignore', ignore)
+        console.log('dirty', dirty)
       })
-      commit('setGraphBoardMode', mode)
+      if (currentMode !== 'GRID' && !ignore && dirty) {
+        // 排版模式不需要提醒
+        $confirm({
+          title: '保存布局',
+          message: '是否保存当前布局？',
+          confirmText: '保存',
+          cancelText: '不保存'
+        }).then(option => {
+          ;({
+            confirm() {
+              dispatch('saveLayout')
+              commit('setGraphBoardMode', mode)
+            },
+            cancel() {
+              commit('setGraphBoardMode', mode)
+            },
+            close() {}
+          }[option]())
+        })
+      } else {
+        commit('setGraphBoardMode', mode)
+      }
     },
     // 保存布局
     async saveLayout({ state, commit }) {
@@ -338,10 +381,15 @@ const graph = {
         console.log('nodes', nodes)
         console.log('layout', layout)
       })
-      commit('setLayout', { mode, layout })
 
       const res = await api.updateLayout(mode, layout, projectId)
-      console.log(res)
+      if (res.status === 200) {
+        commit('setLayout', { mode, layout })
+        commit('setLayoutConfirm')
+        $notify({ title: '保存布局成功', type: 'success' })
+        return true
+      }
+      return false
     },
     // 恢复布局
     restoreLayout({ state, commit }) {
@@ -360,6 +408,7 @@ const graph = {
         console.log('nodes', newNodes)
       })
       commit('setGraphNodes', newNodes)
+      commit('setLayoutConfirm')
     },
     // 持久化相关
     saveAsPng({ state, getters }) {
@@ -389,7 +438,6 @@ const graph = {
     graphBoardSvg: state => state.board.svg,
     graphBoardFocus: state => state.board.focus,
     graphBoardMode: state => state.board.mode,
-    graphBoardModeLabel: state => state.board.modeLabel,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const body = typeMapper[state.editor.type]

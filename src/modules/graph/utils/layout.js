@@ -1,7 +1,7 @@
 /**
  * 布局操作选项
  */
-
+// 布局模式
 export const layoutModes = [
   {
     type: 'primary',

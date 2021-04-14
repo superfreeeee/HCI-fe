@@ -6,9 +6,9 @@
         v-for="mode in modes"
         :key="mode.label"
         :type="mode.type"
-        :plain="mode.label !== graphBoardModeLabel"
+        :plain="mode.mode !== graphBoardMode"
         size="large"
-        @click="switchMode(mode)"
+        @click="switchMode($event, mode)"
         >{{ mode.label }}</el-button
       >
     </div>
@@ -28,6 +28,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
+import { buttonAutoBlur } from '@/common/utils'
 import { layoutModes } from '../utils/layout'
 
 export default {
@@ -48,12 +49,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['graphBoardModeLabel'])
+    ...mapGetters(['graphBoardMode'])
   },
   methods: {
     ...mapActions(['switchLayoutMode', 'saveLayout', 'restoreLayout']),
-    switchMode({ label, mode }) {
-      this.switchLayoutMode({ label, mode })
+    switchMode(e, { mode }) {
+      buttonAutoBlur(e)
+      if (mode !== this.graphBoardMode) {
+        this.switchLayoutMode(mode)
+      }
     }
   }
 }

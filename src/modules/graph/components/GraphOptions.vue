@@ -6,7 +6,7 @@
       size="medium"
       :key="option.label"
       :type="option.type"
-      @click="option.handler"
+      @click="handlerDispatcher($event, option.handler)"
       >{{ option.label }}</el-button
     >
   </div>
@@ -14,6 +14,8 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex'
+import { buttonAutoBlur } from '@/common/utils'
+
 export default {
   name: 'GraphOptions',
   data() {
@@ -62,13 +64,13 @@ export default {
     ...mapGetters(['projectId'])
   },
   methods: {
-    ...mapActions([
-      'editorCreate',
-      'saveAsPng',
-      'saveAsXml'
-    ]),
+    ...mapActions(['editorCreate', 'saveAsPng', 'saveAsXml']),
     exportXml() {
       this.saveAsXml(this.projectId)
+    },
+    handlerDispatcher(e, handler) {
+      buttonAutoBlur(e)
+      handler()
     }
   }
 }

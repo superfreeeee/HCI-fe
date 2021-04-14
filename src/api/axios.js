@@ -6,7 +6,7 @@ import router, { setRecentRoute } from '@/router'
 const instance = axios.create({ baseURL, withCredentials: true })
 
 const expiredToken =
-  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImNyZWF0ZWQiOjE2MTgxMzIyOTk4NTAsInJvbGVzIjpudWxsLCJpZCI6MSwiZXhwIjoxNjE4NjMyOTUzfQ.IjcQFU-9Kf6CcLXS69wa9Id4jFQrwYmCfW6FiXvJHg_XT17Z9XJzLOC5IXVRStLCbl0fH57Bkq3bwAnozEXvOw'
+  'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImNyZWF0ZWQiOjE2MTgzODg2NjMzMTksInJvbGVzIjpudWxsLCJpZCI6MSwiZXhwIjoxNjE4Mzg4NjY0fQ.9aDvHMMAwFi4SiVkNsyjEhiMpPmZ4tTr0UAIJjmhjELO5daj2MCAwPm1CwXgufNoD2NZhN1tiRLPGOj31qX62g'
 
 instance.interceptors.request.use(
   config => {

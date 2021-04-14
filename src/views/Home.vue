@@ -51,7 +51,6 @@ export default {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
     ...mapActions(['getListByUserId', 'userLogout', 'getUserInfo']),
     gotoProject(id) {
-      this.setGraphProjectId(id)
       this.$router.push(`/graph/${id}`)
     },
     createNewGraph() {
