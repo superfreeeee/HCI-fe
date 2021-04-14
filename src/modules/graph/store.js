@@ -320,7 +320,7 @@ const graph = {
       }
       return false
     },
-    switchLayoutMode({ commit }, mode /* { label, mode } */) {
+    switchLayoutMode({ commit, dispatch }, mode /* { label, mode } */) {
       consoleGroup('[switchLayoutMode] set mode', () => {
         console.log(mode)
       })
@@ -350,6 +350,9 @@ const graph = {
         board: { mode }
       } = state
       const layout = state.layouts[mode]
+      if (layout.length < nodes.length) {
+        return
+      }
       const newNodes = restoreLayout(mode, nodes, layout)
       consoleGroup('[action] restoreLayout', () => {
         console.log('mode', mode)

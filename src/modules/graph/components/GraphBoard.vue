@@ -54,23 +54,22 @@ export default {
     },
     graphBoardMode(mode) {
       console.log(`[GraphBoard] switch mode: ${mode}`)
-      const { unPinNodes, pinNodes } = this
+      const { unPinNodes, pinNodes, restoreLayout } = this
       ;({
         force() {
           unPinNodes()
         },
-        grid() {
-          
-        },
+        grid() {},
         fixed() {
           pinNodes()
         }
       }[mode.toLowerCase()]())
+      restoreLayout()
     }
   },
   methods: {
     ...mapMutations(['setGraphBoardSvg', 'setGraphBoardFocus']),
-    ...mapActions(['graphInit', 'editorSelect']),
+    ...mapActions(['graphInit', 'editorSelect', 'restoreLayout']),
     /********** d3 graph init **********/
     init() {
       console.log('[GraphBoard] init')
