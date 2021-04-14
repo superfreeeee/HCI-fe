@@ -71,6 +71,7 @@ export default {
     ...mapMutations(['setGraphBoardSvg', 'setGraphBoardFocus']),
     ...mapActions(['graphInit', 'editorSelect', 'restoreLayout']),
     /********** d3 graph init **********/
+    //
     init() {
       console.log('[GraphBoard] init')
       this.initialized = false
@@ -459,29 +460,19 @@ export default {
       this.editorSelect({ type: 'cancel' })
     },
     /********** GraphOptions **********/
+    // 全局刷新
     backCenter() {
-      const {
-        graphBoardSvg,
-        graphNodes,
-        graphLinks,
-        init,
-        setFocus,
-        graphBoardFocus
-      } = this
-      graphBoardSvg.select('g').remove()
-      this.pinned = false
-      for (const node of graphNodes) {
-        node.x = node.y = 0
-        node.vx = node.vy = 0
-        node.fx = node.fy = null
+      const { graphNodes, reload, graphBoardMode } = this
+      if (graphBoardMode === 'FORCE') {
+        for (const node of graphNodes) {
+          node.x = node.y = 0
+          node.vx = node.vy = 0
+          node.fx = node.fy = null
+        }
+        reload()
       }
-      for (const link of graphLinks) {
-        link.source = link.from
-        link.target = link.to
-      }
-      init()
-      setFocus(graphBoardFocus)
     },
+    // 重置缩放
     zoomReset() {
       const { root, boundZoom, $d3 } = this
       root
@@ -489,6 +480,7 @@ export default {
         .duration(500)
         .call(boundZoom.transform, $d3.zoomIdentity)
     },
+    // 定点模式
     pinNodes() {
       const { simulation, graphNodes, pinned } = this
       if (!pinned) {
@@ -500,6 +492,7 @@ export default {
         }
       }
     },
+    // 取消固定实体
     unPinNodes() {
       const { simulation, graphNodes, pinned } = this
       if (pinned) {
