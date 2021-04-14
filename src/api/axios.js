@@ -12,9 +12,9 @@ instance.interceptors.request.use(
   config => {
     const token = localStorage.getItem('coin-token')
     if (token) {
-      // config.headers['coin-token'] = token
+      config.headers['coin-token'] = token
     }
-    config.headers['coin-token'] = expiredToken
+    // config.headers['coin-token'] = expiredToken
     consoleGroup(`[axios.request] ${config.url}`, () => {
       console.log(config)
     })
