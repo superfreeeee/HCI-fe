@@ -56,6 +56,7 @@ export const checkRouteExist = to => {
   console.log(allRoute)
   let flag = false
   for(let i=0; i<allRoute.length; i++) {
+    // 這邊判斷不好，先放行
     if(to.name === 'Graph') {
       return true
     }
