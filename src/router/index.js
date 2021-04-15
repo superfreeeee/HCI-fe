@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import { $message } from '../common/utils'
+import { makeAllRoute } from '../common/utils'
 
 Vue.use(Router)
 
@@ -43,7 +44,8 @@ const router = new Router({
 })
 
 let recentRoute = null
-let allRoute = router.options.routes
+let routes = router.options.routes
+let allRoute = makeAllRoute(routes)
 
 export const setRecentRoute = to => {
   recentRoute = to || router.currentRoute
@@ -51,9 +53,13 @@ export const setRecentRoute = to => {
 }
 
 export const checkRouteExist = to => {
+  console.log(allRoute)
   let flag = false
   for(let i=0; i<allRoute.length; i++) {
-    if(allRoute[i].path === to.path) {
+    if(to.name === 'Graph') {
+      return true
+    }
+    if(to.path === allRoute[i]) {
       flag = true
       break
     }
@@ -64,8 +70,8 @@ export const checkRouteExist = to => {
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('coin-token')
   if(!checkRouteExist(to)) {
-    $message('不存在路由', 'error')
-    next(router.currentRoute)
+    $message('路由错误', 'error')
+    next(from)
   }
   if (to.meta.requireLogin) {
     // need login
