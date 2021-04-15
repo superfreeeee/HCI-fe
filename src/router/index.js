@@ -43,16 +43,32 @@ const router = new Router({
 })
 
 let recentRoute = null
+let allRoute = router.options.routes
 
 export const setRecentRoute = to => {
   recentRoute = to || router.currentRoute
   console.log('set recentRoute', recentRoute)
 }
 
+export const checkRouteExist = to => {
+  let flag = false
+  for(let i=0; i<allRoute.length; i++) {
+    if(allRoute[i].path === to.path) {
+      flag = true
+      break
+    }
+  }
+  return flag
+}
+
 router.beforeEach((to, from, next) => {
+  const token = localStorage.getItem('coin-token')
+  if(!checkRouteExist(to)) {
+    $message('不存在路由', 'error')
+    next(router.currentRoute)
+  }
   if (to.meta.requireLogin) {
-    // neet login
-    const token = localStorage.getItem('coin-token')
+    // need login
     if (token) {
       // has token(login before)
       // token 过期由 axios 拦截器进行拦截并跳转
@@ -71,7 +87,11 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // no need login
-    next()
+    if(token) {
+      next(false)
+    } else {
+      next()
+    }
   }
 })
 
