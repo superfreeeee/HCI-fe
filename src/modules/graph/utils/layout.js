@@ -1,4 +1,5 @@
 import { consoleGroup } from '@/common/utils'
+import config from './config'
 /**
  * 布局操作选项
  */
@@ -25,33 +26,68 @@ export const layoutModes = [
  * 图谱布局相关
  */
 
-// 保存图谱布局(nodes 数据 -> layout 格式)
+/**
+ * 计算布局占用宽高
+ * @param {*} layoutNodes
+ * @param {*} radiusMapper
+ * @returns { width, height }
+ */
+export const getNodesSize = nodes => {
+  let [x1, y1, x2, y2] = Array(4).fill(0)
+  nodes.forEach(({ x, y, radius }) => {
+    x1 = Math.min(x1, x - radius)
+    y1 = Math.min(y1, y - radius)
+    x2 = Math.max(x2, x + radius)
+    y2 = Math.max(y2, y + radius)
+  })
+  const width = x2 - x1
+  const height = y2 - y1
+  return { width, height }
+}
+
+/**
+ * 保存图谱布局(nodes 数据 -> layout 格式)
+ * @param {*} nodes
+ * @returns { nodes, width, height }
+ */
 export const saveLayout = nodes => {
-  const layout = []
+  const layoutNodes = []
   nodes.forEach(({ id, x, y }) => {
-    layout.push({
+    layoutNodes.push({
       nodeId: id,
       xaxis: x,
       yaxis: y
     })
   })
-  return layout
+  const { width, height } = getNodesSize(nodes)
+  return { nodes: layoutNodes, width, height }
 }
 
-// 恢复布局(nodes 数据 <- layout 格式)
-export const restoreLayout = (mode, nodes, layout) => {
+/**
+ * 恢复布局(nodes 数据 <- layout 格式)
+ * @param {*} mode
+ * @param {*} nodes
+ * @param {*} { nodes }
+ * @returns newNodes
+ */
+export const restoreLayout = (mode, nodes, { nodes: layoutNodes }) => {
   const pos = {}
-  layout.forEach(({ nodeId, xaxis, yaxis }) => {
+  layoutNodes.forEach(({ nodeId, xaxis, yaxis }) => {
     pos[nodeId] = [xaxis, yaxis]
   })
   return nodes.map(node => {
-    const [x, y] = Reflect.has(pos, node.id) ? pos[node.id] : Array(2)
+    const [x, y] = Reflect.has(pos, node.id) ? pos[node.id] : [node.x, node.y]
     return mode === 'FORCE'
       ? { ...node, x, y, fx: null, fy: null }
-      : { ...node, fx: x, fy: y }
+      : { ...node, fx: x, fy: y, x, y }
   })
 }
 
+/**
+ * 清理节点固定坐标 fx, fy
+ * @param {*} nodes
+ * @returns
+ */
 export const clearFixed = nodes => {
   return nodes.map(node => ({ ...node, fx: null, fy: null }))
 }
@@ -76,7 +112,7 @@ export const getGridLayout = nodes => {
 
   // 总宽度、高度
   let [width, height] = [0, 0]
-  const [gap, baseRadius] = [40, 25]
+  const [gap, baseRadius] = [40, config.baseRadius]
   groups.forEach(name => {
     const group = groupsObj[name]
 
@@ -108,7 +144,7 @@ export const getGridLayout = nodes => {
 
   // 计算实际坐标
   let [x, y] = [-width / 2, 0]
-  const layout = []
+  const layoutNodes = []
   groups.forEach(name => {
     const { d, nodes } = groupsObj[name]
     x += d / 2
@@ -116,7 +152,7 @@ export const getGridLayout = nodes => {
     const mid = (len - 1) / 2
     for (let i = 0; i < len; i++) {
       const node = nodes[i]
-      layout.push({
+      layoutNodes.push({
         nodeId: node.id,
         xaxis: x,
         yaxis: y + (i - mid) * (d + gap)
@@ -125,6 +161,10 @@ export const getGridLayout = nodes => {
     x += gap + d / 2
   })
 
-  return layout
-  // return saveLayout(nodes)
+  return { nodes: layoutNodes, width, height }
+}
+
+export const getScale = ({ width, height }) => {
+  const { width: boardWidth, height: boardHeight } = config
+  return Math.min(1, width / boardWidth, height / boardHeight)
 }

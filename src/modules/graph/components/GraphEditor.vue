@@ -165,7 +165,7 @@ export default {
       this.useGroupColor = !color
     },
     useGroupColor(bool) {
-      if (bool) {
+      if (bool && this.graphEditorItem) {
         this.graphEditorItem.color = ''
       }
     }

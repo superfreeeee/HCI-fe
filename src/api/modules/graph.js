@@ -87,7 +87,7 @@ export default {
         path: '/updateLayout',
         method: 'POST',
         data: {
-          nodes: layout,
+          ...layout, // nodes, width, height
           projectId,
           type
         }

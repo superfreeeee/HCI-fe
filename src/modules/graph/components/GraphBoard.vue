@@ -4,17 +4,13 @@
 
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
+import config from '../utils/config'
+
 export default {
   name: 'GraphBoard',
   data() {
     return {
-      config: {
-        width: 1000,
-        height: 750,
-        baseRadius: 25,
-        font: 'Arial',
-        fontSize: 20
-      },
+      config,
       initialized: false,
       simulation: null,
       root: null,
@@ -273,6 +269,8 @@ export default {
         focus,
         unfocus,
         setFocus,
+        pinNodes,
+        unPinNodes,
         tick
       } = this
       let { links, linksText, nodes, nodesText } = this

@@ -3,7 +3,14 @@ import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemVarify, itemOptions, typeMapper } from './utils/item'
-import { clearFixed, getGridLayout, restoreLayout, saveLayout } from './utils/layout'
+import {
+  clearFixed,
+  getGridLayout,
+  getScale,
+  restoreLayout,
+  saveLayout,
+  getNodesSize
+} from './utils/layout'
 // import { fakeGraphData } from '@/common/entity'
 
 const graph = {
@@ -16,7 +23,8 @@ const graph = {
     board: {
       svg: null,
       focus: false,
-      mode: 'FORCE' // 'FORCE' | 'GRID' | 'FREE'
+      mode: 'FORCE', // 'FORCE' | 'GRID' | 'FREE'
+      scale: 1
     },
     layoutConfirm: {
       // 布局保存提示
@@ -34,9 +42,9 @@ const graph = {
     },
     layouts: {
       // later change to history layout
-      FORCE: [],
-      GRID: [],
-      FIXED: []
+      FORCE: { nodes: [] },
+      GRID: { nodes: [] },
+      FIXED: { nodes: [] }
     }
   },
   mutations: {
@@ -60,6 +68,10 @@ const graph = {
     },
     setGraphBoardMode(state, mode) {
       state.board.mode = mode
+    },
+    setGraphBoardScale(state, scale = 1) {
+      console.log('scale', scale)
+      state.board.scale = scale
     },
     setEditor(
       state,
@@ -127,8 +139,8 @@ const graph = {
       items.push(item)
     },
     setLayouts(state, layouts) {
-      layouts.forEach(({ type, nodes }) => {
-        state.layouts[type] = nodes
+      layouts.forEach(layout => {
+        state.layouts[layout.type] = layout
       })
     },
     setLayout(state, { mode = 'FORCE', layout }) {
@@ -155,13 +167,21 @@ const graph = {
       if (res.status === 200) {
         const mode = getters.projectInfo.layoutStatus
         const { projectId, nodes, links, layouts } = res.data
+        const pureLayouts = layouts.map(({ projectId, ...rest }) => ({
+          ...rest
+        }))
+        const scale = getScale(
+          pureLayouts.filter(layout => layout.type === mode)[0]
+        )
         commit('setGraphProjectId', projectId)
         commit('setGraphBoardMode', mode)
         commit('setGraphData', { nodes, links })
-        commit('setLayouts', layouts)
+        commit('setLayouts', pureLayouts)
+        commit('setGraphBoardScale', scale)
         commit('setEditor')
         consoleGroup('[action] graphInit', () => {
           console.log('projectId', projectId)
+          console.log('mode', mode)
           console.log('nodes', nodes)
           console.log('links', links)
           console.log('layouts', layouts)
@@ -418,23 +438,22 @@ const graph = {
         data: { nodes },
         board: { mode }
       } = state
-      const layout = state.layouts[mode]
-      if (layout.length > 0 && layout.length < nodes.length) {
-        commit('setLayout', { mode, layout: [] })
+      let layout = state.layouts[mode]
+      console.log('layouts', state.layouts)
+      console.log('restore layout type', mode, layout)
+      if (layout.nodes.length !== nodes.length && mode === 'GRID') {
+        layout = getGridLayout(nodes)
+        commit('setLayout', { mode: 'GRID', layout })
       }
-      let newNodes =
-        layout.length < nodes.length
-          ? nodes
-          : restoreLayout(mode, nodes, layout)
-      if (mode === 'FORCE') {
-        newNodes = clearFixed(newNodes)
-      }
+      const newNodes = restoreLayout(mode, nodes, layout)
+      const scale = getScale(getNodesSize(newNodes))
       consoleGroup('[action] restoreLayout', () => {
         console.log('mode', mode)
         console.log('layout', layout)
         console.log('nodes', newNodes)
       })
       commit('setGraphNodes', newNodes)
+      commit('setGraphBoardScale', scale)
       commit('setLayoutConfirm')
     },
     // 持久化相关
