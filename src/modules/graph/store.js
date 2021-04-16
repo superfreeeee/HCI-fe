@@ -70,7 +70,6 @@ const graph = {
       state.board.mode = mode
     },
     setGraphBoardScale(state, scale = 1) {
-      console.log('scale', scale)
       state.board.scale = scale
     },
     setEditor(
@@ -95,7 +94,6 @@ const graph = {
       if (state.editor.select === select) {
         select = ''
       }
-      console.log(`select = '${select}'`)
       state.editor.select = select
       if (select !== '') {
         $notify({ title: '点击目标实体', message: '再次点击取消选择' })
@@ -393,11 +391,8 @@ const graph = {
         ;({
           confirm() {
             dispatch('saveLayout')
-            commit('setGraphBoardMode', mode)
           },
-          cancel() {
-            commit('setGraphBoardMode', mode)
-          },
+          cancel() {},
           close() {
             doNext = false
           }
@@ -488,16 +483,24 @@ const graph = {
     graphBoardScale: state => state.board.scale,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
-      const body = typeMapper[state.editor.type]
-      if (state.editor.createNew) {
-        return `新增${body}`
-      }
-      const id = state.editor.item.id
-      return `${body} ID：${id}`
+      const {
+        editor: {
+          type,
+          createNew,
+          item: { id }
+        }
+      } = state
+      const body = typeMapper[type]
+      return createNew ? `新增${body}` : `${body} ID：${id}`
     },
     graphEditorOptions: state =>
       !state.editor.type ? [] : itemOptions[state.editor.type],
     graphEditorItem: state => state.editor.item,
+    graphEditorNodeGroups: state => {
+      const groups = new Set()
+      state.data.nodes.forEach(({ group }) => groups.add(group))
+      return [...groups]
+    },
     graphEditorCreateNew: state => state.editor.createNew,
     graphEditorSelect: state => state.editor.select,
     graphEditorEditable: state => state.editor.editable

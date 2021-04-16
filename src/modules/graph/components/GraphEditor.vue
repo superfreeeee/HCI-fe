@@ -77,6 +77,14 @@
             ></el-input>
           </div>
           <!-- 其他输入框 -->
+          <el-autocomplete
+            v-else-if="option.attr === 'group'"
+            clearable
+            :fetch-suggestions="queryGroup"
+            :placeholder="option.holder"
+            v-model="graphEditorItem[option.attr]"
+            @select="selectGroup"
+          ></el-autocomplete>
           <el-input
             v-else
             :type="option.type"
@@ -120,6 +128,7 @@ export default {
       'graphEditorOptions',
       'graphEditorCreateNew',
       'graphEditorEditable',
+      'graphEditorNodeGroups',
       'graphEditorSelect'
     ]),
     typeStr() {
@@ -183,6 +192,19 @@ export default {
       'editorUpdateCommit',
       'editorDeleteCommit'
     ]),
+    queryGroup(inputGroup, cb) {
+      const { graphEditorNodeGroups } = this
+      console.log(graphEditorNodeGroups)
+      const suggestGroups = inputGroup
+        ? graphEditorNodeGroups.filter(
+            group => group.toLowerCase().indexOf(inputGroup.toLowerCase()) === 0
+          )
+        : graphEditorNodeGroups
+      return cb(suggestGroups.map(group => ({ value: group })))
+    },
+    selectGroup({ value: group }) {
+      this.graphEditorItem.group = group
+    },
     resetItem() {
       const item = {}
       this.graphEditorOptions.forEach(({ attr }) => {

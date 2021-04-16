@@ -52,11 +52,11 @@ export default {
     },
     graphBoardMode(mode) {
       console.log(`[GraphBoard] switch mode: ${mode}`)
-      const { restoreLayout, setScale } = this
+      const { restoreLayout, zoomReset } = this
       this.locked = mode === 'GRID'
       this.pinned = mode !== 'FORCE'
-      restoreLayout().then(scale => {
-        setScale(scale)
+      restoreLayout().then(() => {
+        zoomReset()
       })
     }
   },
@@ -74,6 +74,7 @@ export default {
         graphLinks,
         drag,
         zoom,
+        zoomReset,
         focus,
         tick,
         unfocus,
@@ -81,8 +82,7 @@ export default {
         $d3: d3,
         $el,
         setGraphBoardSvg,
-        restoreLayout,
-        setScale
+        restoreLayout
       } = this
       let simulation,
         boundDrag,
@@ -241,8 +241,8 @@ export default {
        * bind simulation tick
        */
       simulation.on('tick', tick)
-      restoreLayout().then(scale => {
-        setScale(scale)
+      restoreLayout().then(() => {
+        zoomReset()
       })
       this.initialized = true
 
@@ -407,15 +407,6 @@ export default {
         root.attr('transform', e.transform)
       })
     },
-    // 设置缩放
-    setScale(scale) {
-      console.log('scale', scale)
-      const { view, boundZoom, $d3 } = this
-      view
-        .transition()
-        .duration(500)
-        .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
-    },
     // 设置焦点
     setFocus(nodeId) {
       const {
@@ -507,11 +498,11 @@ export default {
     },
     // 重置缩放
     zoomReset() {
-      const { view, boundZoom, $d3 } = this
+      const { view, boundZoom, $d3, graphBoardScale } = this
       view
         .transition()
         .duration(750)
-        .call(boundZoom.transform, $d3.zoomIdentity)
+        .call(boundZoom.transform, $d3.zoomIdentity.scale(graphBoardScale))
     },
     // 定点模式
     pinNodes() {
