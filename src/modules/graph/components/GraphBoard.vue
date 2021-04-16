@@ -127,20 +127,21 @@ export default {
         .select($el)
         .attr('viewBox', [-width / 2, -height / 2, width, height])
 
+      view = svg
+        .append('rect')
+        .attr('class', 'view')
+        .style('fill', 'transparent')
+        .attr('x', -width / 2)
+        .attr('y', -height / 2)
+        .attr('width', width)
+        .attr('height', height)
+
       if (root) root.remove()
       root = svg.append('g').attr('class', 'root')
 
-      // view = svg
-      //   .append('rect')
-      //   .attr('class', 'view')
-      //   .attr('x', 0.5)
-      //   .attr('y', 0.5)
-      //   .attr('width', width - 1)
-      //   .attr('height', height - 1)
-
       // zoom for root
       boundZoom = zoom(root)
-      root.call(boundZoom)
+      view.call(boundZoom)
 
       /**
        * focus Node
@@ -393,8 +394,7 @@ export default {
         .on('end', dragended)
     },
     zoom(root) {
-      const d3 = this.$d3
-      return d3.zoom().on('zoom', e => {
+      return this.$d3.zoom().on('zoom', e => {
         // view.attr('transform', e.transform)
         root.attr('transform', e.transform)
       })
@@ -426,10 +426,12 @@ export default {
         this.focusNode = focusNode
       }
     },
+    // 实体聚焦
     focus(e) {
       const nodeId = Number(e.target.attributes['data-id'].value)
       this.setFocus(nodeId)
     },
+    // 取消实体聚焦
     unfocus(refocus) {
       const { focusNode, graphBoardFocus, setFocus } = this
       if (focusNode) {
@@ -440,6 +442,7 @@ export default {
         setFocus(graphBoardFocus)
       }
     },
+    // 每帧刷新
     tick() {
       const { links, linksText, nodes, nodesText, focusNode } = this
 
@@ -458,6 +461,7 @@ export default {
         focusNode.attr('cx', d => d.x).attr('cy', d => d.y)
       }
     },
+    // 选中实体/关系
     selectItemHandler(type) {
       return e => {
         e.stopPropagation()
@@ -466,6 +470,7 @@ export default {
         this.$emit('editor-open')
       }
     },
+    // 取消选取
     selectItemCanel() {
       this.editorSelect({ type: 'cancel' })
     },
