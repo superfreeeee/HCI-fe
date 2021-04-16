@@ -248,6 +248,7 @@ export default {
       this.boundDrag = boundDrag
       this.svg = svg
       this.root = root
+      this.view = view
       this.boundZoom = boundZoom
       this.focusNode = focusNode
       this.links = links
@@ -394,7 +395,8 @@ export default {
         .on('end', dragended)
     },
     zoom(root) {
-      return this.$d3.zoom().on('zoom', e => {
+      const d3 = this.$d3
+      return d3.zoom().on('zoom', e => {
         // view.attr('transform', e.transform)
         root.attr('transform', e.transform)
       })
@@ -489,10 +491,11 @@ export default {
     },
     // 重置缩放
     zoomReset() {
-      const { root, boundZoom, $d3 } = this
-      root
+      const { view, boundZoom, $d3 } = this
+      console.log('reset')
+      view
         .transition()
-        .duration(500)
+        .duration(750)
         .call(boundZoom.transform, $d3.zoomIdentity)
     },
     // 定点模式
