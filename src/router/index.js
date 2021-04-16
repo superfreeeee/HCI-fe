@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import { $message } from '../common/utils'
-// import { makeAllRoute } from './utils'
 
 Vue.use(Router)
 
@@ -41,43 +40,26 @@ const router = new Router({
       }
     },
     {
+      path: '/notfound',
+      name: 'Notfound',
+      component: () => import('@/views/Notfound.vue')
+    },
+    {
       path: '*',
-      redirect: '/'
+      redirect: '/notfound'
     }
   ]
 })
 
 let recentRoute = null
-// let routes = router.options.routes
-// let allRoute = makeAllRoute(routes)
 
 export const setRecentRoute = to => {
   recentRoute = to || router.currentRoute
   console.log('set recentRoute', recentRoute)
 }
 
-// export const checkRouteExist = to => {
-//   console.log(allRoute)
-//   let flag = false
-//   for (let i = 0; i < allRoute.length; i++) {
-//     // 這邊判斷不好，先放行
-//     if (to.name === 'Graph') {
-//       return true
-//     }
-//     if (to.path === allRoute[i]) {
-//       flag = true
-//       break
-//     }
-//   }
-//   return flag
-// }
-
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('coin-token')
-  // if (!checkRouteExist(to)) {
-  //   $message('路由错误', 'error')
-  //   next(from)
-  // }
   if (to.meta.requireLogin) {
     // need login
     if (token) {
