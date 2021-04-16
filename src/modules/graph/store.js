@@ -452,9 +452,10 @@ const graph = {
         console.log('layout', layout)
         console.log('nodes', newNodes)
       })
-      commit('setGraphNodes', newNodes)
       commit('setGraphBoardScale', scale)
+      commit('setGraphNodes', newNodes)
       commit('setLayoutConfirm')
+      return scale
     },
     // 持久化相关
     saveAsPng({ state, getters }) {
@@ -484,6 +485,7 @@ const graph = {
     graphBoardSvg: state => state.board.svg,
     graphBoardFocus: state => state.board.focus,
     graphBoardMode: state => state.board.mode,
+    graphBoardScale: state => state.board.scale,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const body = typeMapper[state.editor.type]

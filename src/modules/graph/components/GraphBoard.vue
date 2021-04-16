@@ -30,7 +30,8 @@ export default {
       'graphLinks',
       'graphBoardSvg',
       'graphBoardFocus',
-      'graphBoardMode'
+      'graphBoardMode',
+      'graphBoardScale'
     ])
   },
   watch: {
@@ -51,10 +52,12 @@ export default {
     },
     graphBoardMode(mode) {
       console.log(`[GraphBoard] switch mode: ${mode}`)
-      const { restoreLayout } = this
+      const { restoreLayout, setScale } = this
       this.locked = mode === 'GRID'
       this.pinned = mode !== 'FORCE'
-      restoreLayout()
+      restoreLayout().then(scale => {
+        setScale(scale)
+      })
     }
   },
   methods: {
@@ -78,7 +81,8 @@ export default {
         $d3: d3,
         $el,
         setGraphBoardSvg,
-        restoreLayout
+        restoreLayout,
+        setScale
       } = this
       let simulation,
         boundDrag,
@@ -237,7 +241,9 @@ export default {
        * bind simulation tick
        */
       simulation.on('tick', tick)
-      restoreLayout()
+      restoreLayout().then(scale => {
+        setScale(scale)
+      })
       this.initialized = true
 
       this.simulation = simulation
@@ -359,6 +365,7 @@ export default {
       this.nodesText = nodesText
     },
     /********** d3 gesture **********/
+    // d3 拖曳
     drag(simulation) {
       const d3 = this.$d3
 
@@ -392,6 +399,7 @@ export default {
         .on('drag', dragged)
         .on('end', dragended)
     },
+    // d3 缩放
     zoom(root) {
       const d3 = this.$d3
       return d3.zoom().on('zoom', e => {
@@ -399,6 +407,16 @@ export default {
         root.attr('transform', e.transform)
       })
     },
+    // 设置缩放
+    setScale(scale) {
+      console.log('scale', scale)
+      const { view, boundZoom, $d3 } = this
+      view
+        .transition()
+        .duration(500)
+        .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
+    },
+    // 设置焦点
     setFocus(nodeId) {
       const {
         config: { baseRadius },
@@ -426,12 +444,12 @@ export default {
         this.focusNode = focusNode
       }
     },
-    // 实体聚焦
+    // 实体焦点
     focus(e) {
       const nodeId = Number(e.target.attributes['data-id'].value)
       this.setFocus(nodeId)
     },
-    // 取消实体聚焦
+    // 取消实体焦点
     unfocus(refocus) {
       const { focusNode, graphBoardFocus, setFocus } = this
       if (focusNode) {
@@ -490,7 +508,6 @@ export default {
     // 重置缩放
     zoomReset() {
       const { view, boundZoom, $d3 } = this
-      console.log('reset')
       view
         .transition()
         .duration(750)
