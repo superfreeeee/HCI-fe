@@ -49,18 +49,40 @@ export const restoreLayout = (mode, nodes, layout) => {
   })
 }
 
+const ascOrder = (x, y) => x - y
+
 // 计算排版模式布局
 export const getGridLayout = nodes => {
+  // extract nodes
   const groupsObj = {}
   nodes.forEach(({ group, id, radius }) => {
     const node = { id, radius }
     if (!Reflect.has(groupsObj, group)) {
-      groupsObj[group] = []
+      groupsObj[group] = { maxRadius: 0, nodes: [] }
     }
-    groupsObj[group].push(node)
+    groupsObj[group].nodes.push(node)
   })
-  const groups = Reflect.ownKeys(groupsObj).length
-  
+  // sort nodes & find max Radius & calc size
+  const groups = Reflect.ownKeys(groupsObj)
+  console.log(`groups count: ${groups.length}`)
+  let [width, height, gap] = [0, 0, 20]
+  for (const name of groups) {
+    const group = groupsObj[name]
+    const nodes = group.nodes
+    nodes.sort(({ id: x }, { id: y }) => ascOrder(x, y))
+    let maxRadius = 0
+    let sumHeight = 0
+    nodes.forEach(({ radius }) => {
+      maxRadius = Math.max(maxRadius, radius)
+      sumHeight += radius * 2 + gap
+    })
+    group.maxRadius = maxRadius
+    width += maxRadius * 2 + gap
+    height = Math.max(height, sumHeight - gap)
+    console.log(group)
+  }
+  width -= gap
+  // total size
 
   return saveLayout(nodes)
 }

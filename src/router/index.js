@@ -2,7 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from '@/views/Home.vue'
 import { $message } from '../common/utils'
-import { makeAllRoute } from '../common/utils'
+// import { makeAllRoute } from './utils'
 
 Vue.use(Router)
 
@@ -39,41 +39,45 @@ const router = new Router({
       meta: {
         requireLogin: true
       }
+    },
+    {
+      path: '*',
+      redirect: '/'
     }
   ]
 })
 
 let recentRoute = null
-let routes = router.options.routes
-let allRoute = makeAllRoute(routes)
+// let routes = router.options.routes
+// let allRoute = makeAllRoute(routes)
 
 export const setRecentRoute = to => {
   recentRoute = to || router.currentRoute
   console.log('set recentRoute', recentRoute)
 }
 
-export const checkRouteExist = to => {
-  console.log(allRoute)
-  let flag = false
-  for(let i=0; i<allRoute.length; i++) {
-    // 這邊判斷不好，先放行
-    if(to.name === 'Graph') {
-      return true
-    }
-    if(to.path === allRoute[i]) {
-      flag = true
-      break
-    }
-  }
-  return flag
-}
+// export const checkRouteExist = to => {
+//   console.log(allRoute)
+//   let flag = false
+//   for (let i = 0; i < allRoute.length; i++) {
+//     // 這邊判斷不好，先放行
+//     if (to.name === 'Graph') {
+//       return true
+//     }
+//     if (to.path === allRoute[i]) {
+//       flag = true
+//       break
+//     }
+//   }
+//   return flag
+// }
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('coin-token')
-  if(!checkRouteExist(to)) {
-    $message('路由错误', 'error')
-    next(from)
-  }
+  // if (!checkRouteExist(to)) {
+  //   $message('路由错误', 'error')
+  //   next(from)
+  // }
   if (to.meta.requireLogin) {
     // need login
     if (token) {
@@ -94,11 +98,7 @@ router.beforeEach((to, from, next) => {
     }
   } else {
     // no need login
-    if(token) {
-      next(false)
-    } else {
-      next()
-    }
+    next()
   }
 })
 
@@ -106,7 +106,10 @@ const originalPush = Router.prototype.push
 Router.prototype.push = function push(location, onResolve, onReject) {
   if (onResolve || onReject)
     return originalPush.call(this, location, onResolve, onReject)
-  return originalPush.call(this, location).catch(err => err)
+  return originalPush.call(this, location).catch(failure => {
+    console.log(failure)
+    return failure
+  })
 }
 
 export default router
