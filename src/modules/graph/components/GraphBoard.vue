@@ -24,7 +24,8 @@ export default {
       nodesText: null,
       boundDrag: null,
       boundZoom: null,
-      pinned: false
+      pinned: false,
+      locked: false
     }
   },
   computed: {
@@ -54,16 +55,9 @@ export default {
     },
     graphBoardMode(mode) {
       console.log(`[GraphBoard] switch mode: ${mode}`)
-      const { unPinNodes, pinNodes, restoreLayout } = this
-      ;({
-        force() {
-          unPinNodes()
-        },
-        grid() {},
-        fixed() {
-          pinNodes()
-        }
-      }[mode.toLowerCase()]())
+      const { restoreLayout } = this
+      this.locked = mode === 'GRID'
+      this.pinned = mode !== 'FORCE'
       restoreLayout()
     }
   },
@@ -94,6 +88,7 @@ export default {
         boundDrag,
         svg,
         root,
+        view,
         boundZoom,
         focusNode,
         links,
@@ -134,6 +129,15 @@ export default {
 
       if (root) root.remove()
       root = svg.append('g').attr('class', 'root')
+
+      // view = svg
+      //   .append('rect')
+      //   .attr('class', 'view')
+      //   .attr('x', 0.5)
+      //   .attr('y', 0.5)
+      //   .attr('width', width - 1)
+      //   .attr('height', height - 1)
+
       // zoom for root
       boundZoom = zoom(root)
       root.call(boundZoom)
@@ -359,17 +363,20 @@ export default {
       const d3 = this.$d3
 
       const dragstarted = (event, d) => {
+        if (this.locked) return
         if (!event.active) simulation.alphaTarget(0.3).restart()
         d.fx = d.x
         d.fy = d.y
       }
 
       const dragged = (event, d) => {
+        if (this.locked) return
         d.fx = event.x
         d.fy = event.y
       }
 
       const dragended = (event, d) => {
+        if (this.locked) return
         if (!event.active) simulation.alphaTarget(0)
         if (this.pinned) {
           simulation.stop()
@@ -385,10 +392,11 @@ export default {
         .on('drag', dragged)
         .on('end', dragended)
     },
-    zoom(selection) {
+    zoom(root) {
       const d3 = this.$d3
       return d3.zoom().on('zoom', e => {
-        selection.attr('transform', e.transform)
+        // view.attr('transform', e.transform)
+        root.attr('transform', e.transform)
       })
     },
     setFocus(nodeId) {

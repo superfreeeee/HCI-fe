@@ -1,3 +1,4 @@
+import { consoleGroup } from '@/common/utils'
 /**
  * 布局操作选项
  */
@@ -45,44 +46,85 @@ export const restoreLayout = (mode, nodes, layout) => {
   })
   return nodes.map(node => {
     const [x, y] = Reflect.has(pos, node.id) ? pos[node.id] : Array(2)
-    return mode === 'FORCE' ? { ...node, x, y } : { ...node, fx: x, fy: y }
+    return mode === 'FORCE'
+      ? { ...node, x, y, fx: null, fy: null }
+      : { ...node, fx: x, fy: y }
   })
+}
+
+export const clearFixed = nodes => {
+  return nodes.map(node => ({ ...node, fx: null, fy: null }))
 }
 
 const ascOrder = (x, y) => x - y
 
 // 计算排版模式布局
 export const getGridLayout = nodes => {
-  // extract nodes
+  // 节点分组
   const groupsObj = {}
   nodes.forEach(({ group, id, radius }) => {
     const node = { id, radius }
     if (!Reflect.has(groupsObj, group)) {
-      groupsObj[group] = { maxRadius: 0, nodes: [] }
+      groupsObj[group] = { d: 0, nodes: [] }
     }
     groupsObj[group].nodes.push(node)
   })
-  // sort nodes & find max Radius & calc size
+
+  // 按分组名排序
   const groups = Reflect.ownKeys(groupsObj)
-  console.log(`groups count: ${groups.length}`)
-  let [width, height, gap] = [0, 0, 20]
-  for (const name of groups) {
+  groups.sort()
+
+  // 总宽度、高度
+  let [width, height] = [0, 0]
+  const [gap, baseRadius] = [40, 25]
+  groups.forEach(name => {
     const group = groupsObj[name]
+
+    // 节点按 id 排序
     const nodes = group.nodes
     nodes.sort(({ id: x }, { id: y }) => ascOrder(x, y))
-    let maxRadius = 0
+
+    // 计算组内最大半径
+    let d = 0
     let sumHeight = 0
     nodes.forEach(({ radius }) => {
-      maxRadius = Math.max(maxRadius, radius)
+      d = Math.max(d, (baseRadius + radius * 10) * 2)
       sumHeight += radius * 2 + gap
     })
-    group.maxRadius = maxRadius
-    width += maxRadius * 2 + gap
-    height = Math.max(height, sumHeight - gap)
-    console.log(group)
-  }
-  width -= gap
-  // total size
 
-  return saveLayout(nodes)
+    // 高度/宽度更新
+    group.d = d
+    width += d + gap
+    height = Math.max(height, sumHeight - gap)
+  })
+  width -= gap
+
+  consoleGroup('[getGridLayout]', () => {
+    console.log('groups', groups)
+    console.log('groupsObj', groupsObj)
+    console.log('width', width)
+    console.log('height', height)
+  })
+
+  // 计算实际坐标
+  let [x, y] = [-width / 2, 0]
+  const layout = []
+  groups.forEach(name => {
+    const { d, nodes } = groupsObj[name]
+    x += d / 2
+    const len = nodes.length
+    const mid = (len - 1) / 2
+    for (let i = 0; i < len; i++) {
+      const node = nodes[i]
+      layout.push({
+        nodeId: node.id,
+        xaxis: x,
+        yaxis: y + (i - mid) * (d + gap)
+      })
+    }
+    x += gap + d / 2
+  })
+
+  return layout
+  // return saveLayout(nodes)
 }

@@ -3,7 +3,7 @@ import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemVarify, itemOptions, typeMapper } from './utils/item'
-import { getGridLayout, restoreLayout, saveLayout } from './utils/layout'
+import { clearFixed, getGridLayout, restoreLayout, saveLayout } from './utils/layout'
 // import { fakeGraphData } from '@/common/entity'
 
 const graph = {
@@ -240,7 +240,7 @@ const graph = {
       commit('setEditorEditable', true)
     },
     // 提交 实体/关系 创建
-    async editorCreateCommit({ state, commit }) {
+    async editorCreateCommit({ state, commit, dispatch }) {
       let {
         projectId,
         editor: { item, type }
@@ -267,6 +267,7 @@ const graph = {
           focus: item.id
         })
         $notify({ title: `添加${typeMapper[type]}成功`, type: 'success' })
+        dispatch('restoreLayout')
       } else {
         consoleGroup('[action] editorCreateCommit error', () => {
           console.log(res)
@@ -418,10 +419,16 @@ const graph = {
         board: { mode }
       } = state
       const layout = state.layouts[mode]
-      if (layout.length < nodes.length) {
-        return
+      if (layout.length > 0 && layout.length < nodes.length) {
+        commit('setLayout', { mode, layout: [] })
       }
-      const newNodes = restoreLayout(mode, nodes, layout)
+      let newNodes =
+        layout.length < nodes.length
+          ? nodes
+          : restoreLayout(mode, nodes, layout)
+      if (mode === 'FORCE') {
+        newNodes = clearFixed(newNodes)
+      }
       consoleGroup('[action] restoreLayout', () => {
         console.log('mode', mode)
         console.log('layout', layout)
