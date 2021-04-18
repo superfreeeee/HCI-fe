@@ -268,7 +268,7 @@ export default {
     reload() {
       console.log('[GraphBoard] reload')
       const {
-        config: { baseRadius, font, fontSize },
+        config: { baseRadius, font, fontSize, opacity },
         $d3: d3,
         selectItemHandler,
         graphNodes,
@@ -311,7 +311,7 @@ export default {
           graphBoardGroups.includes(groupMapper[d.from]) &&
           graphBoardGroups.includes(groupMapper[d.to])
             ? 1
-            : 0.3
+            : opacity
         )
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
@@ -341,7 +341,9 @@ export default {
         .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
         .attr('fill', d => (d.color ? d.color : scale(d.group)))
-        .attr('opacity', d => (graphBoardGroups.includes(d.group) ? 1 : 0.3))
+        .attr('opacity', d =>
+          graphBoardGroups.includes(d.group) ? 1 : opacity
+        )
         .attr('data-id', d => d.id)
         .attr('x', d => d.x)
         .attr('y', d => d.y)
