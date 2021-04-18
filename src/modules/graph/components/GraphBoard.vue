@@ -45,10 +45,8 @@ export default {
         this.reload()
       }
     },
-    graphBoardFocus(focus) {
-      if (!focus) {
-        this.unfocus()
-      }
+    graphBoardFocus() {
+      this.unfocus(true)
     },
     graphBoardMode(mode) {
       console.log(`[GraphBoard] switch mode: ${mode}`)

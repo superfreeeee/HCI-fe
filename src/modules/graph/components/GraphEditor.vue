@@ -1,5 +1,19 @@
 <template>
   <div class="editor">
+    <el-autocomplete
+      placeholder="搜索实体（输入 id / 实体名称）"
+      :fetch-suggestions="queryNodes"
+      v-model="searchNodeName"
+      @select="searchNode"
+      style="width: 100%"
+      ref="searchInput"
+    >
+      <el-button
+        slot="append"
+        icon="el-icon-search"
+        @click="searchNode"
+      ></el-button>
+    </el-autocomplete>
     <h4 v-if="!graphEditorItem">点击实体/关系查看细节</h4>
     <div v-else>
       <!-- 编辑器头部 -->
@@ -76,19 +90,20 @@
               v-model="graphEditorItem[option.attr]"
             ></el-input>
           </div>
-          <!-- 其他输入框 -->
+          <!-- 选择组别 -->
           <el-autocomplete
             v-else-if="option.attr === 'group'"
             clearable
+            :disabled="!graphEditorEditable"
             :fetch-suggestions="queryGroup"
             :placeholder="option.holder"
             v-model="graphEditorItem[option.attr]"
-            @select="selectGroup"
           ></el-autocomplete>
+          <!-- 其他输入框 -->
           <el-input
             v-else
-            :type="option.type"
             clearable
+            :type="option.type"
             :disabled="!graphEditorEditable"
             :placeholder="option.holder"
             v-model="graphEditorItem[option.attr]"
@@ -111,11 +126,13 @@
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex'
 import { typeMapper } from '../utils/item'
+import { $notify } from '@/common/utils'
 
 export default {
   name: 'GraphEditor',
   data() {
     return {
+      searchNodeName: '',
       useGroupColor: false
     }
   },
@@ -166,6 +183,14 @@ export default {
                 id: this.graphEditorItem.id
               })
       }
+    },
+    graphNodesOption() {
+      const options = this.graphNodes.map(({ id, name }) => ({
+        id,
+        value: `${id}：${name}`
+      }))
+      options.sort(({ id: x }, { id: y }) => x - y)
+      return options
     }
   },
   watch: {
@@ -192,18 +217,42 @@ export default {
       'editorUpdateCommit',
       'editorDeleteCommit'
     ]),
+    queryNodes(inputName, cb) {
+      const { graphNodesOption } = this
+      let inputId = inputName
+      if (inputName.indexOf('：') >= 0) {
+        inputName = inputName.substring(inputName.indexOf('：') + 1)
+        inputId = inputName.substring(0, inputName.indexOf('：'))
+      }
+      const suggestNodes = inputName
+        ? graphNodesOption.filter(({ value }) => {
+            const [id, name] = value.toLowerCase().split('：')
+            return id.indexOf(inputId) === 0 || name.indexOf(inputName) === 0
+          })
+        : graphNodesOption
+      return cb(suggestNodes)
+    },
+    searchNode() {
+      const { searchNodeName, editorSelect } = this
+      if (searchNodeName.indexOf('：') >= 0 || !isNaN(Number(searchNodeName))) {
+        const [id] = searchNodeName.split('：')
+        editorSelect({ type: 'node', id: Number(id) })
+      } else {
+        $notify({
+          title: '请从搜索推荐内选择实体',
+          type: 'warning'
+        })
+      }
+      this.$refs.searchInput.activated = false
+    },
     queryGroup(inputGroup, cb) {
       const { graphEditorNodeGroups } = this
-      console.log(graphEditorNodeGroups)
       const suggestGroups = inputGroup
         ? graphEditorNodeGroups.filter(
             group => group.toLowerCase().indexOf(inputGroup.toLowerCase()) === 0
           )
         : graphEditorNodeGroups
       return cb(suggestGroups.map(group => ({ value: group })))
-    },
-    selectGroup({ value: group }) {
-      this.graphEditorItem.group = group
     },
     resetItem() {
       const item = {}

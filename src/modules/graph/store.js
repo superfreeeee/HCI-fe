@@ -4,7 +4,6 @@ import { consoleGroup, $notify, $confirm } from '@/common/utils'
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { itemVarify, itemOptions, typeMapper } from './utils/item'
 import {
-  clearFixed,
   getGridLayout,
   getScale,
   restoreLayout,
@@ -199,7 +198,7 @@ const graph = {
       consoleGroup('[action] editorSelect', () => {
         console.log(`type=${type}, id=${id}`)
       })
-      const { type: t, editable, select, item } = state.editor
+      const { editable, select, item } = state.editor
       if (!select && editable) {
         const confirm = await $confirm({
           title: '当前物件修改未保存',
@@ -239,10 +238,10 @@ const graph = {
             commit('setGraphBoardFocus', id)
           }
         } else {
-          console.log(`[action] editorSelect, id = ${id} not found`)
+          // console.log(`[action] editorSelect, id = ${id} not found`)
           $notify({
-            title: '实体选择异常',
-            message: `实体 Id: ${id} Not found`,
+            title: `实体 id='${id}' 不存在`,
+            // message: `实体 Id: ${id} Not found`,
             type: 'error'
           })
         }
@@ -434,8 +433,6 @@ const graph = {
         board: { mode }
       } = state
       let layout = state.layouts[mode]
-      console.log('layouts', state.layouts)
-      console.log('restore layout type', mode, layout)
       if (layout.nodes.length !== nodes.length && mode === 'GRID') {
         layout = getGridLayout(nodes)
         commit('setLayout', { mode: 'GRID', layout })
