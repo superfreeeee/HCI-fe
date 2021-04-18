@@ -31,7 +31,8 @@ export default {
       'graphBoardSvg',
       'graphBoardFocus',
       'graphBoardMode',
-      'graphBoardScale'
+      'graphBoardScale',
+      'graphBoardGroups'
     ])
   },
   watch: {
@@ -56,6 +57,12 @@ export default {
       restoreLayout().then(() => {
         zoomReset()
       })
+    },
+    graphBoardGroups(groups) {
+      if (this.initialized) {
+        console.log('[GraphBoard] groups changed', groups)
+        this.reload()
+      }
     }
   },
   methods: {
@@ -267,17 +274,20 @@ export default {
         graphNodes,
         graphLinks,
         graphBoardFocus,
+        graphBoardGroups,
         simulation,
         scale,
         boundDrag,
         focus,
         unfocus,
         setFocus,
-        pinNodes,
-        unPinNodes,
         tick
       } = this
       let { links, linksText, nodes, nodesText } = this
+      const groupMapper = {}
+      graphNodes.forEach(({ id, group }) => {
+        groupMapper[id] = group
+      })
 
       unfocus(false)
       simulation.stop()
@@ -297,6 +307,12 @@ export default {
         .data(graphLinks)
         .join('line')
         .attr('stroke-width', d => d.value * 5)
+        .attr('opacity', d =>
+          graphBoardGroups.includes(groupMapper[d.from]) &&
+          graphBoardGroups.includes(groupMapper[d.to])
+            ? 1
+            : 0.3
+        )
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
         .on('click', selectItemHandler('link'))
@@ -325,6 +341,7 @@ export default {
         .attr('class', 'pointer')
         .attr('r', d => baseRadius + d.radius * 10)
         .attr('fill', d => (d.color ? d.color : scale(d.group)))
+        .attr('opacity', d => (graphBoardGroups.includes(d.group) ? 1 : 0.3))
         .attr('data-id', d => d.id)
         .attr('x', d => d.x)
         .attr('y', d => d.y)
@@ -428,6 +445,7 @@ export default {
           .data([node])
           .join('circle')
           .attr('r', d => baseRadius + d.radius * 10 + 5)
+          .attr('fill', 'none')
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
         this.focusNode = focusNode
@@ -501,31 +519,31 @@ export default {
         .transition()
         .duration(750)
         .call(boundZoom.transform, $d3.zoomIdentity.scale(graphBoardScale))
-    },
-    // 定点模式
-    pinNodes() {
-      const { simulation, graphNodes, pinned } = this
-      if (!pinned) {
-        this.pinned = true
-        simulation.stop()
-        for (const node of graphNodes) {
-          node.fx = node.x
-          node.fy = node.y
-        }
-      }
-    },
-    // 取消固定实体
-    unPinNodes() {
-      const { simulation, graphNodes, pinned } = this
-      if (pinned) {
-        this.pinned = false
-        for (const node of graphNodes) {
-          node.fx = null
-          node.fy = null
-        }
-        simulation.alpha(1).restart()
-      }
     }
+    // 定点模式
+    // pinNodes() {
+    //   const { simulation, graphNodes, pinned } = this
+    //   if (!pinned) {
+    //     this.pinned = true
+    //     simulation.stop()
+    //     for (const node of graphNodes) {
+    //       node.fx = node.x
+    //       node.fy = node.y
+    //     }
+    //   }
+    // },
+    // 取消固定实体
+    // unPinNodes() {
+    //   const { simulation, graphNodes, pinned } = this
+    //   if (pinned) {
+    //     this.pinned = false
+    //     for (const node of graphNodes) {
+    //       node.fx = null
+    //       node.fy = null
+    //     }
+    //     simulation.alpha(1).restart()
+    //   }
+    // }
   },
   mounted() {
     this.$el.addEventListener('click', this.selectItemCanel)

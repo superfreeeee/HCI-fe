@@ -23,7 +23,8 @@ const graph = {
       svg: null,
       focus: false,
       mode: 'FORCE', // 'FORCE' | 'GRID' | 'FREE'
-      scale: 1
+      scale: 1,
+      groups: []
     },
     layoutConfirm: {
       // 布局保存提示
@@ -70,6 +71,9 @@ const graph = {
     },
     setGraphBoardScale(state, scale = 1) {
       state.board.scale = scale
+    },
+    setGraphBoardGroups(state, groups = []) {
+      state.board.groups = groups
     },
     setEditor(
       state,
@@ -183,6 +187,7 @@ const graph = {
           console.log('links', links)
           console.log('layouts', layouts)
         })
+        commit('setGraphBoardGroups', getters.graphNodeGroups)
         return true
       } else {
         console.log('[action] graphInit.error')
@@ -473,11 +478,17 @@ const graph = {
     projectId: state => state.projectId,
     graphData: state => state.data,
     graphNodes: state => state.data.nodes,
+    graphNodeGroups: state => {
+      const groups = new Set()
+      state.data.nodes.forEach(({ group }) => groups.add(group))
+      return [...groups]
+    },
     graphLinks: state => state.data.links,
     graphBoardSvg: state => state.board.svg,
     graphBoardFocus: state => state.board.focus,
     graphBoardMode: state => state.board.mode,
     graphBoardScale: state => state.board.scale,
+    graphBoardGroups: state => state.board.groups,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const {
@@ -493,11 +504,6 @@ const graph = {
     graphEditorOptions: state =>
       !state.editor.type ? [] : itemOptions[state.editor.type],
     graphEditorItem: state => state.editor.item,
-    graphEditorNodeGroups: state => {
-      const groups = new Set()
-      state.data.nodes.forEach(({ group }) => groups.add(group))
-      return [...groups]
-    },
     graphEditorCreateNew: state => state.editor.createNew,
     graphEditorSelect: state => state.editor.select,
     graphEditorEditable: state => state.editor.editable
