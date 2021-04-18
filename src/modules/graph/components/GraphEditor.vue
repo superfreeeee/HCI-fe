@@ -2,6 +2,7 @@
   <div class="editor">
     <graph-editor-search></graph-editor-search>
     <graph-editor-group></graph-editor-group>
+    <el-divider></el-divider>
     <h4 v-if="!graphEditorItem">点击实体/关系查看细节</h4>
     <div v-else>
       <!-- 编辑器头部 -->
@@ -108,6 +109,8 @@
         </el-form-item>
       </el-form>
     </div>
+    <el-divider></el-divider>
+    <graph-editor-statistics></graph-editor-statistics>
   </div>
 </template>
 
@@ -116,12 +119,14 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 import { typeMapper } from '../utils/item'
 import GraphEditorSearch from './GraphEditorSearch'
 import GraphEditorGroup from './GraphEditorGroup'
+import GraphEditorStatistics from './GraphEditorStatistics'
 
 export default {
   name: 'GraphEditor',
   components: {
     GraphEditorSearch,
-    GraphEditorGroup
+    GraphEditorGroup,
+    GraphEditorStatistics
   },
   data() {
     return {

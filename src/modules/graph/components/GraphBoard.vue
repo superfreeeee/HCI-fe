@@ -60,7 +60,7 @@ export default {
     },
     graphBoardGroups(groups) {
       if (this.initialized) {
-        console.log('[GraphBoard] groups changed', groups)
+        console.log('[GraphBoard] groups changed', [...groups])
         this.reload()
       }
     }
