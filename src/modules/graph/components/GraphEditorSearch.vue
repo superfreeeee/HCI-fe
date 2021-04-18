@@ -60,13 +60,16 @@ export default {
 
       let inputId = inputName
       if (inputName.indexOf('：') >= 0) {
+        inputId = Number(inputName.substring(0, inputName.indexOf('：')))
         inputName = inputName.substring(inputName.indexOf('：') + 1)
-        inputId = inputName.substring(0, inputName.indexOf('：'))
       }
       const suggestNodes = inputName
         ? graphNodesOption.filter(({ value }) => {
             const [id, name] = value.toLowerCase().split('：')
-            return id.indexOf(inputId) === 0 || name.indexOf(inputName) === 0
+            return (
+              id.indexOf(inputId) === 0 ||
+              name.indexOf(inputName.toLowerCase()) === 0
+            )
           })
         : graphNodesOption
       return cb(suggestNodes)
