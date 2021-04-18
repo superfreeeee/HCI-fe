@@ -27,6 +27,7 @@ export default {
   computed: {
     ...mapGetters([
       'graphNodes',
+      'graphNodeGroups',
       'graphLinks',
       'graphBoardSvg',
       'graphBoardFocus',
@@ -63,10 +64,19 @@ export default {
         console.log('[GraphBoard] groups changed', [...groups])
         this.reload()
       }
+    },
+    graphNodeGroups() {
+      if (this.initialized) {
+        this.setColors()
+      }
     }
   },
   methods: {
-    ...mapMutations(['setGraphBoardSvg', 'setGraphBoardFocus']),
+    ...mapMutations([
+      'setGraphBoardSvg',
+      'setGraphBoardFocus',
+      'setGraphBoardColorMapper'
+    ]),
     ...mapActions(['graphInit', 'editorSelect', 'restoreLayout']),
     /********** d3 graph init **********/
     //
@@ -263,6 +273,7 @@ export default {
       this.scale = scale
       this.nodes = nodes
       this.nodesText = nodesText
+      this.setColors()
     },
     /********** d3 graph update **********/
     reload() {
@@ -521,6 +532,14 @@ export default {
         .transition()
         .duration(750)
         .call(boundZoom.transform, $d3.zoomIdentity.scale(graphBoardScale))
+    },
+    setColors() {
+      const { scale, graphNodeGroups, setGraphBoardColorMapper } = this
+      const colorMapper = {}
+      graphNodeGroups.forEach(group => {
+        colorMapper[group] = scale(group)
+      })
+      setGraphBoardColorMapper(colorMapper)
     }
     // 定点模式
     // pinNodes() {

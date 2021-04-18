@@ -23,7 +23,8 @@ const graph = {
       focus: false,
       mode: 'FORCE', // 'FORCE' | 'GRID' | 'FREE'
       scale: 1,
-      groups: []
+      groups: [],
+      colorMapper: {}
     },
     layoutConfirm: {
       // 布局保存提示
@@ -73,6 +74,9 @@ const graph = {
     },
     setGraphBoardGroups(state, groups = []) {
       state.board.groups = groups
+    },
+    setGraphBoardColorMapper(state, mapper = {}) {
+      state.board.colorMapper = mapper
     },
     setEditor(
       state,
@@ -488,6 +492,7 @@ const graph = {
     graphBoardMode: state => state.board.mode,
     graphBoardScale: state => state.board.scale,
     graphBoardGroups: state => state.board.groups,
+    graphBoardColorMapper: state => state.board.colorMapper,
     graphEditorType: state => state.editor.type,
     graphEditorTitle: state => {
       const {

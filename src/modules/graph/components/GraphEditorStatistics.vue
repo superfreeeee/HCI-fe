@@ -13,10 +13,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['graphNodes']),
+    ...mapGetters(['graphNodes', 'graphBoardColorMapper']),
     statisticsData() {
+      const { graphNodes, graphBoardColorMapper } = this
       const dataMapper = {}
-      this.graphNodes.forEach(({ group }) => {
+      graphNodes.forEach(({ group }) => {
         if (!Reflect.has(dataMapper, group)) {
           dataMapper[group] = 1
         } else {
@@ -25,10 +26,18 @@ export default {
       })
       const data = Reflect.ownKeys(dataMapper).map(group => ({
         name: group,
-        value: dataMapper[group]
+        value: dataMapper[group],
+        itemStyle: {
+          color: graphBoardColorMapper[group]
+        }
       }))
       data.sort(({ name: x }, { name: y }) => (x < y ? -1 : x === y ? 0 : 1))
       return data
+    }
+  },
+  watch: {
+    graphNodes() {
+      this.draw()
     }
   },
   methods: {

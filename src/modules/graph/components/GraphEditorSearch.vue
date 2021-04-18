@@ -1,11 +1,12 @@
 <template>
   <el-autocomplete
+    style="width: 100%"
+    ref="searchInput"
+    clearable
     placeholder="搜索实体（输入 id / 实体名称）"
     :fetch-suggestions="queryNodes"
     v-model="searchNodeName"
     @select="searchNode"
-    style="width: 100%"
-    ref="searchInput"
   >
     <el-button
       slot="append"
