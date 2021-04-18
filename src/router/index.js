@@ -1,7 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+
 import Home from '@/views/Home.vue'
 import { $message } from '../common/utils'
+import store from '../store'
 
 Vue.use(Router)
 
@@ -58,25 +60,43 @@ export const setRecentRoute = to => {
   console.log('set recentRoute', recentRoute)
 }
 
+const setRecentAndGoLogin = (to, next, msg) => {
+  setRecentRoute(to)
+  $message(msg, 'error')
+  next('/user')
+}
+
+const goNextWithCheck = next => {
+  if (recentRoute) {
+    const target = recentRoute
+    recentRoute = null
+    next(target)
+  } else {
+    next()
+  }
+}
+
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('coin-token')
   if (to.meta.requireLogin) {
     // need login
     if (token) {
       // has token(login before)
-      // token 过期由 axios 拦截器进行拦截并跳转
-      if (recentRoute) {
-        const target = recentRoute
-        recentRoute = null
-        next(target)
+      if (!store.getters.userId) {
+        // repull userInfo
+        store.dispatch('getUserInfo').then(res => {
+          if (res) {
+            goNextWithCheck(next)
+          } else {
+            setRecentAndGoLogin(to, next, 'token 过期，请重新登入')
+          }
+        })
       } else {
-        next()
+        goNextWithCheck(next)
       }
     } else {
       // no token
-      setRecentRoute(to)
-      $message('请先完成登陆', 'error')
-      next('/user')
+      setRecentAndGoLogin(to, next, '请先完成登陆')
     }
   } else {
     // no need login

@@ -74,8 +74,8 @@ export default {
     }
   },
   async mounted() {
-    console.log(`[Graph] mounted, projectId = ${projectId}`)
     const projectId = Number(this.$route.params.projectId)
+    console.log(`[Graph] mounted, projectId = ${projectId}`)
 
     console.log(`[Graph] getProjectInfo`)
     if (!(await this.getProjectInfo(projectId))) return

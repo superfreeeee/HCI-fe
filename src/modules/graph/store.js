@@ -10,7 +10,6 @@ import {
   saveLayout,
   getNodesSize
 } from './utils/layout'
-// import { fakeGraphData } from '@/common/entity'
 
 const graph = {
   state: {
