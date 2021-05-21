@@ -47,6 +47,11 @@ const router = new Router({
       component: () => import('@/views/Notfound.vue')
     },
     {
+      path: '/chat',
+      name: 'Chat',
+      component: () => import('@/views/Chat.vue')
+    },
+    {
       path: '*',
       redirect: '/notfound'
     }

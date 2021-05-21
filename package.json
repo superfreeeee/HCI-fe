@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "crypto-js": "^4.0.0",
     "d3": "^6.5.0",
     "echarts": "^5.1.0",
     "element-ui": "^2.15.1",
