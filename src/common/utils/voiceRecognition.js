@@ -1,13 +1,15 @@
-const APPID = 'f6e5bb70'
-const API_SECRET = '304958fb12577f5928c5fefe8cbcb44b'
-const API_KEY = 'MzhkNDAzZGU2MmVkZjNmMWRmMzk1ZDBj'
 import CryptoJS from 'crypto-js'
-// import Worker from './transcode.worker.js'
-// const transWorker = new Worker()
-// console.log(transWorker)
-var startTime = ''
-var endTime = ''
+import TransWorker from '@/common/utils/transcode.worker.js'
+let transWorker = new TransWorker()
+//APPID，APISecret，APIKey在控制台-我的应用-语音听写（流式版）页面获取
+const APPID = 'f6e5bb70'
+const API_SECRET = 'MzhkNDAzZGU2MmVkZjNmMWRmMzk1ZDBj'
+const API_KEY = '304958fb12577f5928c5fefe8cbcb44b'
 
+/**
+ * 获取websocket url
+ * 该接口需要后端提供，这里为了方便前端处理
+ */
 function getWebSocketUrl() {
   return new Promise((resolve, reject) => {
     // 请求地址根据语种不同变化
@@ -27,7 +29,7 @@ function getWebSocketUrl() {
     resolve(url)
   })
 }
-const voiceRecognition = class {
+class voiceRecognition {
   constructor({ language, accent, appId } = {}) {
     let self = this
     this.status = 'null'
@@ -40,17 +42,13 @@ const voiceRecognition = class {
     this.resultText = ''
     // wpgs下的听写结果需要中间状态辅助记录
     this.resultTextTemp = ''
-    // transWorker.onmessage = function(event) {
-    //   // console.log("构造方法中",self.audioData)
-    //   self.audioData.push(...event.data)
-    // }
+    transWorker.onmessage = function (event) {
+      self.audioData.push(...event.data)
+    }
   }
-
   // 修改录音听写状态
   setStatus(status) {
-    this.onWillStatusChange &&
-      this.status !== status &&
-      this.onWillStatusChange(this.status, status)
+    this.onWillStatusChange && this.status !== status && this.onWillStatusChange(this.status, status)
     this.status = status
   }
   setResultText({ resultText, resultTextTemp } = {}) {
@@ -91,8 +89,6 @@ const voiceRecognition = class {
         this.recorderStop()
       }
       iatWS.onclose = e => {
-        endTime = Date.parse(new Date())
-        console.log('持续时间', endTime - startTime)
         this.recorderStop()
       }
     })
@@ -104,11 +100,10 @@ const voiceRecognition = class {
       navigator.webkitGetUserMedia ||
       navigator.mozGetUserMedia ||
       navigator.msGetUserMedia
-
+    
     // 创建音频环境
     try {
-      this.audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)()
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
       this.audioContext.resume()
       if (!this.audioContext) {
         alert('浏览器不支持webAudioApi相关接口')
@@ -120,13 +115,13 @@ const voiceRecognition = class {
         return
       }
     }
-
+    
     // 获取浏览器录音权限
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia({
           audio: true,
-          video: false
+          video: false,
         })
         .then(stream => {
           getMediaSuccess(stream)
@@ -138,7 +133,7 @@ const voiceRecognition = class {
       navigator.getUserMedia(
         {
           audio: true,
-          video: false
+          video: false,
         },
         stream => {
           getMediaSuccess(stream)
@@ -148,13 +143,8 @@ const voiceRecognition = class {
         }
       )
     } else {
-      if (
-        navigator.userAgent.toLowerCase().match(/chrome/) &&
-        location.origin.indexOf('https://') < 0
-      ) {
-        alert(
-          'chrome下获取浏览器录音功能，因为安全性问题，需要在localhost或127.0.0.1或https下才能获取权限'
-        )
+      if (navigator.userAgent.toLowerCase().match(/chrome/) && location.origin.indexOf('https://') < 0) {
+        alert('chrome下获取浏览器录音功能，因为安全性问题，需要在localhost或127.0.0.1或https下才能获取权限')
       } else {
         alert('无法获取浏览器录音功能，请升级浏览器或使用chrome')
       }
@@ -163,13 +153,13 @@ const voiceRecognition = class {
     }
     // 获取浏览器录音权限成功的回调
     let getMediaSuccess = stream => {
+      console.log('getMediaSuccess')
       // 创建一个用于通过JavaScript直接处理音频
       this.scriptProcessor = this.audioContext.createScriptProcessor(0, 1, 1)
       this.scriptProcessor.onaudioprocess = e => {
         // 去处理音频数据
         if (this.status === 'ing') {
           transWorker.postMessage(e.inputBuffer.getChannelData(0))
-          //  this.audioData.push(e.inputBuffer.getChannelData(0))
         }
       }
       // 创建一个新的MediaStreamAudioSourceNode 对象，使来自MediaStream的音频可以被播放和操作
@@ -180,7 +170,9 @@ const voiceRecognition = class {
       this.connectWebSocket()
     }
 
-    let getMediaFail = e => {
+    let getMediaFail = (e) => {
+      alert('请求麦克风失败')
+      console.log(e)
       this.audioContext && this.audioContext.close()
       this.audioContext = undefined
       // 关闭websocket
@@ -200,11 +192,7 @@ const voiceRecognition = class {
   // 暂停录音
   recorderStop() {
     // safari下suspend后再次resume录音内容将是空白，设置safari下不做suspend
-    if (
-      !(
-        /Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgen)
-      )
-    ) {
+    if (!(/Safari/.test(navigator.userAgent) && !/Chrome/.test(navigator.userAgen))){
       this.audioContext && this.audioContext.suspend()
     }
     this.setStatus('end')
@@ -232,34 +220,31 @@ const voiceRecognition = class {
     let audioData = this.audioData.splice(0, 1280)
     var params = {
       common: {
-        app_id: this.appId
+        app_id: this.appId,
       },
       business: {
         language: this.language, //小语种可在控制台--语音听写（流式）--方言/语种处添加试用
         domain: 'iat',
-        accent: this.accent //中文方言可在控制台--语音听写（流式）--方言/语种处添加试用
+        accent: this.accent, //中文方言可在控制台--语音听写（流式）--方言/语种处添加试用
+        vad_eos: 5000,
+        dwa: 'wpgs', //为使该功能生效，需到控制台开通动态修正功能（该功能免费）
       },
       data: {
         status: 0,
         format: 'audio/L16;rate=16000',
         encoding: 'raw',
-        audio: this.toBase64(audioData)
-      }
+        audio: this.toBase64(audioData),
+      },
     }
-    console.log('参数language：', this.language)
-    console.log('参数accent：', this.accent)
     this.webSocket.send(JSON.stringify(params))
-    startTime = Date.parse(new Date())
     this.handlerInterval = setInterval(() => {
       // websocket未连接
       if (this.webSocket.readyState !== 1) {
-        console.log('websocket未连接')
         this.audioData = []
         clearInterval(this.handlerInterval)
         return
       }
       if (this.audioData.length === 0) {
-        console.log('自动关闭', this.status)
         if (this.status === 'end') {
           this.webSocket.send(
             JSON.stringify({
@@ -267,8 +252,8 @@ const voiceRecognition = class {
                 status: 2,
                 format: 'audio/L16;rate=16000',
                 encoding: 'raw',
-                audio: ''
-              }
+                audio: '',
+              },
             })
           )
           this.audioData = []
@@ -284,8 +269,8 @@ const voiceRecognition = class {
             status: 1,
             format: 'audio/L16;rate=16000',
             encoding: 'raw',
-            audio: this.toBase64(audioData)
-          }
+            audio: this.toBase64(audioData),
+          },
         })
       )
     }, 40)
@@ -301,23 +286,22 @@ const voiceRecognition = class {
       for (let i = 0; i < ws.length; i++) {
         str = str + ws[i].cw[0].w
       }
-      console.log('识别的结果为：', str)
       // 开启wpgs会有此字段(前提：在控制台开通动态修正功能)
       // 取值为 "apd"时表示该片结果是追加到前面的最终结果；取值为"rpl" 时表示替换前面的部分结果，替换范围为rg字段
       if (data.pgs) {
         if (data.pgs === 'apd') {
           // 将resultTextTemp同步给resultText
           this.setResultText({
-            resultText: this.resultTextTemp
+            resultText: this.resultTextTemp,
           })
         }
         // 将结果存储在resultTextTemp中
         this.setResultText({
-          resultTextTemp: this.resultText + str
+          resultTextTemp: this.resultText + str,
         })
       } else {
         this.setResultText({
-          resultText: this.resultText + str
+          resultText: this.resultText + str,
         })
       }
     }
