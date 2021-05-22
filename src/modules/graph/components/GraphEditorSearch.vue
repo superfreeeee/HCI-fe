@@ -36,17 +36,19 @@ export default {
       const appearedIds = new Set(
         searchHistory.map(name => Number(name.split('：')[0]))
       )
-      console.log('appearedIds', appearedIds)
+      // 所有节点转推荐列表
       const options = graphNodes
         .filter(({ id }) => !appearedIds.has(id))
         .map(({ id, name }) => ({
           id,
           value: `${id}：${name}`
         }))
+      // 剩余节点按 id 排序
       options.sort(({ id: x }, { id: y }) => x - y)
       return suggestHistory.concat(options)
     },
     suggestHistory() {
+      // 搜索记录 转 列表推荐
       return this.searchHistory.map(name => {
         const [id] = name.split('：')
         return { id: Number(id), value: name }
