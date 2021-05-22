@@ -11,9 +11,11 @@ import store from './store'
 import * as d3 from 'd3'
 import axios from './api/axios'
 import * as echarts from 'echarts'
+import Chat from 'jwchat'
 
 Vue.use(vuex)
 Vue.use(elementUI)
+Vue.use(Chat)
 
 Vue.config.productionTip = false
 Vue.prototype.$d3 = d3

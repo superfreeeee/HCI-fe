@@ -1,23 +1,13 @@
 <template>
   <div class="box">
-    <el-row type="flex" justify="center" style="height: 75%">
-      <el-col :xs="20" :sm="18" :md="20" :lg="16">
-        <div class="chat-box">
-          <div class="chat"></div>
-          <div class="text">
-            <div class="options">
-              <i
-                class="el-icon-microphone icon-click"
-                @click="onVoiceStart()"
-              />
-              <i
-                class="el-icon-video-pause icon-click"
-                @click="onVoiceStop()"
-              />
-            </div>
-            <el-input v-model="text" type="textarea" :rows="4"></el-input>
-          </div>
-        </div>
+    <el-row type="flex" justify="center">
+      <el-col>
+        <JwChat
+          :taleList="taleList"
+          @enter="bindEnter"
+          v-model="text"
+          :toolConfig="tool"
+        />
       </el-col>
     </el-row>
   </div>
@@ -25,23 +15,50 @@
 
 <script>
 import voiceRecognition from '../common/utils/voiceRecognition'
-const recorder = new voiceRecognition()
+const recorder = new voiceRecognition('en_us', 'mandarin', '5f27b6a9')
 
 export default {
   name: 'Chat',
   data() {
     return {
       text: '',
+      taleList: [
+        {
+          date: '2020/04/25 21:19:07',
+          text: { text: '起床不' },
+          mine: false,
+          name: 'coin小助手',
+          img: '../assets/coin.png',
+        },
+        {
+          date: '2020/04/16 21:19:07',
+          text: { text: '我不饿' },
+          mine: true,
+          name: 'cclin',
+          img: '../assets/logo.png'
+        },
+      ],
+      tool: {
+        // file img video 现在只配置了三个图标
+        show: ['file', 'img'],
+        callback: this.toolEvent,
+      },
     }
   },
   mounted() {},
   methods: {
-    onVoiceStart() {
-      recorder.start()
+    toolEvent(type /* 当前点击的按钮类型 */) {
+      alert(type)
     },
-    onVoiceStop() {
-      recorder.stop()
+    bindEnter() {
+      console.log('bind press enter')
     },
+    // onVoiceStart() {
+    //   recorder.start()
+    // },
+    // onVoiceStop() {
+    //   recorder.stop()
+    // },
   },
 }
 </script>
@@ -50,42 +67,12 @@ export default {
 .box {
   width: 100%;
   height: 100%;
-  background-color: #fdfcf8;
+  background-color: rgb(163, 177, 189);
 }
 
 .box .chat-box {
-  background-color: aliceblue;
-  height: 100%;
-  margin: 6% 8%;
+  margin: 6% auto;
   border-radius: 20px;
-  box-shadow: 1px 1px 1px 1px slategray;
   padding: 10px;
-}
-
-.box .chat-box .chat {
-  height: 70%;
-  border-bottom: 1px whitesmoke;
-  border-bottom-style: groove;
-  margin-bottom: 5px;
-}
-
-.box .chat-box .text {
-  height: 25%;
-  margin-top: 5px;
-}
-
-.box .chat-box .text .options {
-  padding: 0 10px;
-  height: 23%;
-  font-size: larger;
-}
-
-.box .chat-box .text .input {
-  height: 70%;
-}
-
-.icon-click:hover {
-  cursor: pointer;
-  color: #409eff;
 }
 </style>
