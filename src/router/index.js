@@ -42,14 +42,14 @@ const router = new Router({
       }
     },
     {
-      path: '/notfound',
-      name: 'Notfound',
-      component: () => import('@/views/Notfound.vue')
-    },
-    {
       path: '/chat',
       name: 'Chat',
       component: () => import('@/views/Chat.vue')
+    },
+    {
+      path: '/notfound',
+      name: 'Notfound',
+      component: () => import('@/views/Notfound.vue')
     },
     {
       path: '*',

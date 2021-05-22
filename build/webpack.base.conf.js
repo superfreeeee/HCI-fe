@@ -32,7 +32,7 @@ module.exports = {
     rules: [
       {
         test: /\.worker\.js$/,
-        loader: { loader: 'worker-loader' }
+        loader: 'worker-loader'
       },
       {
         test: /\.vue$/,
