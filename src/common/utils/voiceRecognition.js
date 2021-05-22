@@ -1,6 +1,6 @@
 import CryptoJS from 'crypto-js'
-import TransWorker from '@/common/utils/transcode.worker.js'
-let transWorker = new TransWorker()
+// import TransWorker from '@/common/utils/transcode.worker.js'
+// let transWorker = new TransWorker()
 //APPID，APISecret，APIKey在控制台-我的应用-语音听写（流式版）页面获取
 const APPID = 'f6e5bb70'
 const API_SECRET = 'MzhkNDAzZGU2MmVkZjNmMWRmMzk1ZDBj'
@@ -42,9 +42,9 @@ class voiceRecognition {
     this.resultText = ''
     // wpgs下的听写结果需要中间状态辅助记录
     this.resultTextTemp = ''
-    transWorker.onmessage = function (event) {
-      self.audioData.push(...event.data)
-    }
+    // transWorker.onmessage = function (event) {
+    //   self.audioData.push(...event.data)
+    // }
   }
   // 修改录音听写状态
   setStatus(status) {
@@ -159,9 +159,9 @@ class voiceRecognition {
       this.scriptProcessor = this.audioContext.createScriptProcessor(0, 1, 1)
       this.scriptProcessor.onaudioprocess = e => {
         // 去处理音频数据
-        if (this.status === 'ing') {
-          transWorker.postMessage(e.inputBuffer.getChannelData(0))
-        }
+        // if (this.status === 'ing') {
+        //   transWorker.postMessage(e.inputBuffer.getChannelData(0))
+        // }
       }
       // 创建一个新的MediaStreamAudioSourceNode 对象，使来自MediaStream的音频可以被播放和操作
       this.mediaSource = this.audioContext.createMediaStreamSource(stream)
