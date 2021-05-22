@@ -10,6 +10,10 @@
                 class="el-icon-microphone icon-click"
                 @click="onVoiceStart()"
               />
+              <i
+                class="el-icon-video-pause icon-click"
+                @click="onVoiceStop()"
+              />
             </div>
             <el-input v-model="text" type="textarea" :rows="4"></el-input>
           </div>
@@ -21,7 +25,7 @@
 
 <script>
 import voiceRecognition from '../common/utils/voiceRecognition'
-const recorder = new voiceRecognition('en_us', 'mandarin', '5f27b6a9')
+const recorder = new voiceRecognition()
 
 export default {
   name: 'Chat',
@@ -34,6 +38,9 @@ export default {
   methods: {
     onVoiceStart() {
       recorder.start()
+    },
+    onVoiceStop() {
+      recorder.stop()
     },
   },
 }
