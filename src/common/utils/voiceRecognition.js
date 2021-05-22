@@ -63,6 +63,7 @@ class voiceRecognition {
   }
   // 连接websocket
   connectWebSocket() {
+    console.log('connet web socket')
     return getWebSocketUrl().then(url => {
       let iatWS
       if ('WebSocket' in window) {
@@ -198,10 +199,10 @@ class voiceRecognition {
     this.setStatus('end')
   }
   // 处理音频数据
-  // transAudioData(audioData) {
-  //   audioData = transAudioData.transaction(audioData)
-  //   this.audioData.push(...audioData)
-  // }
+  transAudioData(audioData) {
+    audioData = transAudioData.transaction(audioData)
+    this.audioData.push(...audioData)
+  }
   // 对处理后的音频数据进行base64编码，
   toBase64(buffer) {
     var binary = ''
@@ -276,8 +277,10 @@ class voiceRecognition {
     }, 40)
   }
   result(resultData) {
+    console.log('result')
     // 识别结束
     let jsonData = JSON.parse(resultData)
+    console.log(jsonData) 
     if (jsonData.data && jsonData.data.result) {
       let data = jsonData.data.result
       let str = ''
