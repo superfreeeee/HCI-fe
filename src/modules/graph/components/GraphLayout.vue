@@ -1,6 +1,5 @@
 <template>
   <div class="layout">
-    <h3>布局设置</h3>
     <div class="modes">
       <el-button
         v-for="mode in modes"
@@ -87,14 +86,9 @@ h3 {
   border-bottom: 1px solid #bbbbbb;
 }
 .modes {
-  display: flex;
-  justify-content: center;
-  /* gap: 5px; */
+  /* display: flex;
+  justify-content: center; */
   cursor: pointer;
-}
-.actions {
-  display: flex;
-  justify-content: center;
 }
 .actions > * {
   flex: 1;

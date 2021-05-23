@@ -1,6 +1,12 @@
 <template>
   <div class="chatbox">
     <div class="chat-header">co$in 小助手</div>
+    <el-button
+      circle
+      icon="el-icon-arrow-left"
+      class="back"
+      @click="goback()"
+    ></el-button>
     <JwChat
       :taleList="taleList"
       @enter="bindEnter"
@@ -55,6 +61,9 @@ export default {
       console.log('bind press enter')
       console.log(this.text)
     },
+    goback() {
+      this.$router.back()
+    },
     // onVoiceStart() {
     //   recorder.start()
     // },
@@ -74,12 +83,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 .chatbox .jwchat {
   width: 70vw !important;
   height: 80vh !important;
 }
-
 .chatbox .chat-header {
   position: fixed;
   top: 5%;
@@ -94,26 +101,26 @@ export default {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
-
+.chatbox .back {
+  position: fixed;
+  top: 3vh;
+  left: 5vw;
+}
 .wrapper {
   width: 100% !important;
 }
-
 .chatPage[style] {
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px #454948;
   margin: 5px;
   background-color: #fdfcf8;
 }
-
 .web__msg-input[placeholder] {
   background-color: #fffafa;
 }
-
 .wrapper .scroller .web__main-user img[data-v-422b11e3] {
   border-radius: 0;
 }
-
 /* 超小型设备（电话，600px 及以下） */
 @media only screen and (max-width: 600px) {
   .wrapper .scroller[style] {
@@ -135,10 +142,9 @@ export default {
   }
 }
 
-/* 小型设备（纵向平板电脑和大型手机，600 像素及以上） */
+/* 小型设备（纵向平板电脑和大型手机，600 像素及以上）
 @media only screen and (min-width: 600px) {
-
-}
+} */
 
 /* 中型设备（横向平板电脑，768 像素及以上） */
 @media only screen and (min-width: 768px) {
@@ -159,11 +165,11 @@ export default {
   }
 }
 
-/* 大型设备（笔记本电脑/台式机，992px 及以上） */
+/* 大型设备（笔记本电脑/台式机，992px 及以上）
 @media only screen and (min-width: 992px) {
 }
 
-/* 超大型设备（大型笔记本电脑和台式机，1200px 及以上） */
+/* 超大型设备（大型笔记本电脑和台式机，1200px 及以上） 
 @media only screen and (min-width: 1200px) {
-}
+} */
 </style>
