@@ -1,5 +1,5 @@
 <template>
-  <div class="box">
+  <div class="chatbox">
     <div class="chat-header">co$in 小助手</div>
     <JwChat
       :taleList="taleList"
@@ -66,7 +66,7 @@ export default {
 </script>
 
 <style>
-.box {
+.chatbox {
   width: 100%;
   height: 100%;
   background-color: hsl(207, 100%, 91%);
@@ -75,12 +75,12 @@ export default {
   justify-content: center;
 }
 
-.box .jwchat {
+.chatbox .jwchat {
   width: 70vw !important;
   height: 80vh !important;
 }
 
-.box .chat-header {
+.chatbox .chat-header {
   position: fixed;
   top: 5%;
   font-size: larger;
@@ -119,7 +119,7 @@ export default {
   .wrapper .scroller[style] {
     width: 95vw;
   }
-  .box {
+  .chatbox {
     width: 100%;
     height: 100%;
     background-color: hsl(207, 100%, 91%);
@@ -127,7 +127,7 @@ export default {
     align-items: flex-end;
     justify-content: center;
   }
-  .box .jwchat {
+  .chatbox .jwchat {
     height: 88vh !important;
     width: 100vw !important;
     border-radius: 0;
@@ -146,7 +146,7 @@ export default {
     width: calc(100% - 2rem);
     padding: 1rem;
   }
-  .box {
+  .chatbox {
     width: 100%;
     height: 100%;
     background-color: hsl(207, 100%, 91%);
@@ -154,7 +154,7 @@ export default {
     align-items: center;
     justify-content: center;
   }
-  .box .jwchat {
+  .chatbox .jwchat {
     height: 80vh !important;
   }
 }
