@@ -6,8 +6,7 @@
       @enter="bindEnter"
       v-model="text"
       :toolConfig="tool"
-      :width="800"
-      :height="height"
+      class="jwchat"
     />
   </div>
 </template>
@@ -22,7 +21,6 @@ export default {
   name: 'Chat',
   data() {
     return {
-      width: '70%',
       height: '80vh',
       text: '',
       taleList: [
@@ -77,6 +75,11 @@ export default {
   justify-content: center;
 }
 
+.box .jwchat {
+  width: 70vw !important;
+  height: 80vh !important;
+}
+
 .box .chat-header {
   position: fixed;
   top: 5%;
@@ -87,8 +90,13 @@ export default {
   background-color: #fdfcf8;
   border-radius: 20px;
   box-shadow: 1px 1px 1px 1px slategrey;
+  margin-bottom: 50px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.wrapper {
+  width: 100% !important;
 }
 
 .chatPage[style] {
@@ -111,14 +119,25 @@ export default {
   .wrapper .scroller[style] {
     width: 95vw;
   }
+  .box {
+    width: 100%;
+    height: 100%;
+    background-color: hsl(207, 100%, 91%);
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .box .jwchat {
+    height: 88vh !important;
+    width: 100vw !important;
+    border-radius: 0;
+    margin: 0;
+  }
 }
 
 /* 小型设备（纵向平板电脑和大型手机，600 像素及以上） */
 @media only screen and (min-width: 600px) {
-  .wrapper .scroller[style] {
-    width: 95vw;
-    padding-right: 0;
-  }
+
 }
 
 /* 中型设备（横向平板电脑，768 像素及以上） */
@@ -126,6 +145,17 @@ export default {
   .wrapper .scroller[style] {
     width: calc(100% - 2rem);
     padding: 1rem;
+  }
+  .box {
+    width: 100%;
+    height: 100%;
+    background-color: hsl(207, 100%, 91%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .box .jwchat {
+    height: 80vh !important;
   }
 }
 
