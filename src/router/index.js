@@ -44,7 +44,10 @@ const router = new Router({
     {
       path: '/chat',
       name: 'Chat',
-      component: () => import('@/views/Chat.vue')
+      component: () => import('@/views/Chat.vue'),
+      meta: {
+        requireLogin: true
+      }
     },
     {
       path: '/notfound',
