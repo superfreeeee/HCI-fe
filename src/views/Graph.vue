@@ -16,11 +16,6 @@
       </div>
       <graph-sidebar></graph-sidebar>
       <graph-board ref="board" @editor-open="showEditor = true"></graph-board>
-      <!-- <graph-options
-        @graph-action="actionDispatch"
-        @editor-open="showEditor = true"
-      ></graph-options>-->
-      <!-- <graph-layout @graph-action="actionDispatch"></graph-layout> -->
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
       <graph-editor></graph-editor>

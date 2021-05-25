@@ -4,12 +4,16 @@ import api from '@/api/dispatcher'
 const home = {
   state: {
     ownProjects: [],
+    allProjects: [],
     projectInfo: {},
     showCreatePanel: false
   },
   mutations: {
     setOwnProjects(state, data) {
       state.ownProjects = data
+    },
+    setAllProjects(state, data) {
+      state.allProjects = data
     },
     setProjectInfo(state, data) {
       state.projectInfo = data
@@ -51,6 +55,9 @@ const home = {
         console.log('[home/store/createProject] createProject error')
         return Promise.reject('unknown error')
       }
+    },
+    getAllProjects: () => {
+      
     }
   },
   getters: {

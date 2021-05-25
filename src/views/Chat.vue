@@ -18,10 +18,7 @@
 </template>
 
 <script>
-// import voiceRecognition from '../common/utils/voiceRecognition'
-// const recorder = new voiceRecognition('en_us', 'mandarin', '5f27b6a9')
-import coinPng from '../assets/coin.png'
-import logoPng from '../assets/logo.png'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   name: 'Chat',
@@ -29,22 +26,6 @@ export default {
     return {
       height: '80vh',
       text: '',
-      taleList: [
-        {
-          // date: '2020/04/25 21:19:07',
-          text: { text: '起床不' },
-          mine: false,
-          name: 'coin小助手',
-          img: coinPng,
-        },
-        {
-          // date: '2020/04/16 21:19:07',
-          text: { text: '我不饿' },
-          mine: true,
-          name: 'cclin',
-          img: logoPng,
-        },
-      ],
       tool: {
         // file img video 现在只配置了三个图标
         show: ['file', 'img', 'video'],
@@ -53,23 +34,21 @@ export default {
     }
   },
   mounted() {},
+  computed: {
+    ...mapGetters(['taleList', 'projectId']),
+  },
   methods: {
+    ...mapActions(['sendMessage']),
     toolEvent(type /* 当前点击的按钮类型 */) {
       alert(type)
     },
     bindEnter() {
-      console.log('bind press enter')
       console.log(this.text)
+      this.sendMessage(this.text)
     },
     goback() {
       this.$router.back()
     },
-    // onVoiceStart() {
-    //   recorder.start()
-    // },
-    // onVoiceStop() {
-    //   recorder.stop()
-    // },
   },
 }
 </script>
