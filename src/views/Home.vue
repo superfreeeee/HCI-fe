@@ -1,8 +1,21 @@
 <template>
   <div class="box">
     <div class="title">
+      <el-menu
+        :default-active="activeIndex"
+        mode="horizontal"
+        @select="handleSelect"
+      >
+        <el-menu-item index="1">我的项目</el-menu-item>
+        <el-menu-item index="2">广场</el-menu-item>
+      </el-menu>
       <h1>欢迎使用 co$in</h1>
-      <el-button icon="el-icon-plus" class="add" @click="createNewGraph()">
+      <el-button
+        icon="el-icon-plus"
+        class="add"
+        @click="createNewGraph()"
+        v-if="activeIndex === '1'"
+      >
         新建项目
       </el-button>
       <el-popover placement="bottom" trigger="click" class="user">
@@ -25,9 +38,13 @@
       style="width: 30%; margin: 0 0 15px 0"
       round
       @click="gotoProject(project.projectId)"
+      v-show="activeIndex === '1'"
     >
       项目：{{ project.name }}
     </el-button>
+    <!-- <el-button>
+      // 广场
+    </el-button> -->
     <NewProjectPanel />
   </div>
 </template>
@@ -39,13 +56,15 @@ import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel
+    NewProjectPanel,
   },
   data() {
-    return {}
+    return {
+      activeIndex: '1',
+    }
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel'])
+    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel']),
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
@@ -59,15 +78,18 @@ export default {
     logout() {
       localStorage.removeItem('coin-token')
       this.$router.push('/user')
-    }
+    },
+    handleSelect(key) {
+      this.activeIndex = key
+    },
   },
   mounted() {
-    this.getUserInfo().then(success => {
+    this.getUserInfo().then((success) => {
       if (success) {
         this.getListByUserId(this.userInfo.id)
       }
     })
-  }
+  },
 }
 </script>
 
@@ -99,7 +121,7 @@ export default {
 
 .box > .title > .user {
   position: fixed;
-  top: 25px;
+  top: 15px;
   right: 50px;
 }
 

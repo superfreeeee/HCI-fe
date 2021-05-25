@@ -42,7 +42,7 @@ const router = new Router({
       }
     },
     {
-      path: '/chat',
+      path: '/chat/:projectId',
       name: 'Chat',
       component: () => import('@/views/Chat.vue'),
       meta: {

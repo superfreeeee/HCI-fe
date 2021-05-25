@@ -2,7 +2,7 @@
   <el-menu
     @open="handleOpen"
     @close="handleClose"
-    :unique-opened=true
+    :unique-opened="true"
     class="sidemenu"
   >
     <el-submenu index="1">
@@ -145,7 +145,7 @@ export default {
       console.log(key, keyPath)
     },
     gotoChat() {
-      this.$router.push('/chat')
+      this.$router.push(`/chat/${this.projectId}`)
     },
     switchMode(e, { mode }) {
       buttonAutoBlur(e)
