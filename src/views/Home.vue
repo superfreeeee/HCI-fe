@@ -31,20 +31,30 @@
         ></el-button>
       </el-popover>
     </div>
-    <el-button
-      v-for="project in ownProjects"
-      :key="project.projectId"
-      type="primary"
-      style="width: 30%; margin: 0 0 15px 0"
-      round
-      @click="gotoProject(project.projectId)"
-      v-show="activeIndex === '1'"
-    >
-      项目：{{ project.name }}
-    </el-button>
-    <!-- <el-button>
-      // 广场
-    </el-button> -->
+    <div class="list" v-if="this.activeIndex === '1'">
+      <el-button
+        v-for="project in ownProjects"
+        :key="project.projectId"
+        type="primary"
+        style="width: 100%; margin: 0 0 15px 0"
+        round
+        @click="gotoProject(project.projectId)"
+      >
+        项目：{{ project.name }}
+      </el-button>
+    </div>
+    <div class="list" v-else>
+      <el-button
+        v-for="project in allProjects"
+        :key="project.projectId"
+        type="primary"
+        style="width: 100%; margin: 0 0 15px 0"
+        round
+        @click="gotoProject(project.projectId)"
+      >
+        项目：{{ project.name }}
+      </el-button>
+    </div>
     <NewProjectPanel />
   </div>
 </template>
@@ -64,11 +74,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel']),
+    ...mapGetters([
+      'ownProjects',
+      'projectId',
+      'userInfo',
+      'showCreatePanel',
+      'allProjects',
+    ]),
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
-    ...mapActions(['getListByUserId', 'userLogout', 'getUserInfo']),
+    ...mapActions(['getListByUserId', 'userLogout', 'getUserInfo', 'getAllListByUserId']),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
     },
@@ -86,7 +102,9 @@ export default {
   mounted() {
     this.getUserInfo().then((success) => {
       if (success) {
-        this.getListByUserId(this.userInfo.id)
+        const userId = this.userInfo.id
+        this.getListByUserId(userId)
+        // this.getAllListByUserId(userId)
       }
     })
   },
@@ -130,5 +148,13 @@ export default {
   border-bottom: 1px solid black;
   padding-bottom: 5px;
   margin-bottom: 5px;
+}
+
+.box > .list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
 }
 </style>

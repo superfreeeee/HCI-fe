@@ -1,10 +1,10 @@
-// import { fakeProjectInfo, fakeProjects } from '@/common/entity'
+import { fakeProjectInfo, fakeProjects, fakeAllProjects } from '@/common/entity'
 import api from '@/api/dispatcher'
 
 const home = {
   state: {
     ownProjects: [],
-    allProjects: [],
+    allProjects: fakeAllProjects,
     projectInfo: {},
     showCreatePanel: false
   },
@@ -32,6 +32,7 @@ const home = {
         console.log('getListByUserId error')
       }
     },
+    getAllListByUserId: () => {},
     getProjectInfo: async ({ commit, state }, projectId) => {
       if (projectId === state.projectId) return true
       const res = await api.getProjectInfo(projectId)
@@ -56,14 +57,13 @@ const home = {
         return Promise.reject('unknown error')
       }
     },
-    getAllProjects: () => {
-      
-    }
+    getAllProjects: () => {}
   },
   getters: {
     ownProjects: state => state.ownProjects,
     projectInfo: state => state.projectInfo,
-    showCreatePanel: state => state.showCreatePanel
+    showCreatePanel: state => state.showCreatePanel,
+    allProjects: state => state.allProjects
   }
 }
 

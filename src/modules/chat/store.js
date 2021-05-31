@@ -12,13 +12,6 @@ const chat = {
         name: 'coin小助手',
         img: coinPng
       },
-    //   {
-    //     // date: '2020/04/16 21:19:07',
-    //     text: { text: '我不饿' },
-    //     mine: true,
-    //     name: 'cclin',
-    //     img: logoPng
-    //   }
     ]
   },
   mutations: {

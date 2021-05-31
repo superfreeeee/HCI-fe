@@ -84,3 +84,27 @@ export const fakeXml = `
   </relations>
 </project>
 `
+
+export const fakeAllProjects = [
+  {
+    description: '这是第一个知识图谱',
+    layoutStatus: 'FORCE',
+    name: '知识图谱1 plaza',
+    projectId: 1,
+    userId: 1
+  },
+  {
+    description: '这是第二个知识图谱',
+    layoutStatus: 'FORCE',
+    name: '知识图谱2 plaza',
+    projectId: 2,
+    userId: 1
+  },
+  {
+    description: '这是第三个知识图谱',
+    layoutStatus: 'FORCE',
+    name: '知识图谱3 plaza',
+    projectId: 3,
+    userId: 1
+  }
+]
