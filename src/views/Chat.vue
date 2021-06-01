@@ -33,18 +33,23 @@ export default {
       },
     }
   },
-  mounted() {},
+  mounted() {
+    console.log(this.projectId)
+  },
   computed: {
     ...mapGetters(['taleList', 'projectId']),
   },
   methods: {
-    ...mapActions(['sendMessage']),
+    ...mapActions(['sendQuestion']),
     toolEvent(type /* 当前点击的按钮类型 */) {
       alert(type)
     },
     bindEnter() {
-      console.log(this.text)
-      this.sendMessage(this.text)
+      const question = {
+        projectId: this.projectId,
+        question: this.text,
+      }
+      this.sendQuestion(question)
     },
     goback() {
       this.$router.back()

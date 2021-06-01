@@ -2,6 +2,7 @@ import axios from './axios'
 import graph from './modules/graph'
 import project from './modules/project'
 import user from './modules/user'
+import smart from './modules/smart'
 
 class APIDispatcher {
   register({ prefix, configs = {} }) {
@@ -36,5 +37,6 @@ const dispatcher = new APIDispatcher()
 dispatcher.register(graph)
 dispatcher.register(project)
 dispatcher.register(user)
+dispatcher.register(smart)
 
 export default dispatcher

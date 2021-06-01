@@ -2,7 +2,7 @@ import api from '@/api/dispatcher'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
 
-const chat = {
+const smart = {
   state: {
     taleList: [
       {
@@ -11,7 +11,7 @@ const chat = {
         mine: false,
         name: 'coin小助手',
         img: coinPng
-      },
+      }
     ]
   },
   mutations: {
@@ -20,8 +20,9 @@ const chat = {
     }
   },
   actions: {
-    sendMessage: ({ commit }, data) => {
-      console.log('sendMessage', data)
+    sendQuestion: async ({ commit }, data) => {
+      const res = await api.askQuestion(data)
+      console.log(res)
     }
   },
   getters: {
@@ -29,4 +30,4 @@ const chat = {
   }
 }
 
-export default chat
+export default smart
