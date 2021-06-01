@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 
 export default {
   name: 'Chat',
@@ -34,12 +34,13 @@ export default {
     }
   },
   mounted() {
-    console.log(this.projectId)
+    console.log(this.taleList)
   },
   computed: {
     ...mapGetters(['taleList', 'projectId']),
   },
   methods: {
+    ...mapMutations(['pushTaleList']),
     ...mapActions(['sendQuestion']),
     toolEvent(type /* 当前点击的按钮类型 */) {
       alert(type)
