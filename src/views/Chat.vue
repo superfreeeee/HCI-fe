@@ -35,9 +35,10 @@ export default {
   },
   mounted() {
     console.log(this.taleList)
+    console.log(this.userInfo)
   },
   computed: {
-    ...mapGetters(['taleList', 'projectId']),
+    ...mapGetters(['taleList', 'projectId', 'userInfo']),
   },
   methods: {
     ...mapMutations(['pushTaleList']),
@@ -48,9 +49,13 @@ export default {
     bindEnter() {
       const question = {
         projectId: this.projectId,
-        question: this.text,
+        text: this.text,
       }
-      this.sendQuestion(question)
+      const data = {
+        question,
+        username: this.userInfo.username,
+      }
+      this.sendQuestion(data)
     },
     goback() {
       this.$router.back()

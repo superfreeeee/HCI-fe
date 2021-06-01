@@ -25,12 +25,13 @@ const smart = {
   },
   actions: {
     sendQuestion: async ({ commit }, data) => {
-      const res = await api.askQuestion(data)
-      const { answer, graph } = res.data
+      const { question, username } = data
+      const res = await api.askQuestion(question)
+      const { answer } = res.data
       const reqTale = {
-        text: { text: data.question },
+        text: { text: data.question.text },
         mine: true,
-        name: 'cclin',
+        name: username,
         img: logoPng
       }
       const resTale = {
