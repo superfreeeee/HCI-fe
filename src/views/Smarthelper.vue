@@ -11,15 +11,30 @@
       type="border-card"
       style="height: 100%"
     >
-      <el-tab-pane label="图谱问答">图谱问答</el-tab-pane>
-      <el-tab-pane label="实体查询">实体查询</el-tab-pane>
-      <el-tab-pane label="关系查询">关系查询</el-tab-pane>
+      <el-tab-pane label="图谱问答">
+        <GraphDialogue />
+      </el-tab-pane>
+      <el-tab-pane label="实体查询">
+        <EntityQuery />
+      </el-tab-pane>
+      <el-tab-pane label="关系查询">
+        <RelationQuery />
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
 
 <script>
+import GraphDialogue from '../modules/smart/components/GraphDialogue.vue'
+import EntityQuery from '../modules/smart/components/EntityQuery.vue'
+import RelationQuery from '../modules/smart/components/RelationQuery'
+
 export default {
+  components: {
+    GraphDialogue,
+    EntityQuery,
+    RelationQuery,
+  },
   name: 'Smarthelper',
   data() {
     return {
@@ -39,5 +54,11 @@ export default {
   width: calc(100vw - 40px);
   height: calc(90vh - 40px);
   padding: 20px;
+}
+.el-tabs--border-card > .el-tabs__content {
+  height: calc(100% - 30px);
+}
+.el-tabs--border-card > .el-tabs__content > .el-tab-pane {
+  height: 100%;
 }
 </style>
