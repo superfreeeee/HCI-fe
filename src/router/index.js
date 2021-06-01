@@ -50,6 +50,14 @@ const router = new Router({
       }
     },
     {
+      path: '/smarthelper/:projectId',
+      name: 'Smarthelper',
+      component: () => import('@/views/Smarthelper.vue'),
+      meta: {
+        requireLogin: true
+      }
+    },
+    {
       path: '/notfound',
       name: 'Notfound',
       component: () => import('@/views/Notfound.vue')

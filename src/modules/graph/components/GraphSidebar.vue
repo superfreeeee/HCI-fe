@@ -55,11 +55,13 @@
       </template>
       <el-menu-item-group style="text-align: center">
         <el-button
+          v-for="smartOption in smartOptions"
+          :key="smartOption.label"
           type="success"
           style="margin-bottom: 10px; width: 100%"
-          @click="gotoChat()"
+          @click="smartOption.handler"
         >
-          智能小助手
+          {{ smartOption.label }}
         </el-button>
       </el-menu-item-group>
     </el-submenu>
@@ -124,6 +126,16 @@ export default {
           handler: () => this.exportXml(),
         },
       ],
+      smartOptions: [
+        {
+          label: '智能小助手 PC 端',
+          handler: () => this.gotoChat(),
+        },
+        {
+          label: '智能小助手 Web 端',
+          handler: () => this.gotoSmarthelper(),
+        },
+      ],
     }
   },
   computed: {
@@ -146,6 +158,9 @@ export default {
     },
     gotoChat() {
       this.$router.push(`/chat/${this.projectId}`)
+    },
+    gotoSmarthelper() {
+      this.$router.push(`/smarthelper/${this.projectId}`)
     },
     switchMode(e, { mode }) {
       buttonAutoBlur(e)
