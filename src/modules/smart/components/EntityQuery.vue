@@ -2,10 +2,7 @@
   <div class="entityq">
     <div class="ask">
       <span class="title">
-        <i
-          class="el-icon-share"
-          style="font-size: large; margin-right: 10px"
-        />
+        <i class="el-icon-share" style="font-size: large; margin-right: 10px" />
         实体查询
       </span>
       <div class="input">
@@ -24,22 +21,44 @@
     </div>
     <div class="graph">
       <span class="title">关系图</span>
+      <div class="show">
+        <GraphBoard ref="entityQueryBoard" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import GraphBoard from '../../graph/components/GraphBoard'
+
 export default {
   name: 'EntityQuery',
+  components: {
+    GraphBoard,
+  },
   data() {
     return {
       entityQueryinput: '',
     }
   },
   methods: {
+    ...mapActions(['getProjectInfo']),
     entityQuerySearch() {
       console.log('entityQuerySearch')
     },
+  },
+  async mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    console.log(`[Graph] mounted, projectId = ${projectId}`)
+
+    console.log(`[Graph] getProjectInfo`)
+    if (!(await this.getProjectInfo(projectId))) return
+
+    console.log(`[Graph] graphInit`)
+    const board = this.$refs.entityQueryBoard
+    if (!(await board.graphInit(projectId))) return
+    board.init()
   },
 }
 </script>
@@ -70,5 +89,8 @@ export default {
   width: 100%;
   height: 75%;
   box-shadow: 1px 1px 1px 1px slategray;
+}
+.entityq > .graph > .show {
+  height: calc(100% - 35px);
 }
 </style>

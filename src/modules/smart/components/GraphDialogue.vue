@@ -27,22 +27,44 @@
     </div>
     <div class="graph">
       <span class="title">图谱演示</span>
+      <div class="show">
+        <GraphBoard ref="graphDialogueBoard" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+import GraphBoard from '../../graph/components/GraphBoard'
+
 export default {
   name: 'GraphDialogue',
+  components: {
+    GraphBoard,
+  },
   data() {
     return {
       graphDialogueinput: '',
     }
   },
   methods: {
+    ...mapActions(['getProjectInfo']),
     graphDialogueSearch() {
       console.log('graphDialogueSearch')
     },
+  },
+  async mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    console.log(`[Graph] mounted, projectId = ${projectId}`)
+
+    console.log(`[Graph] getProjectInfo`)
+    if (!(await this.getProjectInfo(projectId))) return
+
+    console.log(`[Graph] graphInit`)
+    const board = this.$refs.graphDialogueBoard
+    if (!(await board.graphInit(projectId))) return
+    board.init()
   },
 }
 </script>
@@ -81,6 +103,9 @@ export default {
   height: 75%;
   float: left;
   box-shadow: 1px 1px 1px 1px slategray;
+}
+.graphd > .graph > .show {
+  height: calc(100% - 35px);
 }
 .el-input-group {
   height: 100%;

@@ -8,17 +8,19 @@
     ></el-button>
     <el-tabs
       :tab-position="tabPosition"
+      :before-leave="tabClick"
+      :value="graphDialogueName"
       type="border-card"
       style="height: 100%"
     >
-      <el-tab-pane label="图谱问答">
-        <GraphDialogue />
+      <el-tab-pane label="图谱问答" :name="graphDialogueName">
+        <GraphDialogue v-if="show.graphDialogue" />
       </el-tab-pane>
-      <el-tab-pane label="实体查询">
-        <EntityQuery />
+      <el-tab-pane label="实体查询" :name="entityQueryName">
+        <EntityQuery v-if="show.entityQuery" />
       </el-tab-pane>
-      <el-tab-pane label="关系查询">
-        <RelationQuery />
+      <el-tab-pane label="关系查询" :name="relationQueryName">
+        <RelationQuery v-if="show.relationQuery" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -39,11 +41,24 @@ export default {
   data() {
     return {
       tabPosition: 'left',
+      graphDialogueName: 'graphDialogue',
+      entityQueryName: 'entityQuery',
+      relationQueryName: 'relationQuery',
+      show: {
+        graphDialogue: true,
+        entityQuery: false,
+        relationQuery: false,
+      },
     }
   },
   methods: {
     goback() {
       this.$router.back()
+    },
+    tabClick(activeName, oldActiveName) {
+      console.log(activeName, oldActiveName)
+      this.show[activeName] = true
+      this.show[oldActiveName] = false
     },
   },
 }
@@ -54,6 +69,7 @@ export default {
   width: calc(100vw - 40px);
   height: calc(90vh - 40px);
   padding: 20px;
+  background-color: #fdfcf8;
 }
 .el-tabs--border-card > .el-tabs__content {
   height: calc(100% - 30px);
