@@ -1,7 +1,13 @@
 <template>
   <div class="graphd">
     <div class="ask">
-      <span class="title">输入问题：</span>
+      <span class="title">
+        <i
+          class="el-icon-question"
+          style="font-size: large; margin-right: 10px"
+        />
+        图谱问答
+      </span>
       <div class="input">
         <el-input
           placeholder="请输入问题"
@@ -17,10 +23,10 @@
       </div>
     </div>
     <div class="answer">
-      <span class="title">答案：</span>
+      <span class="title">答案</span>
     </div>
     <div class="graph">
-      <span class="title">图谱演示：</span>
+      <span class="title">图谱演示</span>
     </div>
   </div>
 </template>
