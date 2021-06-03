@@ -1,7 +1,7 @@
 <template>
   <div class="relationq">
     <div class="ask">
-      <span class="title">
+      <span class="header">
         <i
           class="el-icon-refresh"
           style="font-size: large; margin-right: 10px"
@@ -113,7 +113,7 @@ export default {
   box-shadow: 1px 1px 1px 1px slategray;
   margin-bottom: 25px;
 }
-.title {
+.header {
   display: flex;
   align-items: center;
   height: 35px;
