@@ -10,6 +10,7 @@
           placeholder="请输入实体名称"
           v-model="entityQueryinput"
           clearable
+          style="width: 100%"
         >
           <el-button
             slot="append"

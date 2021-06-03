@@ -13,6 +13,7 @@
           placeholder="请输入问题"
           v-model="graphDialogueinput"
           clearable
+          style="width: 100%"
         >
           <el-button
             slot="append"
