@@ -23,10 +23,10 @@
       </div>
     </div>
     <div class="answer">
-      <span class="title">答案</span>
+      <span class="header">答案</span>
     </div>
     <div class="graph">
-      <span class="title">图谱演示</span>
+      <span class="header">图谱演示</span>
       <div class="show">
         <GraphBoard ref="graphDialogueBoard" />
       </div>
@@ -107,10 +107,10 @@ export default {
 .graphd > .graph > .show {
   height: calc(100% - 35px);
 }
-.el-input-group {
+/* .el-input-group {
   height: 100%;
 }
 .el-input__inner {
   height: 100%;
-}
+} */
 </style>

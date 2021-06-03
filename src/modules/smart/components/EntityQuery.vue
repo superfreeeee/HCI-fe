@@ -20,7 +20,7 @@
       </div>
     </div>
     <div class="graph">
-      <span class="title">关系图</span>
+      <span class="header">关系图</span>
       <div class="show">
         <GraphBoard ref="entityQueryBoard" />
       </div>
