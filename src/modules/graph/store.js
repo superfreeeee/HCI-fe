@@ -169,7 +169,7 @@ const graph = {
       const res = await api.getGraphByProjectId(projectId)
       // const res = { status: 200, data: fakeGraphData }
       if (res.status === 200) {
-        const mode = getters.projectInfo.layoutStatus
+        const mode = getters.projectInfo.layoutStatus || 'FORCE'
         const { projectId, nodes, links, layouts } = res.data
         const pureLayouts = layouts.map(({ projectId, ...rest }) => ({
           ...rest
@@ -441,6 +441,7 @@ const graph = {
         board: { mode }
       } = state
       let layout = state.layouts[mode]
+      if (!layout) return 1
       if (layout.nodes.length !== nodes.length && mode === 'GRID') {
         layout = getGridLayout(nodes)
         commit('setLayout', { mode: 'GRID', layout })

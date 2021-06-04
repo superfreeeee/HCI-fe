@@ -164,7 +164,9 @@ export const getGridLayout = nodes => {
   return { nodes: layoutNodes, width, height }
 }
 
-export const getScale = ({ width, height }) => {
+export const getScale = (layout) => {
+  if (!layout) return 1
+  const { width, height } = layout
   const { width: boardWidth, height: boardHeight } = config
   const zoom = 0.7
   return Math.min(1, (boardWidth / width) * zoom, (boardHeight / height) * zoom)
