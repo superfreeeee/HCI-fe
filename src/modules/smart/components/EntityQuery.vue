@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
 
 export default {
@@ -43,24 +43,32 @@ export default {
       entityQueryinput: '',
     }
   },
+  mounted() {
+    this.entityQueryinput = this.entityQueryQues
+  },
+  computed: {
+    ...mapGetters(['entityQueryQues']),
+  },
   methods: {
+    ...mapMutations(['setEntityQueryQues']),
     ...mapActions(['getProjectInfo']),
     entityQuerySearch() {
       console.log('entityQuerySearch')
+      this.setEntityQueryQues(this.entityQueryinput)
     },
   },
-  async mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    console.log(`[Graph] mounted, projectId = ${projectId}`)
+  // async mounted() {
+  //   const projectId = Number(this.$route.params.projectId)
+  //   console.log(`[Graph] mounted, projectId = ${projectId}`)
 
-    console.log(`[Graph] getProjectInfo`)
-    if (!(await this.getProjectInfo(projectId))) return
+  //   console.log(`[Graph] getProjectInfo`)
+  //   if (!(await this.getProjectInfo(projectId))) return
 
-    console.log(`[Graph] graphInit`)
-    const board = this.$refs.entityQueryBoard
-    if (!(await board.graphInit(projectId))) return
-    board.init()
-  },
+  //   console.log(`[Graph] graphInit`)
+  //   const board = this.$refs.entityQueryBoard
+  //   if (!(await board.graphInit(projectId))) return
+  //   board.init()
+  // },
 }
 </script>
 

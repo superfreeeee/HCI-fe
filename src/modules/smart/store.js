@@ -12,7 +12,14 @@ const smart = {
         name: 'coin小助手',
         img: coinPng
       }
-    ]
+    ],
+    graphDialogueQues: '',
+    entityQueryQues: '',
+    relationQueryQues: {
+      source: '',
+      target: '',
+      relation: ''
+    }
   },
   mutations: {
     setTaleList(state, data) {
@@ -21,9 +28,22 @@ const smart = {
     pushTaleList(state, data) {
       state.taleList.push(data.reqTale)
       setTimeout(() => state.taleList.push(data.resTale), 2000)
+    },
+    setGraphDialogueQues(state, data) {
+      state.graphDialogueQues = data
+    },
+    setEntityQueryQues(state, data) {
+      state.entityQueryQues = data
+    },
+    setRelationQueryQues(state, data) {
+      state.relationQueryQues = data
     }
   },
   actions: {
+    initiateGraph: async ({ commit }, projectId) => {
+      const res = await api.initGraph(projectId)
+      console.log('initiateGraph', res)
+    },
     sendQuestion: async ({ commit }, data) => {
       const { question, username } = data
       const res = await api.askQuestion(question)
@@ -45,7 +65,10 @@ const smart = {
     }
   },
   getters: {
-    taleList: state => state.taleList
+    taleList: state => state.taleList,
+    graphDialogueQues: state => state.graphDialogueQues,
+    entityQueryQues: state => state.entityQueryQues,
+    relationQueryQues: state => state.relationQueryQues
   }
 }
 

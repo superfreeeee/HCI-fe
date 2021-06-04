@@ -16,7 +16,7 @@
           style="width: 30%"
         />
         <el-select
-          v-model="value"
+          v-model="relation"
           placeholder="关系"
           clearable=""
           style="margin: 0 20px; width: 20%"
@@ -53,7 +53,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
 
 export default {
@@ -65,7 +65,7 @@ export default {
     return {
       source: '',
       target: '',
-      value: '',
+      relation: '',
       options: [
         {
           label: '主食材',
@@ -82,24 +82,39 @@ export default {
       ],
     }
   },
+  mounted() {
+    this.source = this.relationQueryQues.source
+    this.target = this.relationQueryQues.target
+    this.relation = this.relationQueryQues.relation
+  },
+  computed: {
+    ...mapGetters(['relationQueryQues']),
+  },
   methods: {
+    ...mapMutations(['setRelationQueryQues']),
     ...mapActions(['getProjectInfo']),
     relationQuerySearch() {
       console.log('relationQuerySearch')
+      const relationQueryQues = {
+        source: this.source,
+        target: this.target,
+        relation: this.relation,
+      }
+      this.setRelationQueryQues(relationQueryQues)
     },
   },
-  async mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    console.log(`[Graph] mounted, projectId = ${projectId}`)
+  // async mounted() {
+  //   const projectId = Number(this.$route.params.projectId)
+  //   console.log(`[Graph] mounted, projectId = ${projectId}`)
 
-    console.log(`[Graph] getProjectInfo`)
-    if (!(await this.getProjectInfo(projectId))) return
+  //   console.log(`[Graph] getProjectInfo`)
+  //   if (!(await this.getProjectInfo(projectId))) return
 
-    console.log(`[Graph] graphInit`)
-    const board = this.$refs.relationQueryBoard
-    if (!(await board.graphInit(projectId))) return
-    board.init()
-  },
+  //   console.log(`[Graph] graphInit`)
+  //   const board = this.$refs.relationQueryBoard
+  //   if (!(await board.graphInit(projectId))) return
+  //   board.init()
+  // },
 }
 </script>
 
