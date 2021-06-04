@@ -164,6 +164,14 @@ const graph = {
     }
   },
   actions: {
+    async getProjectInfo(_, projectId) {
+      const res = await api.getProjectInfo(projectId)
+      return res.status === 200 ? res.data : null
+    },
+    async getProjectGraphData(_, projectId) {
+      const res = await api.getGraphByProjectId(projectId)
+      return res.status === 200 ? res.data : null
+    },
     async graphInit({ commit, state, getters }, projectId) {
       if (projectId === state.projectId) return true
       const res = await api.getGraphByProjectId(projectId)

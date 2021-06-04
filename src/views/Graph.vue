@@ -15,10 +15,11 @@
         >
       </div>
       <graph-sidebar></graph-sidebar>
-      <graph-board ref="board" @editor-open="showEditor = true"></graph-board>
+      <graph-board2 ref="board"></graph-board2>
+      <!-- <graph-board ref="board" @editor-open="showEditor = true"></graph-board> -->
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
-      <graph-editor></graph-editor>
+      <!-- <graph-editor></graph-editor> -->
     </div>
     <el-button
       @click="showEditor = !showEditor"
@@ -29,36 +30,45 @@
 
 <script>
 import GraphBoard from '../modules/graph/components/GraphBoard'
+import GraphBoard2 from '../modules/graph/components/GraphBoard2'
 import GraphOptions from '../modules/graph/components/GraphOptions'
 import GraphLayout from '../modules/graph/components/GraphLayout'
 import GraphEditor from '../modules/graph/components/GraphEditor'
 import GraphSidebar from '../modules/graph/components/GraphSidebar'
 import { mapGetters, mapActions } from 'vuex'
 
+import { _projectInfo, _graphData } from '../modules/graph/utils/data'
+import { deepCopy } from '../common/utils/object'
+
 export default {
   name: 'Graph',
   components: {
     GraphBoard,
+    GraphBoard2,
     GraphOptions,
     GraphLayout,
     GraphEditor,
-    GraphSidebar,
+    GraphSidebar
   },
   data() {
     return {
-      showEditor: true,
+      projectInfo: {},
+      graphData: null,
+      showEditor: true
     }
   },
   computed: {
     ...mapGetters([
-      'graphData',
-      'projectInfo',
-    ]),
+      // 'graphData',
+      // 'projectInfo',
+    ])
   },
   methods: {
-    ...mapActions([
-      'getProjectInfo',
-    ]),
+    ...mapActions({
+      getProjectInfoAct: 'getProjectInfo',
+      getProjectGraphDataAct: 'getProjectGraphData'
+    }),
+    ...mapActions(['getProjectInfo']),
     back() {
       this.$router.push('/')
     },
@@ -72,22 +82,52 @@ export default {
         message: this.projectInfo.description,
         duration: 5000,
         type: 'info',
-        position: 'bottom-left',
+        position: 'bottom-left'
       })
-    },
+    }
   },
   async mounted() {
     const projectId = Number(this.$route.params.projectId)
     console.log(`[Graph] mounted, projectId = ${projectId}`)
 
-    console.log(`[Graph] getProjectInfo`)
-    if (!(await this.getProjectInfo(projectId))) return
+    // const projectInfo = await this.getProjectInfoAct(projectId)
+    const projectInfo = deepCopy(_projectInfo)
+    console.log('projectInfo', projectInfo)
+    if (!projectInfo) {
+      // warning
+      return
+    }
+    this.projectInfo = projectInfo
 
-    console.log(`[Graph] graphInit`)
-    const board = this.$refs.board
-    if (!(await board.graphInit(projectId))) return
-    board.init()
-  },
+    // const graphData = await this.getProjectGraphDataAct(projectId)
+    const graphData = deepCopy(_graphData)
+    console.log('graphData', graphData)
+    if (!graphData) {
+      // warning
+      return
+    }
+    this.graphData = graphData
+
+    const graphBoard = this.$refs.board
+    graphBoard.mountGraphData(graphData)
+
+    // setTimeout(() => {
+    //   graphBoard.reset()
+    //   setTimeout(() => {
+    //     graphBoard.mountGraphData(graphData)
+    //   }, 5000)
+    // }, 5000)
+
+    // console.log(`[Graph] getProjectInfo`)
+    // if (!(await this.getProjectInfo(projectId))) return
+
+    // this.getGraphDataByProjectIdAct(projectId);
+
+    // console.log(`[Graph] graphInit`)
+    // const board = this.$refs.board
+    // if (!(await board.graphInit(projectId))) return
+    // board.init()
+  }
 }
 </script>
 
