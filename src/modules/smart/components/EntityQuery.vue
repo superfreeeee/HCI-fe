@@ -10,6 +10,7 @@
           placeholder="请输入实体名称"
           v-model="entityQueryinput"
           clearable
+          style="width: 100%"
         >
           <el-button
             slot="append"
@@ -20,7 +21,7 @@
       </div>
     </div>
     <div class="graph">
-      <span class="title">关系图</span>
+      <span class="header">关系图</span>
       <div class="show">
         <GraphBoard ref="entityQueryBoard" />
       </div>

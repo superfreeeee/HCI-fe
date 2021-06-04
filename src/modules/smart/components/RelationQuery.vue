@@ -44,7 +44,7 @@
       </div>
     </div>
     <div class="graph">
-      <span class="title">关系图</span>
+      <span class="header">关系图</span>
       <div class="show">
         <GraphBoard ref="relationQueryBoard" />
       </div>
@@ -126,9 +126,9 @@ export default {
   padding: 10px;
   height: calc(65% - 20px);
 }
-.el-input {
+/* .el-input {
   height: 100%;
-}
+} */
 .el-select {
   height: 100%;
 }
