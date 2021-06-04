@@ -61,6 +61,7 @@
               @blur="setEditorSelect('')"
             ></el-button>
           </div>
+          <!-- 选颜色 -->
           <div v-else-if="option.type === 'color'">
             <el-radio-group
               :disabled="!graphEditorEditable"
