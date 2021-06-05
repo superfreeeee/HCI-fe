@@ -38,7 +38,7 @@ export default {
     console.log(this.userInfo)
   },
   computed: {
-    ...mapGetters(['taleList', 'projectId', 'userInfo']),
+    ...mapGetters(['taleList', 'userInfo']),
   },
   methods: {
     ...mapMutations(['pushTaleList']),
@@ -47,8 +47,9 @@ export default {
       alert(type)
     },
     bindEnter() {
+      const projectId = Number(this.$route.params.projectId)
       const question = {
-        projectId: this.projectId,
+        projectId,
         text: this.text,
       }
       const data = {

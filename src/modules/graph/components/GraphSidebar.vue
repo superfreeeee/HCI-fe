@@ -131,6 +131,10 @@ export default {
       ],
       smartOptions: [
         {
+          label: '初始化图谱',
+          handler: () => this.initGraph(),
+        },
+        {
           label: '智能小助手 PC 端',
           handler: () => this.gotoChat(),
         },
@@ -152,6 +156,7 @@ export default {
       'saveLayout',
       'restoreLayout',
       'editorCreate',
+      'initiateGraph',
     ]),
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
@@ -160,10 +165,16 @@ export default {
       // console.log(key, keyPath)
     },
     gotoChat() {
-      this.$router.push(`/chat/${this.projectId}`)
+      const projectId = Number(this.$route.params.projectId)
+      this.$router.push(`/chat/${projectId}`)
     },
     gotoSmarthelper() {
-      this.$router.push(`/smarthelper/${this.projectId}`)
+      const projectId = Number(this.$route.params.projectId)
+      this.$router.push(`/smarthelper/${projectId}`)
+    },
+    initGraph() {
+      const projectId = Number(this.$route.params.projectId)
+      this.initiateGraph(projectId)
     },
     switchMode(e, { mode }) {
       buttonAutoBlur(e)

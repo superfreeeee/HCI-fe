@@ -36,7 +36,7 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
 
 export default {
@@ -49,24 +49,32 @@ export default {
       graphDialogueinput: '',
     }
   },
+  mounted() {
+    this.graphDialogueinput = this.graphDialogueQues
+  },
+  computed: {
+    ...mapGetters(['graphDialogueQues']),
+  },
   methods: {
+    ...mapMutations(['setGraphDialogueQues']),
     ...mapActions(['getProjectInfo']),
     graphDialogueSearch() {
       console.log('graphDialogueSearch')
+      this.setGraphDialogueQues(this.graphDialogueinput)
     },
   },
-  async mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    console.log(`[Graph] mounted, projectId = ${projectId}`)
+  // async mounted() {
+  //   const projectId = Number(this.$route.params.projectId)
+  //   console.log(`[Graph] mounted, projectId = ${projectId}`)
 
-    console.log(`[Graph] getProjectInfo`)
-    if (!(await this.getProjectInfo(projectId))) return
+  //   console.log(`[Graph] getProjectInfo`)
+  //   if (!(await this.getProjectInfo(projectId))) return
 
-    console.log(`[Graph] graphInit`)
-    const board = this.$refs.graphDialogueBoard
-    if (!(await board.graphInit(projectId))) return
-    board.init()
-  },
+  //   console.log(`[Graph] graphInit`)
+  //   const board = this.$refs.graphDialogueBoard
+  //   if (!(await board.graphInit(projectId))) return
+  //   board.init()
+  // },
 }
 </script>
 
