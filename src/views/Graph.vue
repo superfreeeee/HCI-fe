@@ -86,7 +86,7 @@ export default {
       console.log(`[GraphAction] ${name}`, args)
       this.$refs.board[name](...args)
     },
-    dispatchEditorAction(name) {
+    dispatchEditorAction(name, ...args) {
       console.log(`[EditorAction] ${name}`, args)
       this.showEditor = true
     },

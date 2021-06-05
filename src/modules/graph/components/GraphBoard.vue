@@ -363,6 +363,9 @@ export default {
     },
     switchLayout(mode) {
       console.log(`switchLayout ${mode}`)
+      this.layoutMode = mode
+      this.restoreLayout()
+      mode === 'FIXED' ? this.pin() : this.unPin()
     },
     saveLayout() {
       console.log(`saveLayout`)
