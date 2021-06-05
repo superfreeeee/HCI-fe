@@ -80,6 +80,7 @@ export default {
   name: 'GraphSideBar',
   data() {
     return {
+      flag: true, // mock verifyInitiate
       modes: layoutModes,
       actions: [
         {
@@ -166,11 +167,21 @@ export default {
     },
     gotoChat() {
       const projectId = Number(this.$route.params.projectId)
-      this.$router.push(`/chat/${projectId}`)
+      if (this.flag) {
+        this.$router.push(`/smarthelper/${projectId}`)
+      } else {
+        this.$router.push(`/graph/${projectId}`)
+        this.$message.error('请先初始化图谱!')
+      }
     },
     gotoSmarthelper() {
       const projectId = Number(this.$route.params.projectId)
-      this.$router.push(`/smarthelper/${projectId}`)
+      if (this.flag) {
+        this.$router.push(`/smarthelper/${projectId}`)
+      } else {
+        this.$router.push(`/graph/${projectId}`)
+        this.$message.error('请先初始化图谱!')
+      }
     },
     initGraph() {
       const projectId = Number(this.$route.params.projectId)
