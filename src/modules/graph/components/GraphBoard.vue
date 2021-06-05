@@ -34,7 +34,8 @@ export default {
       },
       flags: {
         singleFocus: true,
-        enableFocus: true
+        enableFocus: true,
+        pinned: false
       }
     }
   },
@@ -110,8 +111,9 @@ export default {
         resetZoom()
         // this.setFocus([1, 2, 3, 4, 5], true)
         // this.setFocus([6, 7, 8, 9, 10], true)
-      }, 0)
+      }, 300)
       setEnableFocus(true)
+      // this.pin()
     },
     // 重置图谱节点
     reset() {
@@ -364,13 +366,47 @@ export default {
     clearFocus() {
       this.svgElements.focusGroup.selectAll('circle').remove()
     },
-    /********** 图谱事件 **********/
+    // 固定节点
+    pin() {
+      const {
+        svgElements: { simulation },
+        nodes,
+        flags: { pinned }
+      } = this
+      if (!pinned) {
+        this.flags.pinned = true
+        simulation.stop()
+        nodes.forEach(node => {
+          node.fx = node.x
+          node.fy = node.y
+        })
+      }
+    },
+    // 取消固定
+    unPin() {
+      const {
+        svgElements: { simulation },
+        nodes,
+        flags: { pinned }
+      } = this
+      if (pinned) {
+        this.flags.pinned = false
+        nodes.forEach(node => {
+          node.fx = null
+          node.fy = null
+        })
+        simulation.alpha(1).restart()
+      }
+    },
+    /********** 节点/关系操作事件 **********/
+    // 点击节点
     clickNode(e) {
       const id = Number(e.target.attributes['data-id'].value)
       const node = this.getNodeById(id)
       console.log(`click node: id=${id}, `, node)
       this.setNodeFocus(node)
     },
+    // 点击关系
     clickLink(e) {
       const id = Number(e.target.attributes['data-id'].value)
       const link = this.getLinkById(id)
@@ -418,7 +454,7 @@ export default {
     /********** 力导图绑定事件 **********/
     // 拖曳设置
     setDrag(simulation) {
-      const { setEnableFocus } = this
+      const { setEnableFocus, flags } = this
 
       const start = (e, d) => {
         if (!e.active) simulation.alphaTarget(0.3).restart()
@@ -435,8 +471,10 @@ export default {
       const end = (e, d) => {
         if (!e.active) simulation.alphaTarget(0)
         setEnableFocus(true)
-        d.fx = null
-        d.fy = null
+        if (!flags.pinned) {
+          d.fx = null
+          d.fy = null
+        }
       }
 
       const boundDrag = this.$d3
@@ -475,12 +513,14 @@ export default {
       const node =
         typeof nodeOrId === 'object' ? nodeOrId : getNodeById(nodeOrId)
       if (singleFocus) {
-        nodes.forEach(node => {
-          if (node.focus) {
-            node.focus = false
-            _unfocus(node.id)
-          }
-        })
+        nodes
+          .filter(n => n !== node)
+          .forEach(node => {
+            if (node.focus) {
+              node.focus = false
+              _unfocus(node.id)
+            }
+          })
       }
       node.focus = true
     },
