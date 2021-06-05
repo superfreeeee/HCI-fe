@@ -50,7 +50,6 @@
 </template>
 
 <script>
-import { layoutModes } from '@/modules/graph/utils/layout'
 import { buttonAutoBlur } from '@/common/utils'
 import { mapGetters, mapActions } from 'vuex'
 import GraphLayout from './GraphLayout'
@@ -65,45 +64,27 @@ export default {
   data() {
     return {
       flag: true, // mock verifyInitiate
-      modes: layoutModes,
-      actions: [
-        {
-          label: '保存布局',
-          handler: () => this.saveLayout(),
-        },
-        {
-          label: '恢复布局',
-          handler: () => this.restoreLayout(),
-        },
-      ],
       smartOptions: [
         {
           label: '初始化图谱',
-          handler: () => this.initGraph(),
+          handler: () => this.initGraph()
         },
         {
           label: '智能小助手 PC 端',
-          handler: () => this.gotoSmarthelper('/chat'),
+          handler: () => this.gotoSmarthelper('/chat')
         },
         {
           label: '智能小助手 Web 端',
-          handler: () => this.gotoSmarthelper('/smarthelper'),
-        },
-      ],
+          handler: () => this.gotoSmarthelper('/smarthelper')
+        }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId']),
+    ...mapGetters(['graphBoardMode', 'projectId'])
   },
   methods: {
-    ...mapActions([
-      'switchLayoutMode',
-      'saveLayout',
-      'restoreLayout',
-      'editorCreate',
-      'initiateGraph',
-      'verifyInitiate',
-    ]),
+    ...mapActions(['switchLayoutMode', 'initiateGraph', 'verifyInitiate']),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
     },
@@ -121,7 +102,7 @@ export default {
     },
     gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId)
-      this.verifyInitiate(projectId).then((res) => {
+      this.verifyInitiate(projectId).then(res => {
         if (res) {
           this.$router.push(`${path}/${projectId}`)
         } else {
@@ -134,20 +115,11 @@ export default {
       const projectId = Number(this.$route.params.projectId)
       this.initiateGraph(projectId)
     },
-    switchMode(e, { mode }) {
-      buttonAutoBlur(e)
-      if (mode !== this.graphBoardMode) {
-        this.switchLayoutMode(mode)
-      }
-    },
     handlerDispatcher(e, handler) {
       buttonAutoBlur(e)
       handler()
-    },
-    exportXml() {
-      this.saveAsXml(this.projectId)
-    },
-  },
+    }
+  }
 }
 </script>
 

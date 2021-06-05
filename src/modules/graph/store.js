@@ -467,22 +467,19 @@ const graph = {
       return scale
     },
     // 持久化相关
-    saveAsPng({ state, getters }) {
+    saveAsPng(_, { projectName, svg }) {
       console.log('[action] saveAsPng')
-      const name = getters.projectInfo.name
-      const svg = state.board.svg
 
       const group = svg._groups[0][0]
       const width = group.width.baseVal.value
       const height = group.height.baseVal.value
 
       svgToPng(svg, width, height).then(dataUrl => {
-        download(`知识图谱-${name}.png`, dataUrl)
+        download(`知识图谱-${projectName}.png`, dataUrl)
       })
     },
-    async saveAsXml({ getters }, projectId) {
+    async saveAsXml(_, { projectId, name }) {
       const res = await api.exportProjectXml(projectId)
-      const name = getters.projectInfo.name
       xmlDownload(res.data.xml, `知识图谱-${name}.xml`)
     }
   },

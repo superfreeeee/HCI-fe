@@ -127,7 +127,7 @@ export default {
     this.graphData = graphData
 
     const graphBoard = this.$refs.board
-    graphBoard.mountGraphData(graphData)
+    graphBoard.mountGraphData(graphData, projectInfo)
 
     // setTimeout(() => {
     //   graphBoard.reset()

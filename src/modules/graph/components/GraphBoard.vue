@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import { deepCopy } from '../../../common/utils/object'
 import config from '../utils/config'
 import { calcScale } from '../utils/layout'
@@ -18,6 +19,7 @@ export default {
     return {
       origin: null,
       config: { ...config },
+      projectInfo: null,
       layouts: {},
       layoutMode: 'FORCE',
       nodes: [],
@@ -25,6 +27,7 @@ export default {
       focusNodes: [],
       svgElements: {
         simulation: null,
+        svg: null,
         view: null,
         root: null,
         focusGroup: null,
@@ -44,10 +47,11 @@ export default {
     }
   },
   methods: {
+    ...mapActions(['saveAsPng', 'saveAsXml']),
     /***** 重新挂载图谱 *****/
-    mountGraphData(data) {
+    mountGraphData(data, projectInfo) {
       this.origin = deepCopy(data)
-
+      this.projectInfo = deepCopy(projectInfo)
       const { nodes, links, layouts } = data
       this.nodes = nodes
       this.links = links
@@ -94,6 +98,7 @@ export default {
       const svg = $d3
         .select($el)
         .attr('viewBox', [-width / 2, -height / 2, width, height])
+      this.svgElements.svg = svg
 
       // 设置透明操作板
       const view = setView(svg)
@@ -354,7 +359,7 @@ export default {
         .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
     },
     randomDisorder() {
-      this.mountGraphData(this.origin)
+      this.mountGraphData(this.origin, this.projectInfo)
     },
     switchLayout(mode) {
       console.log(`switchLayout ${mode}`)
@@ -570,6 +575,17 @@ export default {
     /********** 图谱标志 **********/
     setEnableFocus(bool = true) {
       this.flags.enableFocus = bool
+    },
+    /********** 图谱标志 **********/
+    exportPng() {
+      const projectName = this.projectInfo.name
+      const svg = this.svgElements.svg
+      console.log(this.projectInfo)
+      this.saveAsPng({ projectName, svg })
+    },
+    exportXml() {
+      const { projectId, name } = this.projectInfo
+      this.saveAsXml({ projectId, name })
     }
   }
 }

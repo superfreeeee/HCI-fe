@@ -43,18 +43,17 @@ export default {
         {
           label: '保存为 png',
           type: 'warning',
-          handler: () => this.saveAsPng()
+          handler: () => this.$emit('graph-action', 'exportPng')
         },
         {
           label: '保存为 xml',
           type: 'warning',
-          handler: () => this.exportXml()
+          handler: () => this.$emit('graph-action', 'exportXml')
         }
       ]
     }
   },
   methods: {
-    ...mapActions(['saveAsPng', 'exportXml']),
     buttonHandlerWrapper(e, handler) {
       buttonAutoBlur(e)
       handler()
