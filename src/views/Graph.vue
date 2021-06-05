@@ -52,7 +52,7 @@ export default {
     return {
       projectInfo: {},
       graphData: null,
-      showEditor: true
+      showEditor: false
     }
   },
   computed: {

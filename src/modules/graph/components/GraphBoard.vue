@@ -307,6 +307,7 @@ export default {
     },
     tick() {
       const {
+        focusGroup,
         svgLinks,
         svgLinksText,
         svgNodes,
@@ -324,15 +325,41 @@ export default {
         .attr('y', d => (d.source.y + d.target.y) / 2)
 
       svgNodes.attr('cx', d => d.x).attr('cy', d => d.y)
-
       svgNodesText.attr('x', d => d.x).attr('y', d => d.y)
+
+      focusGroup
+        .selectAll('circle')
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
     },
     focus(e) {
-      const id = e.target.attributes['data-id'].value
-      console.log(`focus node: ${id}, `, e)
+      const {
+        config: { baseRadius },
+        nodes,
+        svgElements: { focusGroup: fg }
+      } = this
+      const id = Number(e.target.attributes['data-id'].value)
+      const targetNode = nodes.filter(node => node.id === id)[0]
+      if (!targetNode) return
+
+      if (fg.select(`#focus-node-${id}`).empty()) {
+        fg.append('circle')
+          .data([targetNode])
+          .join('circle')
+          .attr('r', d => baseRadius + d.radius * 10 + 5)
+          .attr('fill', 'none')
+          .attr('id', d => `focus-node-${d.id}`)
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+          .join(fg.selectAll('circle'))
+      }
     },
     unfocus(e) {
-      console.log('unfocus', e)
+      const id = Number(e.target.attributes['data-id'].value)
+      const focusNode = this.svgElements.focusGroup.select(`#focus-node-${id}`)
+      if (!focusNode.empty()) {
+        focusNode.remove()
+      }
     }
   }
 }
