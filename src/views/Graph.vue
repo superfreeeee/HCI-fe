@@ -16,6 +16,7 @@
       </div>
       <!-- 侧边操作导航栏 -->
       <graph-sidebar
+        @layout-action="dispatchGraphAction"
         @graph-action="dispatchGraphAction"
         @editor-action="dispatchEditorAction"
       ></graph-sidebar>
@@ -42,8 +43,6 @@
 
 <script>
 import GraphBoard from '../modules/graph/components/GraphBoard'
-import GraphOptions from '../modules/graph/components/GraphOptions'
-import GraphLayout from '../modules/graph/components/GraphLayout'
 import GraphEditor from '../modules/graph/components/GraphEditor'
 import GraphSidebar from '../modules/graph/components/GraphSidebar'
 import { mapGetters, mapActions } from 'vuex'
@@ -55,8 +54,6 @@ export default {
   name: 'Graph',
   components: {
     GraphBoard,
-    GraphOptions,
-    GraphLayout,
     GraphEditor,
     GraphSidebar
   },
@@ -67,7 +64,7 @@ export default {
       graphProperty: {
         nodeScale: null
       },
-      showEditor: true
+      showEditor: false
     }
   },
   computed: {
@@ -85,12 +82,12 @@ export default {
     back() {
       this.$router.push('/')
     },
-    dispatchGraphAction(name) {
-      console.log(`[GraphAction] ${name}`)
-      this.$refs.board[name]()
+    dispatchGraphAction(name, ...args) {
+      console.log(`[GraphAction] ${name}`, args)
+      this.$refs.board[name](...args)
     },
     dispatchEditorAction(name) {
-      console.log(`[EditorAction] ${name}`)
+      console.log(`[EditorAction] ${name}`, args)
       this.showEditor = true
     },
     initPropertyHandler(name, value) {

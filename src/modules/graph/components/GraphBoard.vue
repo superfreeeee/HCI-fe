@@ -18,6 +18,8 @@ export default {
     return {
       origin: null,
       config: { ...config },
+      layouts: {},
+      layoutMode: 'FORCE',
       nodes: [],
       links: [],
       focusNodes: [],
@@ -45,9 +47,16 @@ export default {
     /***** 重新挂载图谱 *****/
     mountGraphData(data) {
       this.origin = deepCopy(data)
-      const { nodes, links } = data
+
+      const { nodes, links, layouts } = data
       this.nodes = nodes
       this.links = links
+      const hashLayout = {}
+      layouts.forEach(layout => {
+        hashLayout[layout.type] = layout
+      })
+      this.layouts = hashLayout
+
       this.init()
     },
     /***** 图谱绘制 *****/
@@ -346,6 +355,29 @@ export default {
     },
     randomDisorder() {
       this.mountGraphData(this.origin)
+    },
+    switchLayout(mode) {
+      console.log(`switchLayout ${mode}`)
+    },
+    saveLayout() {
+      console.log(`saveLayout`)
+      const layoutNodes = this.nodes.map(({ id, x, y }) => ({ id, x, y }))
+      this.layouts[this.layoutMode].nodes = layoutNodes
+      console.log(`layout mode: ${this.layoutMode}`, layoutNodes)
+    },
+    restoreLayout() {
+      console.log(`restoreLayout`)
+      const layoutNodesMapper = {}
+      this.layouts[this.layoutMode].nodes.forEach(({ id, x, y }) => {
+        layoutNodesMapper[id] = { x, y }
+      })
+      this.nodes.forEach(node => {
+        if (Reflect.has(layoutNodesMapper, node.id)) {
+          const { x, y } = layoutNodesMapper[node.id]
+          node.x = x
+          node.y = y
+        }
+      })
     },
     // 设置高亮组
     setFocusNodes(nodeIds) {

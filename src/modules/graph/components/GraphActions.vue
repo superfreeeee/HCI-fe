@@ -36,7 +36,7 @@ export default {
           handler: () => this.$emit('graph-action', 'resetZoom')
         },
         {
-          label: '随机分布',
+          label: '全局刷新',
           type: 'danger',
           handler: () => this.$emit('graph-action', 'randomDisorder')
         },

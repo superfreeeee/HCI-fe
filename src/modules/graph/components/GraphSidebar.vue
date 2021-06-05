@@ -12,24 +12,7 @@
         <span>布局设置</span>
       </template>
       <el-menu-item-group style="text-align: center">
-        <el-button
-          v-for="mode in modes"
-          :key="mode.label"
-          :type="mode.type"
-          :plain="mode.mode !== graphBoardMode"
-          @click="switchMode($event, mode)"
-          style="margin-bottom: 10px; width: 100%"
-          >{{ mode.label }}</el-button
-        >
-        <el-button
-          v-for="action in actions"
-          :key="action.label"
-          size="medium"
-          type="info"
-          @click="action.handler"
-          style="margin-bottom: 10px; width: 100%"
-          >{{ action.label }}</el-button
-        >
+        <graph-layout @graph-action="passingGraphAction" />
       </el-menu-item-group>
     </el-submenu>
     <!-- 图谱操作 -->
@@ -40,18 +23,9 @@
       </template>
       <el-menu-item-group style="text-align: center">
         <graph-actions
-          @graph-action="$emit('graph-action', $event)"
-          @editor-action="$emit('editor-action', $event)"
+          @graph-action="passingGraphAction"
+          @editor-action="passingEditorAction"
         />
-        <!-- <el-button
-          v-for="option in options"
-          size="medium"
-          :key="option.label"
-          :type="option.type"
-          @click="handlerDispatcher($event, option.handler)"
-          style="margin-bottom: 10px; width: 100%"
-          >{{ option.label }}</el-button
-        > -->
       </el-menu-item-group>
     </el-submenu>
     <!-- 智能服务 -->
@@ -79,11 +53,13 @@
 import { layoutModes } from '@/modules/graph/utils/layout'
 import { buttonAutoBlur } from '@/common/utils'
 import { mapGetters, mapActions } from 'vuex'
+import GraphLayout from './GraphLayout'
 import GraphActions from './GraphActions'
 
 export default {
   name: 'GraphSideBar',
   components: {
+    GraphLayout,
     GraphActions
   },
   data() {
@@ -98,44 +74,6 @@ export default {
         {
           label: '恢复布局',
           handler: () => this.restoreLayout()
-        }
-      ],
-      options: [
-        {
-          label: '新增实体',
-          type: 'primary',
-          handler: () => {
-            this.editorCreate('node')
-            this.$emit('editor-open')
-          }
-        },
-        {
-          label: '新增关系',
-          type: 'primary',
-          handler: () => {
-            this.editorCreate('link')
-            this.$emit('editor-open')
-          }
-        },
-        {
-          label: '重置缩放',
-          type: 'danger',
-          handler: () => this.$emit('graph-action', 'resetZoom')
-        },
-        {
-          label: '随机分布',
-          type: 'danger',
-          handler: () => this.$emit('graph-action', 'randomDisorder')
-        },
-        {
-          label: '保存为 png',
-          type: 'warning',
-          handler: () => this.saveAsPng()
-        },
-        {
-          label: '保存为 xml',
-          type: 'warning',
-          handler: () => this.exportXml()
         }
       ],
       smartOptions: [
@@ -160,13 +98,20 @@ export default {
   methods: {
     ...mapActions([
       'switchLayoutMode',
-      'saveAsPng',
-      'saveAsXml',
       'saveLayout',
       'restoreLayout',
       'editorCreate',
       'initiateGraph'
     ]),
+    passingGraphAction(...args) {
+      this.passingEmit('graph-action', ...args)
+    },
+    passingEditorAction(...args) {
+      this.passingEmit('editor-action', ...args)
+    },
+    passingEmit(eventName, ...args) {
+      this.$emit(eventName, ...args)
+    },
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
     },
