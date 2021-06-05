@@ -164,10 +164,35 @@ export const getGridLayout = nodes => {
   return { nodes: layoutNodes, width, height }
 }
 
-export const getScale = (layout) => {
+export const getScale = layout => {
   if (!layout) return 1
   const { width, height } = layout
   const { width: boardWidth, height: boardHeight } = config
   const zoom = 0.7
   return Math.min(1, (boardWidth / width) * zoom, (boardHeight / height) * zoom)
+}
+
+export const calcScale = (nodes, config) => {
+  if (nodes.length === 0) return 1
+  const node0 = nodes[0]
+  // console.log('nodes', nodes)
+
+  let [x1, y1, x2, y2] = [node0.x, node0.y, node0.x, node0.y]
+  nodes.forEach(({ x, y }) => {
+    x1 = Math.min(x1, x)
+    y1 = Math.min(y1, y)
+    x2 = Math.max(x2, x)
+    y2 = Math.max(y2, y)
+  })
+
+  const { width, height, zoomAlpha } = config
+  const [realWidth, realHeight] = [x2 - x1, y2 - y1]
+
+  // console.log(`width = ${width}, height = ${height}`)
+  // console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
+
+  return Math.min(
+    (realWidth * zoomAlpha) / width,
+    (realHeight * zoomAlpha) / height
+  )
 }

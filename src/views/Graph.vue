@@ -14,8 +14,8 @@
           >关于</el-button
         >
       </div>
-      <graph-sidebar></graph-sidebar>
-      <graph-board2 ref="board"></graph-board2>
+      <graph-sidebar @graph-action="dispatchGraphAction"></graph-sidebar>
+      <graph-board ref="board"></graph-board>
       <!-- <graph-board ref="board" @editor-open="showEditor = true"></graph-board> -->
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
@@ -30,7 +30,6 @@
 
 <script>
 import GraphBoard from '../modules/graph/components/GraphBoard'
-import GraphBoard2 from '../modules/graph/components/GraphBoard2'
 import GraphOptions from '../modules/graph/components/GraphOptions'
 import GraphLayout from '../modules/graph/components/GraphLayout'
 import GraphEditor from '../modules/graph/components/GraphEditor'
@@ -44,7 +43,6 @@ export default {
   name: 'Graph',
   components: {
     GraphBoard,
-    GraphBoard2,
     GraphOptions,
     GraphLayout,
     GraphEditor,
@@ -72,8 +70,8 @@ export default {
     back() {
       this.$router.push('/')
     },
-    actionDispatch(name, ...args) {
-      // console.log(`[GraphAction] ${name}`)
+    dispatchGraphAction(name, ...args) {
+      console.log(`[GraphAction] ${name}`)
       this.$refs.board[name](...args)
     },
     showDescription() {

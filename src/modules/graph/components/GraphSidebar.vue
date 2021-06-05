@@ -5,6 +5,7 @@
     :unique-opened="true"
     class="sidemenu"
   >
+    <!-- 布局操作 -->
     <el-submenu index="1">
       <template slot="title">
         <i class="el-icon-s-tools"></i>
@@ -31,6 +32,7 @@
         >
       </el-menu-item-group>
     </el-submenu>
+    <!-- 图谱操作 -->
     <el-submenu index="2">
       <template slot="title">
         <i class="el-icon-edit"></i>
@@ -48,6 +50,7 @@
         >
       </el-menu-item-group>
     </el-submenu>
+    <!-- 智能服务 -->
     <el-submenu index="3">
       <template slot="title">
         <i class="el-icon-magic-stick"></i>
@@ -108,7 +111,7 @@ export default {
         {
           label: '重置缩放',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'zoomReset'),
+          handler: () => this.$emit('graph-action', 'resetZoom'),
         },
         {
           label: '全局刷新',
@@ -151,10 +154,10 @@ export default {
       'editorCreate',
     ]),
     handleOpen(key, keyPath) {
-      console.log(key, keyPath)
+      // console.log(key, keyPath)
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath)
+      // console.log(key, keyPath)
     },
     gotoChat() {
       this.$router.push(`/chat/${this.projectId}`)
