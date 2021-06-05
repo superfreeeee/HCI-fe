@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     ...mapMutations(['pushTaleList']),
-    ...mapActions(['sendQuestion']),
+    ...mapActions(['sendQuestionChat']),
     toolEvent(type /* 当前点击的按钮类型 */) {
       alert(type)
     },
@@ -56,7 +56,7 @@ export default {
         question,
         username: this.userInfo.username,
       }
-      this.sendQuestion(data)
+      this.sendQuestionChat(data)
     },
     goback() {
       this.$router.back()

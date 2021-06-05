@@ -32,6 +32,8 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
+import { _graphData } from '../../graph/utils/data'
+import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'EntityQuery',
@@ -41,10 +43,15 @@ export default {
   data() {
     return {
       entityQueryinput: '',
+      graphData: null,
     }
   },
-  mounted() {
+  async mounted() {
     this.entityQueryinput = this.entityQueryQues
+    const graphData = deepCopy(_graphData)
+    this.graphData = graphData
+    const entityQueryBoard = this.$refs.entityQueryBoard
+    entityQueryBoard.mountGraphData(graphData)
   },
   computed: {
     ...mapGetters(['entityQueryQues']),

@@ -38,6 +38,8 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
+import { _graphData } from '../../graph/utils/data'
+import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'GraphDialogue',
@@ -47,10 +49,15 @@ export default {
   data() {
     return {
       graphDialogueinput: '',
+      graphData: null,
     }
   },
-  mounted() {
+  async mounted() {
     this.graphDialogueinput = this.graphDialogueQues
+    const graphData = deepCopy(_graphData)
+    this.graphData = graphData
+    const graphDialogueBoard = this.$refs.graphDialogueBoard
+    graphDialogueBoard.mountGraphData(graphData)
   },
   computed: {
     ...mapGetters(['graphDialogueQues']),

@@ -27,7 +27,7 @@ const smart = {
     },
     pushTaleList(state, data) {
       state.taleList.push(data.reqTale)
-      setTimeout(() => state.taleList.push(data.resTale), 2000)
+      setTimeout(() => state.taleList.push(data.resTale), 1000)
     },
     setGraphDialogueQues(state, data) {
       state.graphDialogueQues = data
@@ -44,10 +44,10 @@ const smart = {
       const res = await api.initGraph(projectId)
       console.log('initiateGraph', res)
     },
-    sendQuestion: async ({ commit }, data) => {
+    sendQuestionChat: async ({ commit }, data) => {
       const { question, username } = data
       const res = await api.askQuestion(question)
-      const { answer } = res.data
+      const { text } = res.data
       const reqTale = {
         text: { text: data.question.text },
         mine: true,
@@ -55,7 +55,7 @@ const smart = {
         img: logoPng
       }
       const resTale = {
-        text: { text: answer },
+        text: { text },
         mine: false,
         name: 'coin小助手',
         img: coinPng

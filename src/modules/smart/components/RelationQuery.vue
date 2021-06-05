@@ -55,6 +55,8 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
+import { _graphData } from '../../graph/utils/data'
+import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'RelationQuery',
@@ -63,6 +65,7 @@ export default {
   },
   data() {
     return {
+      graphData: null,
       source: '',
       target: '',
       relation: '',
@@ -82,10 +85,14 @@ export default {
       ],
     }
   },
-  mounted() {
+  async mounted() {
     this.source = this.relationQueryQues.source
     this.target = this.relationQueryQues.target
     this.relation = this.relationQueryQues.relation
+    const graphData = deepCopy(_graphData)
+    this.graphData = graphData
+    const relationQueryBoard = this.$refs.relationQueryBoard
+    relationQueryBoard.mountGraphData(graphData)
   },
   computed: {
     ...mapGetters(['relationQueryQues']),
