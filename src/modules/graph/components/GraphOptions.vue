@@ -43,9 +43,9 @@ export default {
           handler: () => this.$emit('graph-action', 'zoomReset')
         },
         {
-          label: '全局刷新',
+          label: '随机分布',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'backCenter')
+          handler: () => this.$emit('graph-action', 'randomDisorder')
         },
         {
           label: '保存为 png',

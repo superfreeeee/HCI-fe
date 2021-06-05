@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { deepCopy } from '../../../common/utils/object'
 import config from '../utils/config'
 import { calcScale } from '../utils/layout'
 
@@ -15,6 +16,7 @@ export default {
   },
   data() {
     return {
+      origin: null,
       config: { ...config },
       nodes: [],
       links: [],
@@ -42,6 +44,7 @@ export default {
   methods: {
     /***** 重新挂载图谱 *****/
     mountGraphData(data) {
+      this.origin = deepCopy(data)
       const { nodes, links } = data
       this.nodes = nodes
       this.links = links
@@ -100,6 +103,7 @@ export default {
       const boundDrag = setDrag(simulation)
       const scale = $d3.scaleOrdinal($d3.schemeCategory10)
       this.svgElements.scale = scale
+      this.$emit('init-property', 'nodeScale', scale)
 
       // 设置节点、节点文字
       setNodes(root, boundDrag, scale)
@@ -339,6 +343,9 @@ export default {
         .transition()
         .duration(750)
         .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
+    },
+    randomDisorder() {
+      this.mountGraphData(this.origin)
     },
     // 设置高亮组
     setFocusNodes(nodeIds) {

@@ -14,12 +14,22 @@
           >关于</el-button
         >
       </div>
-      <graph-sidebar @graph-action="dispatchGraphAction"></graph-sidebar>
-      <graph-board ref="board"></graph-board>
+      <graph-sidebar
+        @graph-action="dispatchGraphAction"
+        @editor-action="dispatchEditorAction"
+      ></graph-sidebar>
+      <graph-board
+        ref="board"
+        @init-property="initPropertyHandler"
+      ></graph-board>
       <!-- <graph-board ref="board" @editor-open="showEditor = true"></graph-board> -->
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
-      <!-- <graph-editor></graph-editor> -->
+      <graph-editor
+        ref="editor"
+        :graphData="graphData"
+        :nodesScale="graphProperty.nodeScale"
+      ></graph-editor>
     </div>
     <el-button
       @click="showEditor = !showEditor"
@@ -51,6 +61,9 @@ export default {
   data() {
     return {
       projectInfo: {},
+      graphProperty: {
+        nodeScale: null
+      },
       graphData: null,
       showEditor: false
     }
@@ -70,9 +83,17 @@ export default {
     back() {
       this.$router.push('/')
     },
-    dispatchGraphAction(name, ...args) {
+    dispatchGraphAction(name) {
       console.log(`[GraphAction] ${name}`)
-      this.$refs.board[name](...args)
+      this.$refs.board[name]()
+    },
+    dispatchEditorAction(name) {
+      console.log(`[EditorAction] ${name}`)
+      this.showEditor = true
+    },
+    initPropertyHandler(name, value) {
+      console.log(`[InitProperty] ${name}`)
+      this.graphProperty[name] = value
     },
     showDescription() {
       this.$notify({

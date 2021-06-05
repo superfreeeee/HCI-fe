@@ -1,9 +1,10 @@
 <template>
   <div class="editor">
-    <graph-editor-search></graph-editor-search>
-    <graph-editor-group></graph-editor-group>
+    <!-- <graph-editor-search></graph-editor-search> -->
+    <!-- <graph-editor-group></graph-editor-group> -->
     <el-divider></el-divider>
-    <h4 v-if="!graphEditorItem">点击实体/关系查看细节</h4>
+    <h4 v-if="true">点击实体/关系查看细节</h4>
+    <!-- <h4 v-if="!graphEditorItem">点击实体/关系查看细节</h4> -->
     <div v-else>
       <!-- 编辑器头部 -->
       <div class="header">
@@ -111,7 +112,7 @@
       </el-form>
     </div>
     <el-divider></el-divider>
-    <graph-editor-statistics></graph-editor-statistics>
+    <graph-editor-statistics :statisticsData="statisticsData" />
   </div>
 </template>
 
@@ -128,6 +129,15 @@ export default {
     GraphEditorSearch,
     GraphEditorGroup,
     GraphEditorStatistics
+  },
+  props: {
+    graphData: {
+      type: Object,
+      default: () => ({})
+    },
+    nodesScale: {
+      type: Function
+    }
   },
   data() {
     return {
@@ -147,6 +157,29 @@ export default {
       'graphNodeGroups',
       'graphEditorSelect'
     ]),
+    statisticsData() {
+      const nodes = this.graphData && this.graphData.nodes
+      const nodesScale = this.nodesScale
+      console.log('statisticsData', nodes, nodesScale)
+      if (!nodes || !nodesScale) return []
+
+      const dataMapper = {}
+      nodes.forEach(({ group }) => {
+        if (!Reflect.has(dataMapper, group)) {
+          dataMapper[group] = 0
+        }
+        dataMapper[group]++
+      })
+      const data = Reflect.ownKeys(dataMapper).map(group => ({
+        name: group,
+        value: dataMapper[group],
+        itemStyle: {
+          color: nodesScale(group)
+        }
+      }))
+      data.sort(({ name: x }, { name: y }) => (x < y ? -1 : x === y ? 0 : 1))
+      return data
+    },
     typeStr() {
       return typeMapper[this.graphEditorType]
     },
@@ -227,10 +260,10 @@ export default {
     deleteCommit() {
       this.setEditor()
     }
-  },
-  mounted() {
-    this.setEditor()
   }
+  // mounted() {
+  //   this.setEditor()
+  // }
 }
 </script>
 

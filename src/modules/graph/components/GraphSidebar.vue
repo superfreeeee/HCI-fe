@@ -39,7 +39,11 @@
         <span>图谱操作</span>
       </template>
       <el-menu-item-group style="text-align: center">
-        <el-button
+        <graph-actions
+          @graph-action="$emit('graph-action', $event)"
+          @editor-action="$emit('editor-action', $event)"
+        />
+        <!-- <el-button
           v-for="option in options"
           size="medium"
           :key="option.label"
@@ -47,7 +51,7 @@
           @click="handlerDispatcher($event, option.handler)"
           style="margin-bottom: 10px; width: 100%"
           >{{ option.label }}</el-button
-        >
+        > -->
       </el-menu-item-group>
     </el-submenu>
     <!-- 智能服务 -->
@@ -75,9 +79,13 @@
 import { layoutModes } from '@/modules/graph/utils/layout'
 import { buttonAutoBlur } from '@/common/utils'
 import { mapGetters, mapActions } from 'vuex'
+import GraphActions from './GraphActions'
 
 export default {
   name: 'GraphSideBar',
+  components: {
+    GraphActions
+  },
   data() {
     return {
       flag: true, // mock verifyInitiate
@@ -85,12 +93,12 @@ export default {
       actions: [
         {
           label: '保存布局',
-          handler: () => this.saveLayout(),
+          handler: () => this.saveLayout()
         },
         {
           label: '恢复布局',
-          handler: () => this.restoreLayout(),
-        },
+          handler: () => this.restoreLayout()
+        }
       ],
       options: [
         {
@@ -99,7 +107,7 @@ export default {
           handler: () => {
             this.editorCreate('node')
             this.$emit('editor-open')
-          },
+          }
         },
         {
           label: '新增关系',
@@ -107,47 +115,47 @@ export default {
           handler: () => {
             this.editorCreate('link')
             this.$emit('editor-open')
-          },
+          }
         },
         {
           label: '重置缩放',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'resetZoom'),
+          handler: () => this.$emit('graph-action', 'resetZoom')
         },
         {
-          label: '全局刷新',
+          label: '随机分布',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'backCenter'),
+          handler: () => this.$emit('graph-action', 'randomDisorder')
         },
         {
           label: '保存为 png',
           type: 'warning',
-          handler: () => this.saveAsPng(),
+          handler: () => this.saveAsPng()
         },
         {
           label: '保存为 xml',
           type: 'warning',
-          handler: () => this.exportXml(),
-        },
+          handler: () => this.exportXml()
+        }
       ],
       smartOptions: [
         {
           label: '初始化图谱',
-          handler: () => this.initGraph(),
+          handler: () => this.initGraph()
         },
         {
           label: '智能小助手 PC 端',
-          handler: () => this.gotoChat(),
+          handler: () => this.gotoChat()
         },
         {
           label: '智能小助手 Web 端',
-          handler: () => this.gotoSmarthelper(),
-        },
-      ],
+          handler: () => this.gotoSmarthelper()
+        }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId']),
+    ...mapGetters(['graphBoardMode', 'projectId'])
   },
   methods: {
     ...mapActions([
@@ -157,7 +165,7 @@ export default {
       'saveLayout',
       'restoreLayout',
       'editorCreate',
-      'initiateGraph',
+      'initiateGraph'
     ]),
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
@@ -199,8 +207,8 @@ export default {
     },
     exportXml() {
       this.saveAsXml(this.projectId)
-    },
-  },
+    }
+  }
 }
 </script>
 
