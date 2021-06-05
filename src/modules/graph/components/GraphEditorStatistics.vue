@@ -18,7 +18,7 @@ export default {
   },
   watch: {
     statisticsData() {
-      console.log('draw statisticsData', this.statisticsData)
+      // console.log('draw statisticsData', this.statisticsData)
       this.draw()
     }
   },
@@ -68,6 +68,7 @@ export default {
     const chart = this.$echarts.init(container)
     this.container = container
     this.chart = chart
+    this.draw()
   }
 }
 </script>

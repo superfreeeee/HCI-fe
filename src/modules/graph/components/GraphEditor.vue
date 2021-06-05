@@ -1,8 +1,12 @@
 <template>
   <div class="editor">
+    <!-- 图谱搜索框 -->
     <!-- <graph-editor-search></graph-editor-search> -->
+
+    <!-- 选取查看组别 -->
     <!-- <graph-editor-group></graph-editor-group> -->
     <el-divider></el-divider>
+
     <h4 v-if="true">点击实体/关系查看细节</h4>
     <!-- <h4 v-if="!graphEditorItem">点击实体/关系查看细节</h4> -->
     <div v-else>
@@ -112,6 +116,7 @@
       </el-form>
     </div>
     <el-divider></el-divider>
+    <!-- 图谱统计数据 -->
     <graph-editor-statistics :statisticsData="statisticsData" />
   </div>
 </template>
@@ -160,7 +165,6 @@ export default {
     statisticsData() {
       const nodes = this.graphData && this.graphData.nodes
       const nodesScale = this.nodesScale
-      console.log('statisticsData', nodes, nodesScale)
       if (!nodes || !nodesScale) return []
 
       const dataMapper = {}
@@ -261,9 +265,6 @@ export default {
       this.setEditor()
     }
   }
-  // mounted() {
-  //   this.setEditor()
-  // }
 }
 </script>
 

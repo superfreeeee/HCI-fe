@@ -14,17 +14,19 @@
           >关于</el-button
         >
       </div>
+      <!-- 侧边操作导航栏 -->
       <graph-sidebar
         @graph-action="dispatchGraphAction"
         @editor-action="dispatchEditorAction"
       ></graph-sidebar>
+      <!-- 图谱中心 -->
       <graph-board
         ref="board"
         @init-property="initPropertyHandler"
       ></graph-board>
-      <!-- <graph-board ref="board" @editor-open="showEditor = true"></graph-board> -->
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
+      <!-- 图谱修改面板 -->
       <graph-editor
         ref="editor"
         :graphData="graphData"
@@ -61,11 +63,11 @@ export default {
   data() {
     return {
       projectInfo: {},
+      graphData: null,
       graphProperty: {
         nodeScale: null
       },
-      graphData: null,
-      showEditor: false
+      showEditor: true
     }
   },
   computed: {
