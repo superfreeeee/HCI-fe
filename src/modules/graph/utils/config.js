@@ -5,5 +5,5 @@ export default {
   font: 'Arial',
   fontSize: 20,
   opacity: 0.1,
-  zoomAlpha: 0.85
+  zoomAlpha: 0.8
 }
