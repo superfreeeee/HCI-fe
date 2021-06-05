@@ -69,31 +69,31 @@ export default {
       actions: [
         {
           label: '保存布局',
-          handler: () => this.saveLayout()
+          handler: () => this.saveLayout(),
         },
         {
           label: '恢复布局',
-          handler: () => this.restoreLayout()
-        }
+          handler: () => this.restoreLayout(),
+        },
       ],
       smartOptions: [
         {
           label: '初始化图谱',
-          handler: () => this.initGraph()
+          handler: () => this.initGraph(),
         },
         {
           label: '智能小助手 PC 端',
-          handler: () => this.gotoChat()
+          handler: () => this.gotoSmarthelper('/chat'),
         },
         {
           label: '智能小助手 Web 端',
-          handler: () => this.gotoSmarthelper()
-        }
-      ]
+          handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
+      ],
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId'])
+    ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
     ...mapActions([
@@ -101,7 +101,8 @@ export default {
       'saveLayout',
       'restoreLayout',
       'editorCreate',
-      'initiateGraph'
+      'initiateGraph',
+      'verifyInitiate',
     ]),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
@@ -118,23 +119,16 @@ export default {
     handleClose(key, keyPath) {
       // console.log(key, keyPath)
     },
-    gotoChat() {
+    gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId)
-      if (this.flag) {
-        this.$router.push(`/smarthelper/${projectId}`)
-      } else {
-        this.$router.push(`/graph/${projectId}`)
-        this.$message.error('请先初始化图谱!')
-      }
-    },
-    gotoSmarthelper() {
-      const projectId = Number(this.$route.params.projectId)
-      if (this.flag) {
-        this.$router.push(`/smarthelper/${projectId}`)
-      } else {
-        this.$router.push(`/graph/${projectId}`)
-        this.$message.error('请先初始化图谱!')
-      }
+      this.verifyInitiate(projectId).then((res) => {
+        if (res) {
+          this.$router.push(`${path}/${projectId}`)
+        } else {
+          this.$router.push(`/graph/${projectId}`)
+          this.$message.error('请先初始化图谱!')
+        }
+      })
     },
     initGraph() {
       const projectId = Number(this.$route.params.projectId)
@@ -152,8 +146,8 @@ export default {
     },
     exportXml() {
       this.saveAsXml(this.projectId)
-    }
-  }
+    },
+  },
 }
 </script>
 

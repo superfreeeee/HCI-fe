@@ -13,6 +13,12 @@ export default {
         method: 'POST',
         data: question
       }
+    },
+    verifyInitiate(projectId) {
+      return {
+        path: `/verifyInitial/${projectId}`,
+        method: 'GET'
+      }
     }
   }
 }

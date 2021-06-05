@@ -40,6 +40,10 @@ const smart = {
     }
   },
   actions: {
+    verifyInitiate: async ({ commit }, projectId) => {
+      const res = await api.verifyInitiate(projectId)
+      return Promise.resolve(res.data)
+    },
     initiateGraph: async ({ commit }, projectId) => {
       const res = await api.initGraph(projectId)
       console.log('initiateGraph', res)
@@ -62,7 +66,7 @@ const smart = {
       }
       const newTales = { reqTale, resTale }
       commit('pushTaleList', newTales)
-    }
+    },
   },
   getters: {
     taleList: state => state.taleList,
