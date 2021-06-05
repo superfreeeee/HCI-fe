@@ -18,6 +18,7 @@ export default {
       config: { ...config },
       nodes: [],
       links: [],
+      focusNodes: [],
       svgElements: {
         simulation: null,
         view: null,
@@ -30,6 +31,10 @@ export default {
         boundDrag: null,
         boundZoom: null,
         scale: null
+      },
+      flags: {
+        singleFocus: true,
+        enableFocus: true
       }
     }
   },
@@ -42,6 +47,7 @@ export default {
       this.init()
     },
     /***** 图谱绘制 *****/
+    // 初始化图谱
     init() {
       const {
         // 全局变量 & 配置
@@ -63,10 +69,12 @@ export default {
         setZoom,
         tick,
         // 图谱操作
-        resetZoom
+        resetZoom,
+        setEnableFocus
       } = this
       // 清除图谱
       reset()
+      setEnableFocus(false)
 
       const simulation = setSimulation()
 
@@ -100,13 +108,18 @@ export default {
 
       setTimeout(() => {
         resetZoom()
+        // this.setFocus([1, 2, 3, 4, 5], true)
+        // this.setFocus([6, 7, 8, 9, 10], true)
       }, 0)
+      setEnableFocus(true)
     },
+    // 重置图谱节点
     reset() {
       const { view, root } = this.svgElements
       if (view) view.remove()
       if (root) root.remove()
     },
+    // 设置力导图初始化
     setSimulation() {
       const {
         $d3,
@@ -134,6 +147,7 @@ export default {
       this.svgElements.simulation = simulation
       return simulation
     },
+    // 设置拖曳背景图
     setView(svg) {
       const { width, height } = this.config
       const view = svg
@@ -144,14 +158,17 @@ export default {
         .attr('y', -height / 2)
         .attr('width', width)
         .attr('height', height)
+        .on('click', this.clearFocus)
       this.svgElements.view = view
       return view
     },
+    // 设置图谱根节点
     setRoot(svg) {
       const root = svg.append('g').attr('class', 'root')
       this.svgElements.root = root
       return root
     },
+    // 设置图谱高亮组
     setFocusGroup(root) {
       const focusGroup = root
         .append('g')
@@ -161,31 +178,34 @@ export default {
       this.svgElements.focusGroup = focusGroup
     },
     setLinks(root) {
+      const { links, clickLink } = this
       const svgLinks = root
         .append('g')
         .attr('class', 'links')
         .attr('stroke', '#999')
         .attr('stroke-opacity', 0.6)
         .selectAll('line')
-        .data(this.links)
+        .data(links)
         .join('line')
         .attr('stroke-width', d => d.value * 5)
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
-        .on('click', e => {
-          console.log('click link', e)
-        })
+        .on('click', clickLink)
       svgLinks.append('title').text(d => d.name)
       this.svgElements.svgLinks = svgLinks
       return svgLinks
     },
     setLinksText(root) {
-      const { font, fontSize } = this.config
+      const {
+        config: { font, fontSize },
+        links,
+        clickLink
+      } = this
       const svgLinksText = root
         .append('g')
         .attr('class', 'links_text')
         .selectAll('text')
-        .data(this.links)
+        .data(links)
         .join('text')
         .style('fill', '#000000')
         .style('font', `${fontSize}px ${font}`)
@@ -194,9 +214,7 @@ export default {
         .attr('text-anchor', 'middle')
         .attr('data-id', d => d.id)
         .text(d => d.name)
-        .on('click', e => {
-          console.log('click link', e)
-        })
+        .on('click', clickLink)
       this.svgElements.svgLinksText = svgLinksText
       return svgLinksText
     },
@@ -205,7 +223,8 @@ export default {
         config: { baseRadius },
         nodes,
         focus,
-        unfocus
+        unfocus,
+        clickNode
       } = this
       const svgNodes = root
         .append('g')
@@ -219,9 +238,7 @@ export default {
         .attr('fill', d => (d.color ? d.color : scale(d.group)))
         .attr('data-id', d => d.id)
         .call(boundDrag)
-        .on('click', e => {
-          console.log('click node', e)
-        })
+        .on('click', clickNode)
         .on('mouseover', focus)
         .on('mouseout', unfocus)
       svgNodes.append('title').text(d => d.name)
@@ -232,6 +249,7 @@ export default {
       const {
         config: { font },
         nodes,
+        clickNode,
         focus,
         unfocus
       } = this
@@ -249,62 +267,35 @@ export default {
         .attr('data-id', d => d.id)
         .text(d => d.name)
         .call(boundDrag)
-        .on('click', e => {
-          console.log('click node', e)
-        })
+        .on('click', clickNode)
         .on('mouseover', focus)
         .on('mouseout', unfocus)
       this.svgElements.svgNodesText = svgNodesText
       return svgNodesText
     },
-    /***** 图谱操作 *****/
-    resetZoom() {
+    // 设置 focus 节点
+    setFocus(node) {
       const {
-        $d3,
-        config,
-        nodes,
-        svgElements: { view, boundZoom }
+        config: { baseRadius },
+        svgElements: { focusGroup: fg },
+        flags: { singleFocus, enableFocus },
+        clearFocus
       } = this
-      const scale = calcScale(nodes, config)
-      view
-        .transition()
-        .duration(750)
-        .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
-    },
-    /***** 力导图绑定事件 *****/
-    setDrag(simulation) {
-      const start = (e, d) => {
-        if (!e.active) simulation.alphaTarget(0.3).restart()
-        d.fx = d.x
-        d.fy = d.y
-      }
+      if (!enableFocus) return
 
-      const drag = (e, d) => {
-        d.fx = e.x
-        d.fy = e.y
+      if (fg.select(`#focus-node-${node.id}`).empty()) {
+        fg.append('circle')
+          .data([node])
+          .join('circle')
+          .attr('r', d => baseRadius + d.radius * 10 + 5)
+          .attr('fill', 'none')
+          .attr('id', d => `focus-node-${d.id}`)
+          .attr('cx', d => d.x)
+          .attr('cy', d => d.y)
+          .join(fg.selectAll('circle'))
       }
-
-      const end = (e, d) => {
-        if (!event.active) simulation.alphaTarget(0)
-        d.fx = null
-        d.fy = null
-      }
-
-      const boundDrag = this.$d3
-        .drag()
-        .on('start', start)
-        .on('drag', drag)
-        .on('end', end)
-      this.svgElements.boundDrag = boundDrag
-      return boundDrag
     },
-    setZoom(root) {
-      const boundZoom = this.$d3.zoom().on('zoom', e => {
-        root.attr('transform', e.transform)
-      })
-      this.svgElements.boundZoom = boundZoom
-      return boundZoom
-    },
+    // 力导图更新
     tick() {
       const {
         focusGroup,
@@ -332,34 +323,174 @@ export default {
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)
     },
-    focus(e) {
+    /********** 图谱操作 **********/
+    // 重置缩放
+    resetZoom() {
+      const {
+        $d3,
+        config,
+        nodes,
+        svgElements: { view, boundZoom }
+      } = this
+      const scale = calcScale(nodes, config)
+      view
+        .transition()
+        .duration(750)
+        .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
+    },
+    // 设置高亮组
+    setFocusNodes(nodeIds) {
       const {
         config: { baseRadius },
-        nodes,
-        svgElements: { focusGroup: fg }
+        focusNodes,
+        svgElements: { focusGroup: fg },
+        getNodesByIds,
+        setNodeFocus
       } = this
+      const targetNodes = getNodesByIds(nodeIds)
+      targetNodes.forEach(node => setNodeFocus(node))
+
+      fg.selectAll('circle')
+        .data(focusNodes)
+        .enter()
+        .insert('circle')
+        .attr('r', d => baseRadius + d.radius * 10 + 5)
+        .attr('fill', 'none')
+        .attr('id', d => `focus-node-${d.id}`)
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+    },
+    // 清除高亮
+    clearFocus() {
+      this.svgElements.focusGroup.selectAll('circle').remove()
+    },
+    /********** 图谱事件 **********/
+    clickNode(e) {
       const id = Number(e.target.attributes['data-id'].value)
-      const targetNode = nodes.filter(node => node.id === id)[0]
+      const node = this.getNodeById(id)
+      console.log(`click node: id=${id}, `, node)
+      this.setNodeFocus(node)
+    },
+    clickLink(e) {
+      const id = Number(e.target.attributes['data-id'].value)
+      const link = this.getLinkById(id)
+      console.log(`click link: id=${id}, `, link)
+    },
+    // 聚焦(高亮显示)
+    focus(e) {
+      const {
+        getNodeById,
+        setFocus,
+        flags: { enableFocus }
+      } = this
+      if (!enableFocus) return
+
+      const id = Number(e.target.attributes['data-id'].value)
+      const targetNode = getNodeById(id)
       if (!targetNode) return
 
-      if (fg.select(`#focus-node-${id}`).empty()) {
-        fg.append('circle')
-          .data([targetNode])
-          .join('circle')
-          .attr('r', d => baseRadius + d.radius * 10 + 5)
-          .attr('fill', 'none')
-          .attr('id', d => `focus-node-${d.id}`)
-          .attr('cx', d => d.x)
-          .attr('cy', d => d.y)
-          .join(fg.selectAll('circle'))
-      }
+      setFocus(targetNode)
     },
+    // 取消聚焦
     unfocus(e) {
+      const {
+        flags: { enableFocus },
+        _unfocus
+      } = this
+      if (!enableFocus) return
+
       const id = Number(e.target.attributes['data-id'].value)
-      const focusNode = this.svgElements.focusGroup.select(`#focus-node-${id}`)
+      _unfocus(id)
+    },
+    _unfocus(id) {
+      const {
+        svgElements: { focusGroup: fg },
+        getNodeById
+      } = this
+      const focusNode = fg.select(`#focus-node-${id}`)
       if (!focusNode.empty()) {
+        const targetNode = getNodeById(id)
+        if (targetNode && targetNode.focus) return
+
         focusNode.remove()
       }
+    },
+    /********** 力导图绑定事件 **********/
+    // 拖曳设置
+    setDrag(simulation) {
+      const { setEnableFocus } = this
+
+      const start = (e, d) => {
+        if (!e.active) simulation.alphaTarget(0.3).restart()
+        setEnableFocus(false)
+        d.fx = d.x
+        d.fy = d.y
+      }
+
+      const drag = (e, d) => {
+        d.fx = e.x
+        d.fy = e.y
+      }
+
+      const end = (e, d) => {
+        if (!e.active) simulation.alphaTarget(0)
+        setEnableFocus(true)
+        d.fx = null
+        d.fy = null
+      }
+
+      const boundDrag = this.$d3
+        .drag()
+        .on('start', start)
+        .on('drag', drag)
+        .on('end', end)
+      this.svgElements.boundDrag = boundDrag
+      return boundDrag
+    },
+    // 缩放&平移设置
+    setZoom(root) {
+      const boundZoom = this.$d3.zoom().on('zoom', e => {
+        root.attr('transform', e.transform)
+      })
+      this.svgElements.boundZoom = boundZoom
+      return boundZoom
+    },
+    /********** 数据属性操作 **********/
+    // 根据 id 查找节点
+    getNodeById(id) {
+      return this.nodes.filter(node => node.id === id)[0]
+    },
+    // 根据 id 查找关系
+    getLinkById(id) {
+      return this.links.filter(link => link.id === id)[0]
+    },
+    // 设置节点高亮标志
+    setNodeFocus(nodeOrId) {
+      const {
+        nodes,
+        flags: { singleFocus },
+        _unfocus,
+        getNodeById
+      } = this
+      const node =
+        typeof nodeOrId === 'object' ? nodeOrId : getNodeById(nodeOrId)
+      if (singleFocus) {
+        nodes.forEach(node => {
+          if (node.focus) {
+            node.focus = false
+            _unfocus(node.id)
+          }
+        })
+      }
+      node.focus = true
+    },
+    clearNodeFocus() {},
+    getNodesByIds(ids) {
+      return this.nodes.filter(node => ids.includes(node.id))
+    },
+    /********** 图谱标志 **********/
+    setEnableFocus(bool = true) {
+      this.flags.enableFocus = bool
     }
   }
 }
