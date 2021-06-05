@@ -84,7 +84,7 @@ import GraphActions from './GraphActions'
 export default {
   name: 'GraphSideBar',
   components: {
-    GraphActions
+    GraphActions,
   },
   data() {
     return {
@@ -93,12 +93,12 @@ export default {
       actions: [
         {
           label: '保存布局',
-          handler: () => this.saveLayout()
+          handler: () => this.saveLayout(),
         },
         {
           label: '恢复布局',
-          handler: () => this.restoreLayout()
-        }
+          handler: () => this.restoreLayout(),
+        },
       ],
       options: [
         {
@@ -107,7 +107,7 @@ export default {
           handler: () => {
             this.editorCreate('node')
             this.$emit('editor-open')
-          }
+          },
         },
         {
           label: '新增关系',
@@ -115,47 +115,47 @@ export default {
           handler: () => {
             this.editorCreate('link')
             this.$emit('editor-open')
-          }
+          },
         },
         {
           label: '重置缩放',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'resetZoom')
+          handler: () => this.$emit('graph-action', 'resetZoom'),
         },
         {
           label: '随机分布',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'randomDisorder')
+          handler: () => this.$emit('graph-action', 'randomDisorder'),
         },
         {
           label: '保存为 png',
           type: 'warning',
-          handler: () => this.saveAsPng()
+          handler: () => this.saveAsPng(),
         },
         {
           label: '保存为 xml',
           type: 'warning',
-          handler: () => this.exportXml()
-        }
+          handler: () => this.exportXml(),
+        },
       ],
       smartOptions: [
         {
           label: '初始化图谱',
-          handler: () => this.initGraph()
+          handler: () => this.initGraph(),
         },
         {
           label: '智能小助手 PC 端',
-          handler: () => this.gotoChat()
+          handler: () => this.gotoSmarthelper('/chat'),
         },
         {
           label: '智能小助手 Web 端',
-          handler: () => this.gotoSmarthelper()
-        }
-      ]
+          handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
+      ],
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId'])
+    ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
     ...mapActions([
@@ -165,7 +165,8 @@ export default {
       'saveLayout',
       'restoreLayout',
       'editorCreate',
-      'initiateGraph'
+      'initiateGraph',
+      'verifyInitiate',
     ]),
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
@@ -173,23 +174,16 @@ export default {
     handleClose(key, keyPath) {
       // console.log(key, keyPath)
     },
-    gotoChat() {
+    gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId)
-      if (this.flag) {
-        this.$router.push(`/smarthelper/${projectId}`)
-      } else {
-        this.$router.push(`/graph/${projectId}`)
-        this.$message.error('请先初始化图谱!')
-      }
-    },
-    gotoSmarthelper() {
-      const projectId = Number(this.$route.params.projectId)
-      if (this.flag) {
-        this.$router.push(`/smarthelper/${projectId}`)
-      } else {
-        this.$router.push(`/graph/${projectId}`)
-        this.$message.error('请先初始化图谱!')
-      }
+      this.verifyInitiate(projectId).then((res) => {
+        if (res) {
+          this.$router.push(`${path}/${projectId}`)
+        } else {
+          this.$router.push(`/graph/${projectId}`)
+          this.$message.error('请先初始化图谱!')
+        }
+      })
     },
     initGraph() {
       const projectId = Number(this.$route.params.projectId)
@@ -207,8 +201,8 @@ export default {
     },
     exportXml() {
       this.saveAsXml(this.projectId)
-    }
-  }
+    },
+  },
 }
 </script>
 
