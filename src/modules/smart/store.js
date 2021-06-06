@@ -46,7 +46,7 @@ const smart = {
     },
     initiateGraph: async ({ commit }, projectId) => {
       const res = await api.initGraph(projectId)
-      console.log('initiateGraph', res)
+      return Promise.resolve(res)
     },
     sendQuestionChat: async ({ commit }, data) => {
       const { question, username } = data
