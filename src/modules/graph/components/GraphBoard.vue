@@ -6,7 +6,7 @@
 import { mapActions } from 'vuex'
 import { deepCopy } from '../../../common/utils/object'
 import config from '../utils/config'
-import { calcScale } from '../utils/layout'
+import { getGridLayout, calcScale } from '../utils/layout'
 
 export default {
   name: 'GraphBoard',
@@ -20,7 +20,7 @@ export default {
       origin: null,
       config: { ...config },
       projectInfo: null,
-      layouts: {},
+      layouts: null,
       layoutMode: 'FORCE',
       nodes: [],
       links: [],
@@ -42,7 +42,8 @@ export default {
       flags: {
         singleFocus: true,
         enableFocus: true,
-        pinned: false
+        pinned: false,
+        locked: false
       }
     }
   },
@@ -52,14 +53,18 @@ export default {
     mountGraphData(data, projectInfo) {
       this.origin = deepCopy(data)
       this.projectInfo = deepCopy(projectInfo)
+
       const { nodes, links, layouts } = data
       this.nodes = nodes
       this.links = links
-      const hashLayout = {}
-      layouts.forEach(layout => {
-        hashLayout[layout.type] = layout
-      })
-      this.layouts = hashLayout
+
+      if (!this.layouts) {
+        const hashLayout = {}
+        layouts.forEach(layout => {
+          hashLayout[layout.type] = layout
+        })
+        this.layouts = hashLayout
+      }
 
       this.init()
     },
@@ -359,33 +364,73 @@ export default {
         .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
     },
     randomDisorder() {
-      this.mountGraphData(this.origin, this.projectInfo)
+      const {
+        svgElements: { simulation }
+      } = this
+      if (this.layoutMode === 'FORCE') {
+        this.nodes.forEach(node => {
+          node.vx = node.vy = null
+          node.x = node.y = null
+          node.fx = node.fy = null
+        })
+        simulation.alphaTarget(0.3).restart()
+      }
+
+      // this.mountGraphData(this.origin, this.projectInfo)
+      // if (this.flags.pinned) {
+      //   console.log('in pinned mode')
+      //   this.pin()
+      // }
     },
     switchLayout(mode) {
-      console.log(`switchLayout ${mode}`)
-      this.layoutMode = mode
-      this.restoreLayout()
-      mode === 'FIXED' ? this.pin() : this.unPin()
+      if (this.layoutMode !== mode) {
+        this.layoutMode = mode
+        this.restoreLayout()
+      }
     },
     saveLayout() {
-      console.log(`saveLayout`)
       const layoutNodes = this.nodes.map(({ id, x, y }) => ({ id, x, y }))
       this.layouts[this.layoutMode].nodes = layoutNodes
-      console.log(`layout mode: ${this.layoutMode}`, layoutNodes)
+      console.log(`saveLayout layout mode: ${this.layoutMode}`, layoutNodes)
     },
     restoreLayout() {
-      console.log(`restoreLayout`)
+      const {
+        config,
+        layoutMode,
+        layouts,
+        nodes,
+        pin,
+        unPin,
+        flags: { pinned },
+        setLocked
+      } = this
+      if (layoutMode === 'GRID' && layouts.GRID.nodes.length !== nodes.length) {
+        layouts.GRID.nodes = getGridLayout(nodes, config)
+      }
       const layoutNodesMapper = {}
-      this.layouts[this.layoutMode].nodes.forEach(({ id, x, y }) => {
+      layouts[layoutMode].nodes.forEach(({ id, x, y }) => {
         layoutNodesMapper[id] = { x, y }
       })
-      this.nodes.forEach(node => {
+      console.log(`restoreLayout ${layoutMode}:`, layoutNodesMapper)
+
+      unPin()
+      nodes.forEach(node => {
         if (Reflect.has(layoutNodesMapper, node.id)) {
           const { x, y } = layoutNodesMapper[node.id]
           node.x = x
           node.y = y
+          if (pinned) {
+            node.fx = x
+            node.fy = y
+          }
         }
       })
+      setLocked(layoutMode === 'GRID')
+      if (layoutMode === 'FORCE') {
+        unPin()
+      } else {
+        pin()
+      }
     },
     // 设置高亮组
     setFocusNodes(nodeIds) {
@@ -416,13 +461,11 @@ export default {
     // 固定节点
     pin() {
       const {
-        svgElements: { simulation },
         nodes,
         flags: { pinned }
       } = this
       if (!pinned) {
         this.flags.pinned = true
-        simulation.stop()
         nodes.forEach(node => {
           node.fx = node.x
           node.fy = node.y
@@ -504,6 +547,7 @@ export default {
       const { setEnableFocus, flags } = this
 
       const start = (e, d) => {
+        if (flags.locked) return
         if (!e.active) simulation.alphaTarget(0.3).restart()
         setEnableFocus(false)
         d.fx = d.x
@@ -511,13 +555,17 @@ export default {
       }
 
       const drag = (e, d) => {
+        if (flags.locked) return
         d.fx = e.x
         d.fy = e.y
       }
 
       const end = (e, d) => {
+        if (flags.locked) return
         if (!e.active) simulation.alphaTarget(0)
         setEnableFocus(true)
+        d.x = d.fx
+        d.y = d.fy
         if (!flags.pinned) {
           d.fx = null
           d.fy = null
@@ -578,6 +626,9 @@ export default {
     /********** 图谱标志 **********/
     setEnableFocus(bool = true) {
       this.flags.enableFocus = bool
+    },
+    setLocked(bool = false) {
+      this.flags.locked = bool
     },
     /********** 图谱标志 **********/
     exportPng() {

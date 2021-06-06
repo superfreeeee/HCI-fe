@@ -12,7 +12,10 @@
         <span>布局设置</span>
       </template>
       <el-menu-item-group style="text-align: center">
-        <graph-layout @graph-action="passingGraphAction" />
+        <graph-layout
+          :layoutMode="layoutMode"
+          @graph-action="passingGraphAction"
+        />
       </el-menu-item-group>
     </el-submenu>
     <!-- 图谱操作 -->
@@ -57,6 +60,12 @@ import GraphActions from './GraphActions'
 
 export default {
   name: 'GraphSideBar',
+  props: {
+    layoutMode: {
+      type: String,
+      default: 'FORCE'
+    }
+  },
   components: {
     GraphLayout,
     GraphActions

@@ -16,6 +16,7 @@
       </div>
       <!-- 侧边操作导航栏 -->
       <graph-sidebar
+        :layoutMode="graphProperty.layoutMode"
         @layout-action="dispatchGraphAction"
         @graph-action="dispatchGraphAction"
         @editor-action="dispatchEditorAction"
@@ -62,6 +63,7 @@ export default {
       projectInfo: {},
       graphData: null,
       graphProperty: {
+        layoutMode: 'FORCE',
         nodeScale: null
       },
       showEditor: false
@@ -84,6 +86,9 @@ export default {
     },
     dispatchGraphAction(name, ...args) {
       console.log(`[GraphAction] ${name}`, args)
+      if (name === 'switchLayout') {
+        this.graphProperty.layoutMode = args[0]
+      }
       this.$refs.board[name](...args)
     },
     dispatchEditorAction(name, ...args) {

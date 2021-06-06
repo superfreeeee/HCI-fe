@@ -4,8 +4,8 @@
       v-for="action in actions"
       :key="action.label"
       :type="action.type"
+      :plain="action.mode && layoutMode !== action.mode"
       size="medium"
-      round
       @click="buttonHandlerWrapper($event, action.handler)"
       >{{ action.label }}</el-button
     >
@@ -17,21 +17,29 @@ import { buttonAutoBlur } from '@/common/utils'
 
 export default {
   name: 'GraphLayout',
+  props: {
+    layoutMode: {
+      type: String
+    }
+  },
   data() {
     return {
       actions: [
         {
           label: '力导图模式',
+          mode: 'FORCE',
           type: 'primary',
           handler: () => this.$emit('graph-action', 'switchLayout', 'FORCE')
         },
         {
           label: '排版模式',
+          mode: 'GRID',
           type: 'danger',
           handler: () => this.$emit('graph-action', 'switchLayout', 'GRID')
         },
         {
           label: '定点模式',
+          mode: 'FIXED',
           type: 'warning',
           handler: () => this.$emit('graph-action', 'switchLayout', 'FIXED')
         },

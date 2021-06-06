@@ -95,7 +95,7 @@ export const clearFixed = nodes => {
 const ascOrder = (x, y) => x - y
 
 // 计算排版模式布局
-export const getGridLayout = nodes => {
+export const getGridLayout = (nodes, config) => {
   // 节点分组
   const groupsObj = {}
   nodes.forEach(({ group, id, radius }) => {
@@ -120,7 +120,7 @@ export const getGridLayout = nodes => {
     const nodes = group.nodes
     nodes.sort(({ id: x }, { id: y }) => ascOrder(x, y))
 
-    // 计算组内最大半径
+    // 计算组内最大直径
     let d = 0
     let sumHeight = 0
     nodes.forEach(({ radius }) => {
@@ -152,16 +152,12 @@ export const getGridLayout = nodes => {
     const mid = (len - 1) / 2
     for (let i = 0; i < len; i++) {
       const node = nodes[i]
-      layoutNodes.push({
-        nodeId: node.id,
-        xaxis: x,
-        yaxis: y + (i - mid) * (d + gap)
-      })
+      layoutNodes.push({ id: node.id, x, y: y + (i - mid) * (d + gap) })
     }
     x += gap + d / 2
   })
 
-  return { nodes: layoutNodes, width, height }
+  return layoutNodes
 }
 
 export const getScale = layout => {
