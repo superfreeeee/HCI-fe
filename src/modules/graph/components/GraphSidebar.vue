@@ -59,7 +59,7 @@ export default {
   name: 'GraphSideBar',
   components: {
     GraphLayout,
-    GraphActions
+    GraphActions,
   },
   data() {
     return {
@@ -67,21 +67,21 @@ export default {
       smartOptions: [
         {
           label: '初始化图谱',
-          handler: () => this.initGraph()
+          handler: () => this.initGraph(),
         },
         {
           label: '智能小助手 PC 端',
-          handler: () => this.gotoSmarthelper('/chat')
+          handler: () => this.gotoSmarthelper('/chat'),
         },
         {
           label: '智能小助手 Web 端',
-          handler: () => this.gotoSmarthelper('/smarthelper')
-        }
-      ]
+          handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
+      ],
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId'])
+    ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
     ...mapActions(['switchLayoutMode', 'initiateGraph', 'verifyInitiate']),
@@ -102,7 +102,7 @@ export default {
     },
     gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId)
-      this.verifyInitiate(projectId).then(res => {
+      this.verifyInitiate(projectId).then((res) => {
         if (res) {
           this.$router.push(`${path}/${projectId}`)
         } else {
@@ -113,13 +113,20 @@ export default {
     },
     initGraph() {
       const projectId = Number(this.$route.params.projectId)
-      this.initiateGraph(projectId)
+      this.initiateGraph(projectId).then((res) => {
+        const { success, msg } = res.data
+        if (success) {
+          this.$message.success(msg)
+        } else {
+          this.$message.error(msg)
+        }
+      })
     },
     handlerDispatcher(e, handler) {
       buttonAutoBlur(e)
       handler()
-    }
-  }
+    },
+  },
 }
 </script>
 
