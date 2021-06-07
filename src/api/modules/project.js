@@ -15,6 +15,15 @@ export default {
     },
     exportProjectXml(projectId) {
       return { path: `/export/${projectId}` }
+    },
+    updateName(data) {
+      return { path: '/updateProjectName', method: 'POST', data }
+    },
+    updateDescription(data) {
+      return { path: '/updateProjectDescription', method: 'POST', data }
+    },
+    updateStatus(data) {
+      return { path: '/updateProjectStatus', method: 'POST', data }
     }
   }
 }

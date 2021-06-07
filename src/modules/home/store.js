@@ -41,17 +41,15 @@ const home = {
         console.log('getAllListByPageNo error')
       }
     },
-    // getProjectInfo: async ({ commit, state }, projectId) => {
-    //   if (projectId === state.projectId) return true
-    //   const res = await api.getProjectInfo(projectId)
-    //   if (res.status === 200) {
-    //     commit('setProjectInfo', res.data)
-    //     return true
-    //   } else {
-    //     console.log('getProjectInfo error')
-    //     return false
-    //   }
-    // },
+    getProjectInfo: async ({ commit, state }, projectId) => {
+      if (projectId === state.projectId) return true
+      const res = await api.getProjectInfo(projectId)
+      if (res.status === 200) {
+        commit('setProjectInfo', res.data)
+      } else {
+        console.log('getProjectInfo error')
+      }
+    },
     createProject: async ({ commit }, data) => {
       const res = await api.createProject(data)
       if (res.status === 200) {

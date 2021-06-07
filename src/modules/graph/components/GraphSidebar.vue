@@ -72,7 +72,7 @@
 
 <script>
 import { buttonAutoBlur } from '@/common/utils'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import GraphLayout from './GraphLayout'
 import GraphActions from './GraphActions'
 
@@ -108,15 +108,15 @@ export default {
       settingOptions: [
         {
           label: '修改项目名称',
-          handler: () => this.changeProjectInfo(),
+          handler: () => this.changeName(),
         },
         {
           label: '修改项目描述',
-          handler: () => this.changeProjectInfo(),
+          handler: () => this.changeDesc(),
         },
         {
           label: '修改项目权限',
-          handler: () => this.changeProjectInfo(),
+          handler: () => this.changeStatus(),
         },
       ],
     }
@@ -125,6 +125,11 @@ export default {
     ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
+    ...mapMutations([
+      'setShowModifyNameModal',
+      'setShowModifyDescModal',
+      'setShowModifyStatusModal',
+    ]),
     ...mapActions(['switchLayoutMode', 'initiateGraph', 'verifyInitiate']),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
@@ -167,8 +172,14 @@ export default {
       buttonAutoBlur(e)
       handler()
     },
-    changeProjectInfo() {
-      console.log('changeProjectInfo')
+    changeName() {
+      this.setShowModifyNameModal(true)
+    },
+    changeDesc() {
+      this.setShowModifyDescModal(true)
+    },
+    changeStatus() {
+      this.setShowModifyStatusModal(true)
     },
   },
 }

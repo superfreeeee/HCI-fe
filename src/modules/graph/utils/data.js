@@ -8,6 +8,7 @@ export const _projectInfo = {
 
 export const _graphData = {
   projectId: 3,
+  status: 'PRIVATE',
   nodes: [
     {
       id: 4,
