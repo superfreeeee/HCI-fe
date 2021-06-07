@@ -6,7 +6,8 @@ const home = {
     ownProjects: [],
     allProjects: [],
     projectInfo: {},
-    showCreatePanel: false
+    showCreatePanel: false,
+    pageNo: 1.
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -20,6 +21,9 @@ const home = {
     },
     setShowCreatePanel(state, data) {
       state.showCreatePanel = data
+    },
+    setPageNo(state, data) {
+      state.pageNo = data
     }
   },
   actions: {
@@ -69,7 +73,8 @@ const home = {
     ownProjects: state => state.ownProjects,
     projectInfo: state => state.projectInfo,
     showCreatePanel: state => state.showCreatePanel,
-    allProjects: state => state.allProjects
+    allProjects: state => state.allProjects,
+    pageNo: state => state.pageNo,
   }
 }
 

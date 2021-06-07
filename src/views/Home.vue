@@ -58,6 +58,7 @@
         layout="prev, pager, next"
         :total="1000"
         @current-change="switchPage"
+        :current-page="pageNo"
       >
       </el-pagination>
     </div>
@@ -77,7 +78,6 @@ export default {
   data() {
     return {
       activeIndex: '1',
-      defaultPageNo: 1,
     }
   },
   computed: {
@@ -87,10 +87,11 @@ export default {
       'userInfo',
       'showCreatePanel',
       'allProjects',
+      'pageNo',
     ]),
   },
   methods: {
-    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
+    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel', 'setPageNo']),
     ...mapActions([
       'getListByUserId',
       'userLogout',
@@ -112,6 +113,7 @@ export default {
     },
     switchPage(currPageNo) {
       // console.log('switchPage', currPageNo)
+      this.setPageNo(currPageNo)
       this.getAllListByPageNo(currPageNo)
     },
   },
@@ -120,7 +122,7 @@ export default {
       if (success) {
         const userId = this.userInfo.id
         this.getListByUserId(userId)
-        this.getAllListByPageNo(this.defaultPageNo)
+        this.getAllListByPageNo(this.pageNo)
       }
     })
   },
