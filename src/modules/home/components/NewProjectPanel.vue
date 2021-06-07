@@ -22,6 +22,12 @@
           v-model="form.description"
         ></el-input>
       </el-form-item>
+      <el-form-item label="项目权限" prop="status">
+        <el-radio-group size="mini" v-model="statusRadio">
+          <el-radio label="私密"></el-radio>
+          <el-radio label="公开"></el-radio>
+        </el-radio-group>
+      </el-form-item>
       <el-form-item label="知识图谱xml" prop="xml">
         <el-radio-group size="mini" v-model="xmlRadio">
           <el-radio label="空项目" @change="disableXmlInput()"></el-radio>
@@ -54,46 +60,49 @@ export default {
       form: {
         name: '',
         description: '',
-        xml: ''
+        xml: '',
+        status: '',
       },
       xmlInput: false,
       xmlRadio: '空项目',
+      statusRadio: '私密',
       rulesWithXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
         description: [{ required: true, message: '项目描述不能为空!' }],
-        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }]
+        xml: [{ required: true, message: '知识图谱 xml 不能为空!' }],
       },
       rulesWithoutXml: {
         name: [{ required: true, message: '项目名称不能为空!' }],
-        description: [{ required: true, message: '项目描述不能为空!' }]
-      }
+        description: [{ required: true, message: '项目描述不能为空!' }],
+      },
     }
   },
   computed: {
-    ...mapGetters(['showCreatePanel', 'userId'])
+    ...mapGetters(['showCreatePanel', 'userId']),
   },
   methods: {
     ...mapMutations(['setShowCreatePanel']),
     ...mapActions(['createProject']),
     doneCreate() {
-      this.$refs.form.validate(valid => {
+      this.$refs.form.validate((valid) => {
         if (valid) {
-          const { name, description, xml } = this.form
+          const { name, description, xml, status } = this.form
           const projectParam = {
             name,
             description,
             userId: Number(this.userId),
-            xml: xml === '空项目' ? '' : xml
+            status: this.statusRadio === '私密' ? 'PRIVATE' : 'PUBLIC',
+            xml: xml === '空项目' ? '' : xml,
           }
           console.log('projectParam', projectParam)
           this.createProject(projectParam)
-            .catch(msg => {
+            .catch((msg) => {
               $message(msg, 'error')
             })
-            .then(projectId => {
+            .then((projectId) => {
               this.$router.push(`/graph/${projectId}`)
             })
-            .catch(msg => {
+            .catch((msg) => {
               $message('router fail')
             })
         } else {
@@ -112,8 +121,8 @@ export default {
     },
     resetForm() {
       this.$refs.form.resetFields()
-    }
-  }
+    },
+  },
 }
 </script>
 
