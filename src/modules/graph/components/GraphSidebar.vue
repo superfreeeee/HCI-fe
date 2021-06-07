@@ -49,6 +49,24 @@
         </el-button>
       </el-menu-item-group>
     </el-submenu>
+    <!-- 项目设置 -->
+    <el-submenu index="4">
+      <template slot="title">
+        <i class="el-icon-setting"></i>
+        <span>项目设置</span>
+      </template>
+      <el-menu-item-group style="text-align: center">
+        <el-button
+          v-for="settingOption in settingOptions"
+          :key="settingOption.label"
+          type="info"
+          style="margin-bottom: 10px; width: 100%"
+          @click="settingOption.handler"
+        >
+          {{ settingOption.label }}
+        </el-button>
+      </el-menu-item-group>
+    </el-submenu>
   </el-menu>
 </template>
 
@@ -63,8 +81,8 @@ export default {
   props: {
     layoutMode: {
       type: String,
-      default: 'FORCE'
-    }
+      default: 'FORCE',
+    },
   },
   components: {
     GraphLayout,
@@ -72,7 +90,7 @@ export default {
   },
   data() {
     return {
-      flag: true, // mock verifyInitiate
+      // flag: true, // mock verifyInitiate
       smartOptions: [
         {
           label: '初始化图谱',
@@ -85,6 +103,20 @@ export default {
         {
           label: '智能小助手 Web 端',
           handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
+      ],
+      settingOptions: [
+        {
+          label: '修改项目名称',
+          handler: () => this.changeProjectInfo(),
+        },
+        {
+          label: '修改项目描述',
+          handler: () => this.changeProjectInfo(),
+        },
+        {
+          label: '修改项目权限',
+          handler: () => this.changeProjectInfo(),
         },
       ],
     }
@@ -134,6 +166,9 @@ export default {
     handlerDispatcher(e, handler) {
       buttonAutoBlur(e)
       handler()
+    },
+    changeProjectInfo() {
+      console.log('changeProjectInfo')
     },
   },
 }
