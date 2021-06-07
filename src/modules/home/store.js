@@ -1,10 +1,10 @@
-import { fakeProjectInfo, fakeProjects, fakeAllProjects } from '@/common/entity'
+// import { fakeAllProjects } from '@/common/entity'
 import api from '@/api/dispatcher'
 
 const home = {
   state: {
     ownProjects: [],
-    allProjects: fakeAllProjects,
+    allProjects: [],
     projectInfo: {},
     showCreatePanel: false
   },
@@ -32,7 +32,15 @@ const home = {
         console.log('getListByUserId error')
       }
     },
-    getAllListByUserId: () => {},
+    getAllListByPageNo: async ({ commit }, pageNo) => {
+      const res = await api.getAllListByPageNo(pageNo)
+      if (res.status === 200) {
+        const projects = res.data
+        commit('setAllProjects', projects)
+      } else {
+        console.log('getAllListByPageNo error')
+      }
+    },
     // getProjectInfo: async ({ commit, state }, projectId) => {
     //   if (projectId === state.projectId) return true
     //   const res = await api.getProjectInfo(projectId)
