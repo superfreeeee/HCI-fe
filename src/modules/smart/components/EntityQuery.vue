@@ -10,7 +10,7 @@
           placeholder="请输入实体名称"
           v-model="entityQueryinput"
           clearable
-          style="width: 100%"
+          style="width: 80%; margin-right: 20px"
         >
           <el-button
             slot="append"
@@ -18,6 +18,12 @@
             @click="entityQuerySearch()"
           ></el-button>
         </el-input>
+        <el-switch
+          v-model="fuzzyQuery"
+          active-color="#13ce66"
+          inactive-color="#ff4949"
+          active-text="模糊查询"
+        ></el-switch>
       </div>
     </div>
     <div class="graph">
@@ -32,8 +38,6 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
-import { _graphData } from '../../graph/utils/data'
-import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'EntityQuery',
@@ -44,24 +48,43 @@ export default {
     return {
       entityQueryinput: '',
       graphData: null,
+      fuzzyQuery: true,
     }
   },
-  async mounted() {
+  mounted() {
     this.entityQueryinput = this.entityQueryQues
-    const graphData = deepCopy(_graphData)
-    this.graphData = graphData
-    const entityQueryBoard = this.$refs.entityQueryBoard
-    entityQueryBoard.mountGraphData(graphData)
+    if (!this.entityQueryGraphData) {
+      return
+    } else {
+      this.renderGraph()
+    }
   },
   computed: {
-    ...mapGetters(['entityQueryQues']),
+    ...mapGetters(['entityQueryQues', 'entityQueryGraphData']),
   },
   methods: {
     ...mapMutations(['setEntityQueryQues']),
-    ...mapActions(['getProjectInfo']),
+    ...mapActions(['getProjectInfo', 'smartEntityQuery']),
+    renderGraph() {
+      this.graphData = this.entityQueryGraphData
+      const entityQueryBoard = this.$refs.entityQueryBoard
+      entityQueryBoard.mountGraphData(this.graphData)
+    },
     entityQuerySearch() {
-      console.log('entityQuerySearch')
       this.setEntityQueryQues(this.entityQueryinput)
+      const projectId = Number(this.$route.params.projectId)
+      const question = {
+        entityName: this.entityQueryinput,
+        fuzzyQuery: this.fuzzyQuery,
+        projectId,
+      }
+      this.smartEntityQuery(question).then((res) => {
+        if (!res) {
+          this.$message.warning('搜不到哦~')
+        } else {
+          this.renderGraph()
+        }
+      })
     },
   },
   // async mounted() {

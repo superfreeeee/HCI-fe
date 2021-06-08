@@ -39,6 +39,9 @@
       @click="showEditor = !showEditor"
       :icon="`el-icon-arrow-${showEditor ? 'right' : 'left'}`"
     ></el-button>
+    <graph-modify-name-modal />
+    <graph-modify-desc-modal />
+    <graph-modify-status-modal />
   </div>
 </template>
 
@@ -46,6 +49,9 @@
 import GraphBoard from '../modules/graph/components/GraphBoard'
 import GraphEditor from '../modules/graph/components/GraphEditor'
 import GraphSidebar from '../modules/graph/components/GraphSidebar'
+import GraphModifyNameModal from '../modules/graph/components/GraphModifyNameModal'
+import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescModal'
+import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal'
 import { mapGetters, mapActions } from 'vuex'
 
 import { _projectInfo, _graphData } from '../modules/graph/utils/data'
@@ -56,11 +62,14 @@ export default {
   components: {
     GraphBoard,
     GraphEditor,
-    GraphSidebar
+    GraphSidebar,
+    GraphModifyNameModal,
+    GraphModifyDescModal,
+    GraphModifyStatusModal,
   },
   data() {
     return {
-      projectInfo: {},
+      // projectInfo: {},
       graphData: null,
       graphProperty: {
         layoutMode: 'FORCE',
@@ -72,13 +81,13 @@ export default {
   computed: {
     ...mapGetters([
       // 'graphData',
-      // 'projectInfo',
+      'projectInfo',
     ])
   },
   methods: {
     ...mapActions({
       getProjectInfoAct: 'getProjectInfo',
-      getProjectGraphDataAct: 'getProjectGraphData'
+      getProjectGraphDataAct: 'getProjectGraphData',
     }),
     ...mapActions(['getProjectInfo']),
     back() {
@@ -114,15 +123,18 @@ export default {
     console.log(`[Graph] mounted, projectId = ${projectId}`)
 
     // const projectInfo = await this.getProjectInfoAct(projectId)
-    const projectInfo = deepCopy(_projectInfo)
-    console.log('projectInfo', projectInfo)
-    if (!projectInfo) {
-      // warning
-      return
-    }
-    this.projectInfo = projectInfo
+    this.getProjectInfo(projectId)
+
+    // const projectInfo = deepCopy(_projectInfo)
+    // console.log('projectInfo', projectInfo)
+    // if (!projectInfo) {
+    //   // warning
+    //   return
+    // }
+    // this.projectInfo = projectInfo
 
     // const graphData = await this.getProjectGraphDataAct(projectId)
+
     const graphData = deepCopy(_graphData)
     console.log('graphData', graphData)
     if (!graphData) {
@@ -132,7 +144,7 @@ export default {
     this.graphData = graphData
 
     const graphBoard = this.$refs.board
-    graphBoard.mountGraphData(graphData, projectInfo)
+    graphBoard.mountGraphData(graphData, this.projectInfo)
 
     // setTimeout(() => {
     //   graphBoard.reset()

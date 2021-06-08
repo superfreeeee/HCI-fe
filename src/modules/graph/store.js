@@ -45,7 +45,10 @@ const graph = {
       FORCE: { nodes: [] },
       GRID: { nodes: [] },
       FIXED: { nodes: [] }
-    }
+    },
+    showModifyNameModal: false,
+    showModifyDescModal: false,
+    showModifyStatusModal: false
   },
   mutations: {
     setGraphProjectId(state, id) {
@@ -161,6 +164,15 @@ const graph = {
           state.layoutConfirm.timer = null
         }, 5000)
       }
+    },
+    setShowModifyNameModal(state, data) {
+      state.showModifyNameModal = data
+    },
+    setShowModifyDescModal(state, data) {
+      state.showModifyDescModal = data
+    },
+    setShowModifyStatusModal(state, data) {
+      state.showModifyStatusModal = data
     }
   },
   actions: {
@@ -481,6 +493,18 @@ const graph = {
     async saveAsXml(_, { projectId, name }) {
       const res = await api.exportProjectXml(projectId)
       xmlDownload(res.data.xml, `知识图谱-${name}.xml`)
+    },
+    updateProjectName: async ({ commit }, data) => {
+      const res = await api.updateName(data)
+      return Promise.resolve(res.data)
+    },
+    updateProjectDesc: async ({ commit }, data) => {
+      const res = await api.updateDescription(data)
+      return Promise.resolve(res.data)
+    },
+    updateProjectStatus: async ({ commit }, data) => {
+      const res = await api.updateStatus(data)
+      return Promise.resolve(res.data)
     }
   },
   getters: {
@@ -516,7 +540,10 @@ const graph = {
     graphEditorItem: state => state.editor.item,
     graphEditorCreateNew: state => state.editor.createNew,
     graphEditorSelect: state => state.editor.select,
-    graphEditorEditable: state => state.editor.editable
+    graphEditorEditable: state => state.editor.editable,
+    showModifyNameModal: state => state.showModifyNameModal,
+    showModifyDescModal: state => state.showModifyDescModal,
+    showModifyStatusModal: state => state.showModifyStatusModal
   }
 }
 

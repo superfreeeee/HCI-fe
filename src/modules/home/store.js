@@ -1,12 +1,13 @@
-import { fakeProjectInfo, fakeProjects, fakeAllProjects } from '@/common/entity'
+// import { fakeAllProjects } from '@/common/entity'
 import api from '@/api/dispatcher'
 
 const home = {
   state: {
     ownProjects: [],
-    allProjects: fakeAllProjects,
+    allProjects: [],
     projectInfo: {},
-    showCreatePanel: false
+    showCreatePanel: false,
+    pageNo: 1.
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -20,6 +21,9 @@ const home = {
     },
     setShowCreatePanel(state, data) {
       state.showCreatePanel = data
+    },
+    setPageNo(state, data) {
+      state.pageNo = data
     }
   },
   actions: {
@@ -32,18 +36,24 @@ const home = {
         console.log('getListByUserId error')
       }
     },
-    getAllListByUserId: () => {},
-    // getProjectInfo: async ({ commit, state }, projectId) => {
-    //   if (projectId === state.projectId) return true
-    //   const res = await api.getProjectInfo(projectId)
-    //   if (res.status === 200) {
-    //     commit('setProjectInfo', res.data)
-    //     return true
-    //   } else {
-    //     console.log('getProjectInfo error')
-    //     return false
-    //   }
-    // },
+    getAllListByPageNo: async ({ commit }, pageNo) => {
+      const res = await api.getAllListByPageNo(pageNo)
+      if (res.status === 200) {
+        const projects = res.data
+        commit('setAllProjects', projects)
+      } else {
+        console.log('getAllListByPageNo error')
+      }
+    },
+    getProjectInfo: async ({ commit, state }, projectId) => {
+      if (projectId === state.projectId) return true
+      const res = await api.getProjectInfo(projectId)
+      if (res.status === 200) {
+        commit('setProjectInfo', res.data)
+      } else {
+        console.log('getProjectInfo error')
+      }
+    },
     createProject: async ({ commit }, data) => {
       const res = await api.createProject(data)
       if (res.status === 200) {
@@ -63,7 +73,8 @@ const home = {
     ownProjects: state => state.ownProjects,
     projectInfo: state => state.projectInfo,
     showCreatePanel: state => state.showCreatePanel,
-    allProjects: state => state.allProjects
+    allProjects: state => state.allProjects,
+    pageNo: state => state.pageNo,
   }
 }
 

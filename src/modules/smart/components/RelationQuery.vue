@@ -55,8 +55,6 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
-import { _graphData } from '../../graph/utils/data'
-import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'RelationQuery',
@@ -85,29 +83,43 @@ export default {
       ],
     }
   },
-  async mounted() {
+  mounted() {
     this.source = this.relationQueryQues.source
     this.target = this.relationQueryQues.target
     this.relation = this.relationQueryQues.relation
-    const graphData = deepCopy(_graphData)
-    this.graphData = graphData
-    const relationQueryBoard = this.$refs.relationQueryBoard
-    relationQueryBoard.mountGraphData(graphData)
+    if (!this.relationQueryGraphData) {
+      return
+    } else {
+      this.renderGraph()
+    }
   },
   computed: {
-    ...mapGetters(['relationQueryQues']),
+    ...mapGetters(['relationQueryQues', 'relationQueryGraphData']),
   },
   methods: {
     ...mapMutations(['setRelationQueryQues']),
-    ...mapActions(['getProjectInfo']),
+    ...mapActions(['getProjectInfo', 'smartRelationQuery']),
+    renderGraph() {
+      this.graphData = this.smartRelationQuery
+      const relationQueryBoard = this.$refs.relationQueryBoard
+      relationQueryBoard.mountGraphData(this.graphData)
+    },
     relationQuerySearch() {
-      console.log('relationQuerySearch')
+      const projectId = Number(this.$route.params.projectId)
       const relationQueryQues = {
-        source: this.source,
-        target: this.target,
-        relation: this.relation,
+        sourceName: this.source,
+        targetName: this.target,
+        relName: this.relation,
       }
       this.setRelationQueryQues(relationQueryQues)
+      relationQueryQues.projectId = projectId
+      this.smartRelationQuery(relationQueryQues).then((res) => {
+        if (!res) {
+          this.$message.warning('搜不到哦~')
+        } else {
+          this.renderGraph()
+        }
+      })
     },
   },
   // async mounted() {

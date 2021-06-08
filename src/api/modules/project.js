@@ -7,11 +7,23 @@ export default {
     getListByUserId(userId) {
       return { path: `/listByUserId/${userId}` }
     },
+    getAllListByPageNo(pageNo) {
+      return { path: `/publicProject/${pageNo}` }
+    },
     createProject(projectInfo) {
       return { path: '/create', method: 'POST', data: projectInfo }
     },
     exportProjectXml(projectId) {
       return { path: `/export/${projectId}` }
+    },
+    updateName(data) {
+      return { path: '/updateProjectName', method: 'POST', data }
+    },
+    updateDescription(data) {
+      return { path: '/updateProjectDescription', method: 'POST', data }
+    },
+    updateStatus(data) {
+      return { path: '/updateProjectStatus', method: 'POST', data }
     }
   }
 }

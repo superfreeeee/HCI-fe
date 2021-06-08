@@ -54,6 +54,13 @@
       >
         项目：{{ project.name }}
       </el-button>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="1000"
+        @current-change="switchPage"
+        :current-page="pageNo"
+      >
+      </el-pagination>
     </div>
     <NewProjectPanel />
   </div>
@@ -80,11 +87,17 @@ export default {
       'userInfo',
       'showCreatePanel',
       'allProjects',
+      'pageNo',
     ]),
   },
   methods: {
-    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
-    ...mapActions(['getListByUserId', 'userLogout', 'getUserInfo', 'getAllListByUserId']),
+    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel', 'setPageNo']),
+    ...mapActions([
+      'getListByUserId',
+      'userLogout',
+      'getUserInfo',
+      'getAllListByPageNo',
+    ]),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
     },
@@ -98,13 +111,18 @@ export default {
     handleSelect(key) {
       this.activeIndex = key
     },
+    switchPage(currPageNo) {
+      // console.log('switchPage', currPageNo)
+      this.setPageNo(currPageNo)
+      this.getAllListByPageNo(currPageNo)
+    },
   },
   mounted() {
     this.getUserInfo().then((success) => {
       if (success) {
         const userId = this.userInfo.id
         this.getListByUserId(userId)
-        // this.getAllListByUserId(userId)
+        this.getAllListByPageNo(this.pageNo)
       }
     })
   },
@@ -127,6 +145,7 @@ export default {
 .box > .title {
   position: sticky;
   width: 100%;
+  height: 23%;
   top: 0;
   background-color: #ffffff;
 }

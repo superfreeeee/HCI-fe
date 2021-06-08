@@ -49,12 +49,30 @@
         </el-button>
       </el-menu-item-group>
     </el-submenu>
+    <!-- 项目设置 -->
+    <el-submenu index="4">
+      <template slot="title">
+        <i class="el-icon-setting"></i>
+        <span>项目设置</span>
+      </template>
+      <el-menu-item-group style="text-align: center">
+        <el-button
+          v-for="settingOption in settingOptions"
+          :key="settingOption.label"
+          type="info"
+          style="margin-bottom: 10px; width: 100%"
+          @click="settingOption.handler"
+        >
+          {{ settingOption.label }}
+        </el-button>
+      </el-menu-item-group>
+    </el-submenu>
   </el-menu>
 </template>
 
 <script>
 import { buttonAutoBlur } from '@/common/utils'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions, mapMutations } from 'vuex'
 import GraphLayout from './GraphLayout'
 import GraphActions from './GraphActions'
 
@@ -63,8 +81,8 @@ export default {
   props: {
     layoutMode: {
       type: String,
-      default: 'FORCE'
-    }
+      default: 'FORCE',
+    },
   },
   components: {
     GraphLayout,
@@ -72,7 +90,7 @@ export default {
   },
   data() {
     return {
-      flag: true, // mock verifyInitiate
+      // flag: true, // mock verifyInitiate
       smartOptions: [
         {
           label: '初始化图谱',
@@ -87,12 +105,31 @@ export default {
           handler: () => this.gotoSmarthelper('/smarthelper'),
         },
       ],
+      settingOptions: [
+        {
+          label: '修改项目名称',
+          handler: () => this.changeName(),
+        },
+        {
+          label: '修改项目描述',
+          handler: () => this.changeDesc(),
+        },
+        {
+          label: '修改项目权限',
+          handler: () => this.changeStatus(),
+        },
+      ],
     }
   },
   computed: {
     ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
+    ...mapMutations([
+      'setShowModifyNameModal',
+      'setShowModifyDescModal',
+      'setShowModifyStatusModal',
+    ]),
     ...mapActions(['switchLayoutMode', 'initiateGraph', 'verifyInitiate']),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
@@ -134,6 +171,15 @@ export default {
     handlerDispatcher(e, handler) {
       buttonAutoBlur(e)
       handler()
+    },
+    changeName() {
+      this.setShowModifyNameModal(true)
+    },
+    changeDesc() {
+      this.setShowModifyDescModal(true)
+    },
+    changeStatus() {
+      this.setShowModifyStatusModal(true)
     },
   },
 }
