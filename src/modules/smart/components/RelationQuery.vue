@@ -22,10 +22,10 @@
           style="margin: 0 20px; width: 20%"
         >
           <el-option
-            v-for="item in options"
-            :key="item.relation"
-            :label="item.label"
-            :value="item.relation"
+            v-for="item in relationNames"
+            :key="item"
+            :label="item"
+            :value="item"
           >
           </el-option>
         </el-select>
@@ -67,23 +67,25 @@ export default {
       source: '',
       target: '',
       relation: '',
-      options: [
-        {
-          label: '主食材',
-          relation: '主食材',
-        },
-        {
-          label: '辅料',
-          relation: '辅料',
-        },
-        {
-          label: '属于',
-          relation: '属于',
-        },
-      ],
+      // options: [
+      //   {
+      //     label: '主食材',
+      //     relation: '主食材',
+      //   },
+      //   {
+      //     label: '辅料',
+      //     relation: '辅料',
+      //   },
+      //   {
+      //     label: '属于',
+      //     relation: '属于',
+      //   },
+      // ],
     }
   },
   mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    this.getRelationNames(projectId)
     this.source = this.relationQueryQues.sourceName
     this.target = this.relationQueryQues.targetName
     this.relation = this.relationQueryQues.relName
@@ -94,11 +96,15 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['relationQueryQues', 'relationQueryGraphData']),
+    ...mapGetters([
+      'relationQueryQues',
+      'relationQueryGraphData',
+      'relationNames',
+    ]),
   },
   methods: {
     ...mapMutations(['setRelationQueryQues']),
-    ...mapActions(['getProjectInfo', 'smartRelationQuery']),
+    ...mapActions(['getProjectInfo', 'smartRelationQuery', 'getRelationNames']),
     renderGraph() {
       this.graphData = this.relationQueryGraphData
       const relationQueryBoard = this.$refs.relationQueryBoard

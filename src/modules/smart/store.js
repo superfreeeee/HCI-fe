@@ -21,7 +21,8 @@ const smart = {
       relName: ''
     },
     entityQueryGraphData: null,
-    relationQueryGraphData: null
+    relationQueryGraphData: null,
+    relationNames: []
   },
   mutations: {
     setTaleList(state, data) {
@@ -45,6 +46,9 @@ const smart = {
     },
     setRelationQueryGraphData(state, data) {
       state.relationQueryGraphData = data
+    },
+    setRelationNames(state, data) {
+      state.relationNames = data
     }
   },
   actions: {
@@ -88,6 +92,11 @@ const smart = {
       const graphData = res.data
       commit('setRelationQueryGraphData', graphData)
       return Promise.resolve(graphData)
+    },
+    getRelationNames: async ({ commit }, projectId) => {
+      const res = await api.getRelations(projectId)
+      // console.log('getRelationNames', res)
+      commit('setRelationNames', res.data)
     }
   },
   getters: {
@@ -97,6 +106,7 @@ const smart = {
     relationQueryQues: state => state.relationQueryQues,
     entityQueryGraphData: state => state.entityQueryGraphData,
     relationQueryGraphData: state => state.relationQueryGraphData,
+    relationNames: state => state.relationNames,
   }
 }
 
