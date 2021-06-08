@@ -70,23 +70,23 @@ export default {
       options: [
         {
           label: '主食材',
-          relation: 'main',
+          relation: '主食材',
         },
         {
           label: '辅料',
-          relation: 'role',
+          relation: '辅料',
         },
         {
-          label: '所属',
-          relation: 'group',
+          label: '属于',
+          relation: '属于',
         },
       ],
     }
   },
   mounted() {
-    this.source = this.relationQueryQues.source
-    this.target = this.relationQueryQues.target
-    this.relation = this.relationQueryQues.relation
+    this.source = this.relationQueryQues.sourceName
+    this.target = this.relationQueryQues.targetName
+    this.relation = this.relationQueryQues.relName
     if (!this.relationQueryGraphData) {
       return
     } else {
@@ -100,7 +100,7 @@ export default {
     ...mapMutations(['setRelationQueryQues']),
     ...mapActions(['getProjectInfo', 'smartRelationQuery']),
     renderGraph() {
-      this.graphData = this.smartRelationQuery
+      this.graphData = this.relationQueryGraphData
       const relationQueryBoard = this.$refs.relationQueryBoard
       relationQueryBoard.mountGraphData(this.graphData)
     },
@@ -114,8 +114,8 @@ export default {
       this.setRelationQueryQues(relationQueryQues)
       relationQueryQues.projectId = projectId
       this.smartRelationQuery(relationQueryQues).then((res) => {
-        if (!res) {
-          this.$message.warning('搜不到哦~')
+        if (res.nodes.length === 0) {
+          this.$message.warning('查无结果！')
         } else {
           this.renderGraph()
         }

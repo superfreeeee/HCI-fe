@@ -16,9 +16,9 @@ const smart = {
     graphDialogueQues: '',
     entityQueryQues: '',
     relationQueryQues: {
-      source: '',
-      target: '',
-      relation: ''
+      sourceName: '',
+      targetName: '',
+      relName: ''
     },
     entityQueryGraphData: null,
     relationQueryGraphData: null
