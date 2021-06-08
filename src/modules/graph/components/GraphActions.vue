@@ -13,7 +13,7 @@
 
 <script>
 import { buttonAutoBlur } from '@/common/utils'
-import { mapActions } from 'vuex'
+import { debounceAndThrottle } from '../utils/function'
 
 export default {
   name: 'GraphActions',
@@ -33,12 +33,18 @@ export default {
         {
           label: '重置缩放',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'resetZoom')
+          handler: debounceAndThrottle(
+            () => this.$emit('graph-action', 'resetZoom'),
+            200
+          )
         },
         {
-          label: '全局刷新',
+          label: '随机分布',
           type: 'danger',
-          handler: () => this.$emit('graph-action', 'randomDisorder')
+          handler: debounceAndThrottle(
+            () => this.$emit('graph-action', 'randomDisorder'),
+            200
+          )
         },
         {
           label: '保存为 png',

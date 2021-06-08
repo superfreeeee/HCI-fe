@@ -173,22 +173,27 @@ export const calcScale = (nodes, config) => {
   const node0 = nodes[0]
   // console.log('nodes', nodes)
 
-  let [x1, y1, x2, y2] = [node0.x, node0.y, node0.x, node0.y]
-  nodes.forEach(({ x, y }) => {
-    x1 = Math.min(x1, x)
-    y1 = Math.min(y1, y)
-    x2 = Math.max(x2, x)
-    y2 = Math.max(y2, y)
+  let [x1, y1, x2, y2] = [
+    node0.fx || node0.x,
+    node0.fy || node0.y,
+    node0.fx || node0.x,
+    node0.fy || node0.y
+  ]
+  nodes.forEach(({ fx, fy, x, y }) => {
+    x1 = Math.min(x1, fx || x)
+    y1 = Math.min(y1, fy || y)
+    x2 = Math.max(x2, fx || x)
+    y2 = Math.max(y2, fy || y)
   })
 
   const { width, height, zoomAlpha } = config
   const [realWidth, realHeight] = [x2 - x1, y2 - y1]
 
-  // console.log(`width = ${width}, height = ${height}`)
-  // console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
+  console.log(`width = ${width}, height = ${height}`)
+  console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
 
   return Math.min(
-    (realWidth * zoomAlpha) / width,
-    (realHeight * zoomAlpha) / height
+    (width * zoomAlpha) / realWidth,
+    (height * zoomAlpha) / realHeight
   )
 }

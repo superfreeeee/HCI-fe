@@ -132,11 +132,11 @@ export default {
 
       setTimeout(() => {
         resetZoom()
-        // this.setFocus([1, 2, 3, 4, 5], true)
-        // this.setFocus([6, 7, 8, 9, 10], true)
       }, 300)
+      setTimeout(() => {
+        resetZoom()
+      }, 600)
       setEnableFocus(true)
-      // this.pin()
     },
     // 重置图谱节点
     reset() {
@@ -337,8 +337,20 @@ export default {
         .attr('y2', d => d.target.y)
 
       svgLinksText
-        .attr('x', d => (d.source.x + d.target.x) / 2)
-        .attr('y', d => (d.source.y + d.target.y) / 2)
+        .attr('x', d => {
+          const {
+            source: { x: x1 },
+            target: { x: x2 }
+          } = d
+          return (x1 + x2) / 2
+        })
+        .attr('y', d => {
+          const {
+            source: { y: y1 },
+            target: { y: y2 }
+          } = d
+          return (y1 + y2) / 2
+        })
 
       svgNodes.attr('cx', d => d.x).attr('cy', d => d.y)
       svgNodesText.attr('x', d => d.x).attr('y', d => d.y)
@@ -363,6 +375,7 @@ export default {
         .duration(750)
         .call(boundZoom.transform, $d3.zoomIdentity.scale(scale))
     },
+    // 随机分布
     randomDisorder() {
       const {
         svgElements: { simulation }
@@ -382,17 +395,20 @@ export default {
       //   this.pin()
       // }
     },
+    // 切换布局
     switchLayout(mode) {
       if (this.layoutMode !== mode) {
         this.layoutMode = mode
         this.restoreLayout()
       }
     },
+    // 保存布局
     saveLayout() {
       const layoutNodes = this.nodes.map(({ id, x, y }) => ({ id, x, y }))
       this.layouts[this.layoutMode].nodes = layoutNodes
       console.log(`saveLayout layout mode: ${this.layoutMode}`, layoutNodes)
     },
+    // 恢复布局
     restoreLayout() {
       const {
         config,
@@ -426,11 +442,7 @@ export default {
         }
       })
       setLocked(layoutMode === 'GRID')
-      if (layoutMode === 'FORCE') {
-        unPin()
-      } else {
-        pin()
-      }
+      layoutMode === 'FORCE' ? unPin() : pin()
     },
     // 设置高亮组
     setFocusNodes(nodeIds) {
@@ -457,6 +469,7 @@ export default {
     // 清除高亮
     clearFocus() {
       this.svgElements.focusGroup.selectAll('circle').remove()
+      this.nodes.forEach(node => this.clearNodeFocus(node))
     },
     // 固定节点
     pin() {
@@ -619,7 +632,11 @@ export default {
       }
       node.focus = true
     },
-    clearNodeFocus() {},
+    clearNodeFocus(nodeOrId) {
+      const node =
+        typeof nodeOrId === 'object' ? nodeOrId : getNodeById(nodeOrId)
+      node.focus = false
+    },
     getNodesByIds(ids) {
       return this.nodes.filter(node => ids.includes(node.id))
     },
