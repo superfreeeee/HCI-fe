@@ -51,7 +51,7 @@ export default {
       fuzzyQuery: true,
     }
   },
-  async mounted() {
+  mounted() {
     this.entityQueryinput = this.entityQueryQues
     if (!this.entityQueryGraphData) {
       return

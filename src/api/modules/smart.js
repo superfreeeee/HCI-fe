@@ -45,7 +45,16 @@ export default {
       return {
         path: '/relQuery',
         method: 'POST',
-        data: question
+        data: question,
+        mapper(data) {
+          const { projectId, nodes, relations, layout } = data
+          return {
+            projectId,
+            nodes: nodes.map(n => responseItemTranformer('node', n)),
+            links: relations.map(r => responseItemTranformer('link', r)),
+            layouts: layout
+          }
+        }
       }
     }
   }

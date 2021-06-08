@@ -21,6 +21,7 @@ const smart = {
       relation: ''
     },
     entityQueryGraphData: null,
+    relationQueryGraphData: null
   },
   mutations: {
     setTaleList(state, data) {
@@ -42,6 +43,9 @@ const smart = {
     setEntityQueryGraphData(state, data) {
       state.entityQueryGraphData = data
     },
+    setRelationQueryGraphData(state, data) {
+      state.relationQueryGraphData = data
+    }
   },
   actions: {
     verifyInitiate: async ({ commit }, projectId) => {
@@ -77,6 +81,13 @@ const smart = {
       const graphData = res.data
       commit('setEntityQueryGraphData', graphData)
       return Promise.resolve(graphData)
+    },
+    smartRelationQuery: async ({ commit }, data) => {
+      const res = await api.relationQuery(data)
+      // console.log('smartRelationQuery', res.data)
+      const graphData = res.data
+      commit('setRelationQueryGraphData', graphData)
+      return Promise.resolve(graphData)
     }
   },
   getters: {
@@ -85,6 +96,7 @@ const smart = {
     entityQueryQues: state => state.entityQueryQues,
     relationQueryQues: state => state.relationQueryQues,
     entityQueryGraphData: state => state.entityQueryGraphData,
+    relationQueryGraphData: state => state.relationQueryGraphData,
   }
 }
 
