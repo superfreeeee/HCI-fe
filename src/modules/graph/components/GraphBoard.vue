@@ -55,8 +55,8 @@ export default {
       this.projectInfo = deepCopy(projectInfo)
 
       const { nodes, links, layouts } = data
-      this.nodes = nodes
-      this.links = links
+      this.nodes = [...nodes]
+      this.links = [...links]
 
       if (!this.layouts) {
         const hashLayout = {}
@@ -130,9 +130,9 @@ export default {
 
       simulation.on('tick', tick)
 
-      setTimeout(() => {
-        resetZoom()
-      }, 300)
+      // setTimeout(() => {
+      //   resetZoom()
+      // }, 300)
       setTimeout(() => {
         resetZoom()
       }, 600)
@@ -183,7 +183,7 @@ export default {
         .attr('y', -height / 2)
         .attr('width', width)
         .attr('height', height)
-        .on('click', this.clearFocus)
+        .on('click', this.clickView)
       this.svgElements.view = view
       return view
     },
@@ -302,22 +302,26 @@ export default {
     setFocus(node) {
       const {
         config: { baseRadius },
+        nodes,
         svgElements: { focusGroup: fg },
-        flags: { singleFocus, enableFocus },
-        clearFocus
+        flags: { enableFocus },
+        setNodeHighLight
       } = this
       if (!enableFocus) return
 
       if (fg.select(`#focus-node-${node.id}`).empty()) {
-        fg.append('circle')
-          .data([node])
+        setNodeHighLight(node, true)
+        const originFocus = fg.selectAll('circle')
+        fg.selectAll('circle')
+          .data(nodes.filter(node => node.highLight || node.focus))
           .join('circle')
           .attr('r', d => baseRadius + d.radius * 10 + 5)
           .attr('fill', 'none')
           .attr('id', d => `focus-node-${d.id}`)
           .attr('cx', d => d.x)
           .attr('cy', d => d.y)
-          .join(fg.selectAll('circle'))
+          .merge(originFocus)
+        // .join(fg.selectAll('circle'))
       }
     },
     // 力导图更新
@@ -359,6 +363,185 @@ export default {
         .selectAll('circle')
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)
+    },
+    updateNodesWithText() {
+      const {
+        config: { baseRadius, font },
+        nodes,
+        links,
+        svgElements: {
+          simulation,
+          root,
+          svgNodes,
+          svgNodesText,
+          boundDrag,
+          scale
+        },
+        clickNode,
+        focus,
+        unfocus
+      } = this
+      console.log('updateNodesWithText', nodes)
+
+      // update nodes
+      let _svgNodes = root
+        .select('g.nodes')
+        .selectAll('circle')
+        .data(nodes)
+        .join('circle')
+        .attr('r', d => baseRadius + d.radius * 10)
+        .attr('fill', d => (d.color ? d.color : scale(d.group)))
+        .attr('data-id', d => d.id)
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .call(boundDrag)
+        .on('click', clickNode)
+        .on('mouseover', focus)
+        .on('mouseout', unfocus)
+      _svgNodes.append('title').text(d => d.name)
+      _svgNodes = _svgNodes.merge(svgNodes)
+      this.svgElements.svgNodes = _svgNodes
+
+      // update nodes text
+      const _svgNodesText = root
+        .select('g.nodes_text')
+        .selectAll('text')
+        .data(nodes)
+        .join('text')
+        .style('fill', '#ffffff')
+        .style('font', d => `${d.textSize}px ${font}`)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .call(boundDrag)
+        .on('click', clickNode)
+        .on('mouseover', focus)
+        .on('mouseout', unfocus)
+        .merge(svgNodesText)
+      this.svgElements.svgNodesText = _svgNodesText
+
+      simulation.nodes(nodes)
+      simulation.force('link').links(links)
+      simulation.alpha(1).restart()
+    },
+    updateLinksWithText() {
+      const {
+        config: { fontSize, font },
+        nodes,
+        links,
+        svgElements: { simulation, root, svgLinks, svgLinksText },
+        clickLink
+      } = this
+      console.log('updateLinksWithText', links)
+
+      // update links
+      let _svgLinks = root
+        .select('g.links')
+        .selectAll('line')
+        .data(links)
+        .join('line')
+        .attr('stroke-width', d => d.value * 5)
+        .attr('id', d => `link-${d.id}`)
+        .attr('data-id', d => d.id)
+        .on('click', clickLink)
+      _svgLinks.append('title').text(d => d.name)
+      _svgLinks = _svgLinks.merge(svgLinks)
+      this.svgElements.svgLinks = _svgLinks
+
+      // update links text
+      const _svgLinksText = root
+        .select('g.links_text')
+        .selectAll('text')
+        .data(links)
+        .join('text')
+        .style('fill', '#000000')
+        .style('font', `${fontSize}px ${font}`)
+        .style('user-select', 'none')
+        .attr('dominant-baseline', 'middle')
+        .attr('text-anchor', 'middle')
+        .attr('data-id', d => d.id)
+        .text(d => d.name)
+        .on('click', clickLink)
+        .merge(svgLinksText)
+      this.svgElements.svgLinksText = _svgLinksText
+
+      simulation.nodes(nodes)
+      simulation.force('link').links(links)
+      simulation.alpha(1).restart()
+    },
+    updateFocus() {
+      const {
+        config: { baseRadius },
+        svgElements: { focusGroup: fg }
+      } = this
+      const originFocus = fg.selectAll('circle')
+      fg.selectAll('circle')
+        .data(this.nodes.filter(node => node.highLight || node.focus))
+        .join('circle')
+        .attr('r', d => baseRadius + d.radius * 10 + 5)
+        .attr('fill', 'none')
+        .attr('id', d => `focus-node-${d.id}`)
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .merge(originFocus)
+    },
+    /********** 外部节点操作 **********/
+    createNode(node) {
+      console.log('[GraphBoard] createNode', node)
+      const { nodes, updateNodesWithText, setNodeFocus, setFocus } = this
+      nodes.push(node)
+      updateNodesWithText()
+      setNodeFocus(node)
+      setFocus(node)
+    },
+    createLink(link) {
+      console.log('[GraphBoard] createLink', link)
+      const { links, updateLinksWithText } = this
+      links.push(link)
+      updateLinksWithText()
+    },
+    updateNode(node) {
+      console.log('[GraphBoard]', node)
+      const _node = this.nodes.filter(_node => _node.id === node.id)[0]
+      for (const prop in _node) {
+        _node[prop] = node[prop]
+      }
+      this.updateNodesWithText()
+      this.setNodeFocus(_node)
+      this.updateFocus()
+    },
+    updateLink(link) {
+      console.log('[GraphBoard]', link)
+      const _link = this.links.filter(_link => _link.id === link.id)[0]
+      for (const prop in _link) {
+        link[prop] = link[prop]
+      }
+      this.updateLinksWithText()
+    },
+    deleteNode(nodeId) {
+      console.log('[GraphBoard]', nodeId)
+      const { nodes, links } = this
+
+      // delete node
+      const node = nodes.filter(node => node.id === nodeId)[0]
+      nodes.splice(nodes.indexOf(node), 1)
+
+      // delete links
+      this.links = links.filter(
+        ({ from, to }) => from !== node.id && to !== node.id
+      )
+      this.updateNodesWithText()
+      this.updateLinksWithText()
+      this.clearFocus()
+    },
+    deleteLink(linkId) {
+      console.log('[GraphBoard]', linkId)
+      const { links } = this
+      const link = links.filter(link => link.id === linkId)[0]
+      links.splice(links.indexOf(link), 1)
+      this.updateLinksWithText()
     },
     /********** 图谱操作 **********/
     // 重置缩放
@@ -469,7 +652,10 @@ export default {
     // 清除高亮
     clearFocus() {
       this.svgElements.focusGroup.selectAll('circle').remove()
-      this.nodes.forEach(node => this.clearNodeFocus(node))
+      this.nodes.forEach(node => {
+        this.setNodeHighLight(node, false)
+        this.clearNodeFocus(node)
+      })
     },
     // 固定节点
     pin() {
@@ -507,13 +693,22 @@ export default {
       const id = Number(e.target.attributes['data-id'].value)
       const node = this.getNodeById(id)
       console.log(`click node: id=${id}, `, node)
+
       this.setNodeFocus(node)
+      this.$emit('editor-action', 'selectNode', { ...node })
     },
     // 点击关系
     clickLink(e) {
       const id = Number(e.target.attributes['data-id'].value)
       const link = this.getLinkById(id)
       console.log(`click link: id=${id}, `, link)
+
+      this.clearFocus()
+      this.$emit('editor-action', 'selectLink', { ...link })
+    },
+    clickView() {
+      this.clearFocus()
+      this.$emit('editor-action', 'selectNone')
     },
     // 聚焦(高亮显示)
     focus(e) {
@@ -544,11 +739,13 @@ export default {
     _unfocus(id) {
       const {
         svgElements: { focusGroup: fg },
-        getNodeById
+        getNodeById,
+        setNodeHighLight
       } = this
+      const targetNode = getNodeById(id)
+      setNodeHighLight(targetNode, false)
       const focusNode = fg.select(`#focus-node-${id}`)
       if (!focusNode.empty()) {
-        const targetNode = getNodeById(id)
         if (targetNode && targetNode.focus) return
 
         focusNode.remove()
@@ -606,20 +803,29 @@ export default {
     getNodeById(id) {
       return this.nodes.filter(node => node.id === id)[0]
     },
+    getNode(nodeOrId) {
+      return typeof nodeOrId === 'object'
+        ? nodeOrId
+        : this.getNodeById(nodeOrId)
+    },
     // 根据 id 查找关系
     getLinkById(id) {
       return this.links.filter(link => link.id === id)[0]
     },
     // 设置节点高亮标志
+    setNodeHighLight(nodeOrId, bool = false) {
+      const node = this.getNode(nodeOrId)
+      node.highLight = bool
+    },
     setNodeFocus(nodeOrId) {
       const {
         nodes,
         flags: { singleFocus },
         _unfocus,
-        getNodeById
+        getNode
       } = this
-      const node =
-        typeof nodeOrId === 'object' ? nodeOrId : getNodeById(nodeOrId)
+      const node = getNode(nodeOrId)
+
       if (singleFocus) {
         nodes
           .filter(n => n !== node)
@@ -633,8 +839,7 @@ export default {
       node.focus = true
     },
     clearNodeFocus(nodeOrId) {
-      const node =
-        typeof nodeOrId === 'object' ? nodeOrId : getNodeById(nodeOrId)
+      const node = this.getNode(nodeOrId)
       node.focus = false
     },
     getNodesByIds(ids) {

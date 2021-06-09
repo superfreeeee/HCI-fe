@@ -2,7 +2,12 @@ import api from '@/api/dispatcher'
 import { consoleGroup, $notify, $confirm } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
-import { itemVarify, itemOptions, typeMapper } from './utils/item'
+import {
+  itemVarify,
+  itemOptions,
+  typeMapper,
+  itemTransformer
+} from './utils/item'
 import {
   getGridLayout,
   getScale,
@@ -176,14 +181,15 @@ const graph = {
     }
   },
   actions: {
-    async getProjectInfo(_, projectId) {
-      const res = await api.getProjectInfo(projectId)
-      return res.status === 200 ? res.data : null
-    },
+    // async getProjectInfo(_, projectId) {
+    //   const res = await api.getProjectInfo(projectId)
+    //   return res.status === 200 ? res.data : null
+    // },
     async getProjectGraphData(_, projectId) {
       const res = await api.getGraphByProjectId(projectId)
       return res.status === 200 ? res.data : null
     },
+    /********** old **********/
     async graphInit({ commit, state, getters }, projectId) {
       if (projectId === state.projectId) return true
       const res = await api.getGraphByProjectId(projectId)
@@ -478,6 +484,76 @@ const graph = {
       commit('setLayoutConfirm')
       return scale
     },
+    /********** new **********/
+    async createItem(_, { projectId, type, item }) {
+      const data = itemTransformer(type, item, projectId)
+      console.log(`[action] createItem: type=${type}, item=`, data)
+      if (type === 'node' || type === 'link') {
+        const res =
+          type === 'node'
+            ? await api.graphInsertNode(data)
+            : await api.graphInsertRel(data)
+        console.log('res', res)
+        if (res.status === 200) {
+          return type === 'node'
+            ? {
+                ...item,
+                radius: Number(item.radius),
+                id: res.data.nodeId
+              }
+            : {
+                ...item,
+                id: res.data.relationId,
+                source: item.from,
+                target: item.to
+              }
+        }
+        // request fail warning
+        return false
+      }
+      // unknown type warning
+      return false
+    },
+    async updateItem(_, { projectId, type, item }) {
+      const data = itemTransformer(type, item, projectId)
+      console.log(`[action] updateItem: type=${type}, item=`, data)
+      if (type === 'node' || type === 'link') {
+        const res =
+          type === 'node'
+            ? await api.graphUpdateNode(data)
+            : await api.graphUpdateRel(data)
+        console.log('res', res)
+        if (res.status === 200) {
+          return type === 'node'
+            ? {
+                ...item,
+                radius: Number(item.radius)
+              }
+            : {
+                ...item,
+                source: item.from,
+                target: item.to
+              }
+        }
+        // request fail warning
+        return false
+      }
+      // unknown type warning
+      return false
+    },
+    async deleteItem(_, { projectId, type, id }) {
+      console.log(`[action] deleteItem: type=${type}, id=${id}`)
+      if (type === 'node' || type === 'link') {
+        const res =
+          type === 'node'
+            ? await api.graphDeleteNodeCascade(id, projectId)
+            : await api.graphDeleteRel(id, projectId)
+        console.log('res', res)
+        return res.status === 200
+      }
+      return false
+    },
+    /********** other **********/
     // 持久化相关
     saveAsPng(_, { projectName, svg }) {
       console.log('[action] saveAsPng')

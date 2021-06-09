@@ -23,19 +23,19 @@ export default {
     },
 
     /* 插入实体 */
-    graphInsertNode(node, projectId) {
+    graphInsertNode(data) {
       return {
         path: '/insertNode',
         method: 'POST',
-        data: itemTransformer('node', node, projectId)
+        data
       }
     },
     /* 插入关系 */
-    graphInsertRel(relation, projectId) {
+    graphInsertRel(data) {
       return {
         path: '/insertRel',
         method: 'POST',
-        data: itemTransformer('link', relation, projectId)
+        data
       }
     },
 
@@ -65,19 +65,19 @@ export default {
     },
 
     /* 更新实体 */
-    graphUpdateNode(node, projectId) {
+    graphUpdateNode(data) {
       return {
         path: '/updateNode',
         method: 'POST',
-        data: itemTransformer('node', node, projectId)
+        data
       }
     },
     /* 更新关系 */
-    graphUpdateRel(relation, projectId) {
+    graphUpdateRel(data) {
       return {
         path: '/updateRel',
         method: 'POST',
-        data: itemTransformer('link', relation, projectId)
+        data
       }
     },
 

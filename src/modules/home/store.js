@@ -7,7 +7,7 @@ const home = {
     allProjects: [],
     projectInfo: {},
     showCreatePanel: false,
-    pageNo: 1.
+    pageNo: 1
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -50,8 +50,10 @@ const home = {
       const res = await api.getProjectInfo(projectId)
       if (res.status === 200) {
         commit('setProjectInfo', res.data)
+        return res.data
       } else {
         console.log('getProjectInfo error')
+        return null
       }
     },
     createProject: async ({ commit }, data) => {
@@ -74,7 +76,7 @@ const home = {
     projectInfo: state => state.projectInfo,
     showCreatePanel: state => state.showCreatePanel,
     allProjects: state => state.allProjects,
-    pageNo: state => state.pageNo,
+    pageNo: state => state.pageNo
   }
 }
 

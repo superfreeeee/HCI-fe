@@ -25,6 +25,7 @@
       <graph-board
         ref="board"
         @init-property="initPropertyHandler"
+        @editor-action="dispatchEditorAction"
       ></graph-board>
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
@@ -33,6 +34,9 @@
         ref="editor"
         :graphData="graphData"
         :nodesScale="graphProperty.nodeScale"
+        :nodeOptions="nodeOptions"
+        :nodeGroups="nodeGroups"
+        @graph-action="dispatchGraphAction"
       ></graph-editor>
     </div>
     <el-button
@@ -65,11 +69,11 @@ export default {
     GraphSidebar,
     GraphModifyNameModal,
     GraphModifyDescModal,
-    GraphModifyStatusModal,
+    GraphModifyStatusModal
   },
   data() {
     return {
-      // projectInfo: {},
+      projectInfo: {},
       graphData: null,
       graphProperty: {
         layoutMode: 'FORCE',
@@ -81,15 +85,22 @@ export default {
   computed: {
     ...mapGetters([
       // 'graphData',
-      'projectInfo',
-    ])
+      // 'projectInfo',
+    ]),
+    nodeOptions() {
+      const data = this.graphData
+      return data ? data.nodes.map(({ id, name }) => ({ id, name })) : []
+    },
+    nodeGroups() {
+      if (!this.graphData) return []
+      return [...new Set(this.graphData.nodes.map(node => node.group))]
+    }
   },
   methods: {
     ...mapActions({
       getProjectInfoAct: 'getProjectInfo',
-      getProjectGraphDataAct: 'getProjectGraphData',
+      getProjectGraphDataAct: 'getProjectGraphData'
     }),
-    ...mapActions(['getProjectInfo']),
     back() {
       this.$router.push('/')
     },
@@ -98,11 +109,66 @@ export default {
       if (name === 'switchLayout') {
         this.graphProperty.layoutMode = args[0]
       }
+      if (
+        [
+          'createNode',
+          'createLink',
+          'updateNode',
+          'updateLink',
+          'deleteNode',
+          'deleteLink'
+        ].includes(name)
+      ) {
+        const item = args[0]
+        const { nodes, links } = this.graphData
+        ;({
+          createNode: () => {
+            nodes.push(item)
+          },
+          createLink: () => {
+            links.push(item)
+          },
+          updateNode: () => {
+            const node = nodes.filter(node => node.id === item.id)[0]
+            if (node) {
+              for (const prop in node) {
+                node[prop] = item[prop]
+              }
+            }
+          },
+          updateLink: () => {
+            const link = links.filter(link => link.id === item.id)[0]
+            if (link) {
+              for (const prop in link) {
+                link[prop] = item[prop]
+              }
+            }
+          },
+          deleteNode: () => {
+            const node = nodes.filter(node => node.id === item.id)[0]
+            if (node) {
+              console.log('delete target ', node)
+              nodes.splice(nodes.indexOf(node), 1)
+              this.graphData.links = links.filter(
+                ({ from, to }) => from !== node.id && to !== node.id
+              )
+            }
+          },
+          deleteLink: () => {
+            const target = links.filter(link => link.id === item.id)[0]
+            if (target) {
+              console.log('delete target ', target)
+              links.splice(links.indexOf(target), 1)
+            }
+          }
+        }[name]())
+      }
       this.$refs.board[name](...args)
     },
     dispatchEditorAction(name, ...args) {
       console.log(`[EditorAction] ${name}`, args)
       this.showEditor = true
+      this.$refs.editor.dispatchEditorAction(name, ...args)
     },
     initPropertyHandler(name, value) {
       console.log(`[InitProperty] ${name}`)
@@ -122,20 +188,18 @@ export default {
     const projectId = Number(this.$route.params.projectId)
     console.log(`[Graph] mounted, projectId = ${projectId}`)
 
-    // const projectInfo = await this.getProjectInfoAct(projectId)
-    this.getProjectInfo(projectId)
+    const projectInfo = await this.getProjectInfoAct(projectId)
 
     // const projectInfo = deepCopy(_projectInfo)
-    // console.log('projectInfo', projectInfo)
-    // if (!projectInfo) {
-    //   // warning
-    //   return
-    // }
-    // this.projectInfo = projectInfo
+    console.log('projectInfo', projectInfo)
+    if (!projectInfo) {
+      // warning
+      return
+    }
+    this.projectInfo = projectInfo
 
-    // const graphData = await this.getProjectGraphDataAct(projectId)
-
-    const graphData = deepCopy(_graphData)
+    const graphData = await this.getProjectGraphDataAct(projectId)
+    // const graphData = deepCopy(_graphData)
     console.log('graphData', graphData)
     if (!graphData) {
       // warning
@@ -152,16 +216,6 @@ export default {
     //     graphBoard.mountGraphData(graphData)
     //   }, 5000)
     // }, 5000)
-
-    // console.log(`[Graph] getProjectInfo`)
-    // if (!(await this.getProjectInfo(projectId))) return
-
-    // this.getGraphDataByProjectIdAct(projectId);
-
-    // console.log(`[Graph] graphInit`)
-    // const board = this.$refs.board
-    // if (!(await board.graphInit(projectId))) return
-    // board.init()
   }
 }
 </script>

@@ -179,21 +179,25 @@ export const calcScale = (nodes, config) => {
     node0.fx || node0.x,
     node0.fy || node0.y
   ]
-  nodes.forEach(({ fx, fy, x, y }) => {
-    x1 = Math.min(x1, fx || x)
-    y1 = Math.min(y1, fy || y)
-    x2 = Math.max(x2, fx || x)
-    y2 = Math.max(y2, fy || y)
+  nodes.forEach(({ fx, fy, x, y, radius }) => {
+    x1 = Math.min(x1, (fx || x) - radius)
+    y1 = Math.min(y1, (fy || y) - radius)
+    x2 = Math.max(x2, (fx || x) + radius)
+    y2 = Math.max(y2, (fy || y) + radius)
   })
 
   const { width, height, zoomAlpha } = config
   const [realWidth, realHeight] = [x2 - x1, y2 - y1]
 
+  const scale = Math.min(
+    (width * zoomAlpha) / realWidth,
+    (height * zoomAlpha) / realHeight,
+    zoomAlpha
+  )
+
   console.log(`width = ${width}, height = ${height}`)
   console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
+  console.log(`scale = ${scale}`)
 
-  return Math.min(
-    (width * zoomAlpha) / realWidth,
-    (height * zoomAlpha) / realHeight
-  )
+  return scale
 }
