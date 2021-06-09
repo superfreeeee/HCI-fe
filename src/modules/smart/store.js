@@ -1,6 +1,7 @@
 import api from '@/api/dispatcher'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
+import { linebreakFormat } from './utils/function'
 
 const smart = {
   state: {
@@ -71,7 +72,7 @@ const smart = {
         img: logoPng
       }
       const resTale = {
-        text: { text },
+        text: { text: linebreakFormat(text) },
         mine: false,
         name: 'coin小助手',
         img: coinPng
@@ -106,7 +107,7 @@ const smart = {
     relationQueryQues: state => state.relationQueryQues,
     entityQueryGraphData: state => state.entityQueryGraphData,
     relationQueryGraphData: state => state.relationQueryGraphData,
-    relationNames: state => state.relationNames,
+    relationNames: state => state.relationNames
   }
 }
 
