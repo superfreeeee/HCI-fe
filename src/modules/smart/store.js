@@ -1,6 +1,7 @@
 import api from '@/api/dispatcher'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
+import { linebreakFormat } from './utils/function'
 
 const smart = {
   state: {
@@ -16,12 +17,13 @@ const smart = {
     graphDialogueQues: '',
     entityQueryQues: '',
     relationQueryQues: {
-      source: '',
-      target: '',
-      relation: ''
+      sourceName: '',
+      targetName: '',
+      relName: ''
     },
     entityQueryGraphData: null,
-    relationQueryGraphData: null
+    relationQueryGraphData: null,
+    relationNames: []
   },
   mutations: {
     setTaleList(state, data) {
@@ -45,6 +47,9 @@ const smart = {
     },
     setRelationQueryGraphData(state, data) {
       state.relationQueryGraphData = data
+    },
+    setRelationNames(state, data) {
+      state.relationNames = data
     }
   },
   actions: {
@@ -67,7 +72,7 @@ const smart = {
         img: logoPng
       }
       const resTale = {
-        text: { text },
+        text: { text: linebreakFormat(text) },
         mine: false,
         name: 'coin小助手',
         img: coinPng
@@ -88,6 +93,11 @@ const smart = {
       const graphData = res.data
       commit('setRelationQueryGraphData', graphData)
       return Promise.resolve(graphData)
+    },
+    getRelationNames: async ({ commit }, projectId) => {
+      const res = await api.getRelations(projectId)
+      // console.log('getRelationNames', res)
+      commit('setRelationNames', res.data)
     }
   },
   getters: {
@@ -97,6 +107,7 @@ const smart = {
     relationQueryQues: state => state.relationQueryQues,
     entityQueryGraphData: state => state.entityQueryGraphData,
     relationQueryGraphData: state => state.relationQueryGraphData,
+    relationNames: state => state.relationNames
   }
 }
 

@@ -99,6 +99,7 @@ export default {
 }
 .wrapper {
   width: 100% !important;
+  height: 100% !important;
 }
 .chatPage[style] {
   border-radius: 20px;

@@ -56,6 +56,12 @@ export default {
           }
         }
       }
+    },
+    getRelations(projectId) {
+      return {
+        path: `/relationNames/${projectId}`,
+        method: 'GET'
+      }
     }
   }
 }

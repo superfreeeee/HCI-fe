@@ -79,8 +79,8 @@ export default {
         projectId,
       }
       this.smartEntityQuery(question).then((res) => {
-        if (!res) {
-          this.$message.warning('搜不到哦~')
+        if (res.nodes.length === 0) {
+          this.$message.warning('查无结果！')
         } else {
           this.renderGraph()
         }

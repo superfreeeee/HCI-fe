@@ -22,10 +22,10 @@
           style="margin: 0 20px; width: 20%"
         >
           <el-option
-            v-for="item in options"
-            :key="item.relation"
-            :label="item.label"
-            :value="item.relation"
+            v-for="item in relationNames"
+            :key="item"
+            :label="item"
+            :value="item"
           >
           </el-option>
         </el-select>
@@ -67,26 +67,28 @@ export default {
       source: '',
       target: '',
       relation: '',
-      options: [
-        {
-          label: '主食材',
-          relation: 'main',
-        },
-        {
-          label: '辅料',
-          relation: 'role',
-        },
-        {
-          label: '所属',
-          relation: 'group',
-        },
-      ],
+      // options: [
+      //   {
+      //     label: '主食材',
+      //     relation: '主食材',
+      //   },
+      //   {
+      //     label: '辅料',
+      //     relation: '辅料',
+      //   },
+      //   {
+      //     label: '属于',
+      //     relation: '属于',
+      //   },
+      // ],
     }
   },
   mounted() {
-    this.source = this.relationQueryQues.source
-    this.target = this.relationQueryQues.target
-    this.relation = this.relationQueryQues.relation
+    const projectId = Number(this.$route.params.projectId)
+    this.getRelationNames(projectId)
+    this.source = this.relationQueryQues.sourceName
+    this.target = this.relationQueryQues.targetName
+    this.relation = this.relationQueryQues.relName
     if (!this.relationQueryGraphData) {
       return
     } else {
@@ -94,13 +96,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['relationQueryQues', 'relationQueryGraphData']),
+    ...mapGetters([
+      'relationQueryQues',
+      'relationQueryGraphData',
+      'relationNames',
+    ]),
   },
   methods: {
     ...mapMutations(['setRelationQueryQues']),
-    ...mapActions(['getProjectInfo', 'smartRelationQuery']),
+    ...mapActions(['getProjectInfo', 'smartRelationQuery', 'getRelationNames']),
     renderGraph() {
-      this.graphData = this.smartRelationQuery
+      this.graphData = this.relationQueryGraphData
       const relationQueryBoard = this.$refs.relationQueryBoard
       relationQueryBoard.mountGraphData(this.graphData)
     },
@@ -114,8 +120,8 @@ export default {
       this.setRelationQueryQues(relationQueryQues)
       relationQueryQues.projectId = projectId
       this.smartRelationQuery(relationQueryQues).then((res) => {
-        if (!res) {
-          this.$message.warning('搜不到哦~')
+        if (res.nodes.length === 0) {
+          this.$message.warning('查无结果！')
         } else {
           this.renderGraph()
         }
