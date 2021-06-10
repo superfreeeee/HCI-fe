@@ -18,7 +18,7 @@ export default {
   },
   watch: {
     statisticsData() {
-      // console.log('draw statisticsData', this.statisticsData)
+      console.log('draw statisticsData', this.statisticsData)
       this.draw()
     }
   },

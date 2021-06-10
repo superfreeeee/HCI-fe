@@ -553,8 +553,15 @@ export default {
     },
     deleteNode(nodeId) {
       // console.log('[GraphBoard]', nodeId)
-      const { nodes, links } = this
-
+      const {
+        nodes,
+        links,
+        updateNodesWithText,
+        updateLinksWithText,
+        clearFocus,
+        layoutMode,
+        restoreLayout
+      } = this
       // delete node
       const node = nodes.filter(node => node.id === nodeId)[0]
       nodes.splice(nodes.indexOf(node), 1)
@@ -563,9 +570,10 @@ export default {
       this.links = links.filter(
         ({ from, to }) => from !== node.id && to !== node.id
       )
-      this.updateNodesWithText()
-      this.updateLinksWithText()
-      this.clearFocus()
+      updateNodesWithText()
+      updateLinksWithText()
+      clearFocus()
+      layoutMode === 'GRID' && restoreLayout(true)
     },
     deleteLink(linkId) {
       // console.log('[GraphBoard]', linkId)
