@@ -119,7 +119,15 @@ const graph = {
     /********** other **********/
     async updateLayout(_, layout) {
       console.log(`[action] save layout: layout=`, layout)
-      const res = await api.updateLayout(layout)
+      const beLayout = {
+        ...layout,
+        nodes: layout.nodes.map(({ id, x, y }) => ({
+          nodeId: id,
+          xaxis: x,
+          yaxis: y
+        }))
+      }
+      const res = await api.updateLayout(beLayout)
       if (res.status === 200) {
         $notify({ title: '保存布局成功', type: 'success' })
         return true

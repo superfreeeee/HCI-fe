@@ -59,14 +59,7 @@ export default {
       const { nodes, links, layouts } = data
       this.nodes = [...nodes]
       this.links = [...links]
-
-      if (!this.layouts) {
-        const hashLayout = {}
-        layouts.forEach(layout => {
-          hashLayout[layout.type] = layout
-        })
-        this.layouts = hashLayout
-      }
+      this.layouts = deepCopy(layouts)
 
       this.init()
       this.flags.loaded = true
@@ -95,7 +88,8 @@ export default {
         tick,
         // 图谱操作
         resetZoom,
-        setEnableFocus
+        setEnableFocus,
+        restoreLayout
       } = this
       // 清除图谱
       reset()
@@ -140,6 +134,7 @@ export default {
         resetZoom()
       }, 600)
       setEnableFocus(true)
+      restoreLayout()
     },
     // 重置图谱节点
     reset() {

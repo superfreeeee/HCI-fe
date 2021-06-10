@@ -11,12 +11,25 @@ export default {
       return {
         path: `/${projectId}`,
         mapper(data) {
+          // console.log('origin', data)
           const { projectId, nodes, relations, layout } = data
+          const layouts = {}
+          layout.forEach(l => {
+            const layout = {
+              ...l,
+              nodes: l.nodes.map(node => ({
+                id: node.nodeId,
+                x: node.xaxis,
+                y: node.yaxis
+              }))
+            }
+            layouts[l.type] = layout
+          })
           return {
             projectId,
             nodes: nodes.map(n => responseItemTranformer('node', n)),
             links: relations.map(r => responseItemTranformer('link', r)),
-            layouts: layout
+            layouts
           }
         }
       }
