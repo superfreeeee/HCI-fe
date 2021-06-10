@@ -41,8 +41,23 @@ export const itemTransformer = (type, item, projectId) => {
         ...rest
       }
     },
-    link({ name, id: relationId, from: source, to: target, value: width }) {
-      return { projectId, relationId, name, source, target, width }
+    link({
+      name,
+      id: relationId,
+      from: source,
+      to: target,
+      value: width,
+      properties
+    }) {
+      return {
+        projectId,
+        relationId,
+        name,
+        source,
+        target,
+        width,
+        properties: transformProperties(properties)
+      }
     }
   }[type](item)
 }

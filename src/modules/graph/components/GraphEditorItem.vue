@@ -32,10 +32,11 @@
         v-if="selectedItem.type === 'node'"
         ref="editorItem"
         label-position="top"
+        :rules="activeRules"
         :model="selectedItem.item"
         label-width="80px"
       >
-        <el-form-item label="实体名称">
+        <el-form-item required label="实体名称" prop="name">
           <el-input
             clearable
             :disabled="!editable"
@@ -43,21 +44,33 @@
             v-model="selectedItem.item.name"
           ></el-input>
         </el-form-item>
-        <el-form-item label="实体类别">
-          <el-autocomplete
+        <el-form-item required label="实体类别" prop="group">
+          <el-select
+            clearable
+            :disabled="!editable"
+            placeholder="实体类别"
+            v-model="selectedItem.item.group"
+          >
+            <el-option
+              v-for="group in options.itemGroups"
+              :key="group"
+              :value="group"
+            ></el-option>
+          </el-select>
+          <!-- <el-autocomplete
             clearable
             :disabled="!editable"
             :fetch-suggestions="queryGroup"
             placeholder="输入/选择实体类别"
             v-model="selectedItem.item.group"
-          ></el-autocomplete>
+          ></el-autocomplete> -->
         </el-form-item>
-        <el-form-item label="实体权重">
+        <el-form-item required label="实体权重" prop="radius">
           <el-input
             clearable
             :disabled="!editable"
             placeholder="1~20"
-            v-model="selectedItem.item.radius"
+            v-model.number="selectedItem.item.radius"
           ></el-input>
         </el-form-item>
         <el-form-item label="实体颜色">
@@ -77,20 +90,20 @@
             ></el-input>
           </div>
         </el-form-item>
-        <el-form-item label="实体形状">
+        <!-- <el-form-item label="实体形状">
           <el-input
             clearable
             :disabled="!editable"
             placeholder="实体形状"
             v-model="selectedItem.item.figure"
           ></el-input>
-        </el-form-item>
-        <el-form-item label="字体大小">
+        </el-form-item> -->
+        <el-form-item required label="字体大小" prop="textSize">
           <el-input
             clearable
             :disabled="!editable"
             placeholder="单位 px"
-            v-model="selectedItem.item.textSize"
+            v-model.number="selectedItem.item.textSize"
           ></el-input>
         </el-form-item>
         <el-form-item label="其他属性">
@@ -99,12 +112,24 @@
             v-for="(prop, idx) in selectedItem.item.properties"
             :key="idx"
           >
-            <el-input
+            <!-- <el-input
               clearable
               :disabled="!editable"
               placeholder="属性名"
               v-model="prop.name"
-            ></el-input>
+            ></el-input> -->
+            <el-select
+              clearable
+              :disabled="!editable"
+              placeholder="属性名"
+              v-model="prop.name"
+            >
+              <el-option
+                v-for="prop in restProperties"
+                :key="prop"
+                :value="prop"
+              ></el-option>
+            </el-select>
             <el-input
               clearable
               :disabled="!editable"
@@ -118,7 +143,10 @@
               @click="removeProp(idx)"
             ></el-button>
           </div>
-          <el-button v-if="editable" icon="el-icon-plus" @click="addProp"
+          <el-button
+            v-if="editable && restProperties.length > 0"
+            icon="el-icon-plus"
+            @click="addProp"
             >添加属性</el-button
           >
         </el-form-item>
@@ -136,18 +164,31 @@
         v-if="selectedItem.type === 'link'"
         ref="editorItem"
         label-position="top"
+        :rules="activeRules"
         :model="selectedItem.item"
         label-width="80px"
       >
-        <el-form-item label="关系名称">
-          <el-input
+        <el-form-item required label="关系名称" prop="name">
+          <el-select
             clearable
             :disabled="!editable"
             placeholder="关系名称"
             v-model="selectedItem.item.name"
-          ></el-input>
+          >
+            <el-option
+              v-for="name in options.linkNames"
+              :key="name"
+              :value="name"
+            ></el-option>
+          </el-select>
+          <!-- <el-input
+            clearable
+            :disabled="!editable"
+            placeholder="关系名称"
+            v-model="selectedItem.item.name"
+          ></el-input> -->
         </el-form-item>
-        <el-form-item label="关系实体1">
+        <el-form-item required label="关系实体1" prop="from">
           <div>
             <el-select
               clearable
@@ -174,7 +215,7 @@
             ></el-button>
           </div>
         </el-form-item>
-        <el-form-item label="关系实体2">
+        <el-form-item required label="关系实体2" prop="to">
           <div>
             <el-select
               clearable
@@ -199,13 +240,57 @@
             ></el-button>
           </div>
         </el-form-item>
-        <el-form-item label="关系权重">
+        <el-form-item required label="关系权重" prop="value">
           <el-input
             clearable
             :disabled="!editable"
             placeholder="1~20"
             v-model="selectedItem.item.value"
           ></el-input>
+        </el-form-item>
+        <el-form-item label="其他属性">
+          <div
+            class="properties"
+            v-for="(prop, idx) in selectedItem.item.properties"
+            :key="idx"
+          >
+            <el-select
+              clearable
+              :disabled="!editable"
+              placeholder="属性名"
+              v-model="prop.name"
+            >
+              <el-option
+                v-for="prop in restProperties"
+                :key="prop"
+                :value="prop"
+              ></el-option>
+            </el-select>
+            <!-- <el-input
+              clearable
+              :disabled="!editable"
+              placeholder="属性名"
+              v-model="prop.name"
+            ></el-input> -->
+            <el-input
+              clearable
+              :disabled="!editable"
+              placeholder="属性值"
+              v-model="prop.value"
+            ></el-input>
+            <el-button
+              v-if="editable"
+              type="danger"
+              icon="el-icon-close"
+              @click="removeProp(idx)"
+            ></el-button>
+          </div>
+          <el-button
+            v-if="editable && restProperties.length > 0"
+            icon="el-icon-plus"
+            @click="addProp"
+            >添加属性</el-button
+          >
         </el-form-item>
         <el-form-item class="options">
           <el-button type="primary" @click="primaryButton.handler">{{
@@ -246,10 +331,40 @@ export default {
       originItem: null,
       options: {
         nodeOptions: [],
-        nodeGroups: []
+        nodeGroups: [],
+        itemGroups: ['菜谱', '菜系', '食材'],
+        linkNames: ['属于', '主食材', '辅料'],
+        nodeProperties: {
+          菜谱: ['口味', '工艺', '耗时', '做法'],
+          食材: ['简介', '功效', '营养价值']
+        },
+        linkProperties: {
+          主食材: ['用量'],
+          辅料: ['用量']
+        }
       },
       selectingNode: '',
-      selectingMode: false
+      selectingMode: false,
+      rules: {
+        node: {
+          name: [{ required: true, message: '实体名称为必填项' }],
+          group: [{ required: true, message: '实体类别为必填项' }],
+          radius: [
+            { required: true, message: '实体权重为必填项' },
+            { type: 'number', min: 1, message: '实体权重必须为正整数' }
+          ],
+          textSize: [
+            { required: true, message: '字体大小为必填项' },
+            { type: 'number', min: 1, message: '实体权重必须为正整数' }
+          ]
+        },
+        link: {
+          name: [{ required: true, message: '关系名称为必填项' }],
+          from: [{ required: true, message: '关系实体1为必填项' }],
+          to: [{ required: true, message: '关系实体2为必填项' }],
+          value: [{ required: true, message: '关系权重为必填项' }]
+        }
+      }
     }
   },
   computed: {
@@ -302,6 +417,25 @@ export default {
       return this.createNew
         ? { label: '重置选项', handler: this.reset }
         : { label: '取消修改', handler: this.cancel }
+    },
+    restProperties() {
+      const {
+        selectedItem: {
+          type,
+          item: { name, group, properties }
+        },
+        options: { nodeProperties, linkProperties }
+      } = this
+      const prop = type === 'node' ? group : name
+      const props = type === 'node' ? nodeProperties : linkProperties
+      const options = props[prop] || []
+      const usedProperties = properties.map(prop => prop.name)
+      const rest = options.filter(option => !usedProperties.includes(option))
+      // console.log('restProperties', rest)
+      return rest
+    },
+    activeRules() {
+      return this.rules[this.selectedItem.type]
     }
   },
   watch: {
@@ -417,15 +551,20 @@ export default {
     },
     getEditLink(origin) {
       if (origin) {
-        const { id, name, from, to, value } = origin
-        const newLink = { id, name, from, to, value }
+        const { id, name, from, to, value, properties } = origin
+        const props = []
+        for (const name in properties) {
+          props.push({ name, value: properties[name] })
+        }
+        const newLink = { id, name, from, to, value, properties: props }
         return newLink
       } else {
         return {
           name: '',
           from: '',
           to: '',
-          value: ''
+          value: '',
+          properties: []
         }
       }
     },
@@ -464,11 +603,22 @@ export default {
       // reset attribute
       this.selectedItem.item = { ...this.originItem }
     },
-    createItem() {
+    validate() {
+      return new Promise(resolve => {
+        this.$refs.editorItem.validate(res => {
+          resolve(res)
+        })
+      })
+    },
+    async createItem() {
       const {
         projectId,
-        selectedItem: { type, item }
+        selectedItem: { type, item },
+        validate
       } = this
+      const res = await validate()
+      console.log('validate', res)
+      if (!res) return
       this.createItemAct({ projectId, type, item }).then(item => {
         if (item) {
           if (type === 'node') {
@@ -481,11 +631,15 @@ export default {
         }
       })
     },
-    updateItem() {
+    async updateItem() {
       const {
         projectId,
-        selectedItem: { type, item }
+        selectedItem: { type, item },
+        validate
       } = this
+      const res = await validate()
+      console.log('validate', res)
+      if (!res) return
       this.updateItemAct({ projectId, type, item }).then(item => {
         if (item) {
           if (type === 'node') {

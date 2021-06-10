@@ -765,6 +765,7 @@ export default {
       // console.log(`click node: id=${id}, `, node)
 
       if (this.flags.selectingMode) {
+        this.flags.selectingMode = false
         this.$emit('editor-action', 'catchNode', node)
       } else {
         this.setNodeFocus(node)
@@ -830,26 +831,44 @@ export default {
     /********** 力导图绑定事件 **********/
     // 拖曳设置
     setDrag(simulation) {
-      const { setEnableFocus, flags } = this
+      const { setEnableFocus, flags, nodes } = this
 
       const start = (e, d) => {
-        if (flags.locked) return
         if (!e.active) simulation.alphaTarget(0.3).restart()
         setEnableFocus(false)
-        d.fx = d.x
-        d.fy = d.y
+        if (flags.locked) {
+          console.log('target', d)
+          const group = d.group
+          nodes
+            .filter(node => node.group === group)
+            .forEach(node => {
+              node.fx = d.x
+            })
+          console.log(nodes.filter(node => node.group === group))
+        } else {
+          d.fx = d.x
+          d.fy = d.y
+        }
       }
 
       const drag = (e, d) => {
-        if (flags.locked) return
-        d.fx = e.x
-        d.fy = e.y
+        if (flags.locked) {
+          const group = d.group
+          nodes
+            .filter(node => node.group === group)
+            .forEach(node => {
+              node.fx = e.x
+            })
+        } else {
+          d.fx = e.x
+          d.fy = e.y
+        }
       }
 
       const end = (e, d) => {
+        setEnableFocus(true)
         if (flags.locked) return
         if (!e.active) simulation.alphaTarget(0)
-        setEnableFocus(true)
         d.x = d.fx
         d.y = d.fy
         if (!flags.pinned) {

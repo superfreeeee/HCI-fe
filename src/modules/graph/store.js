@@ -57,7 +57,8 @@ const graph = {
                 ...item,
                 id: res.data.relationId,
                 source: item.from,
-                target: item.to
+                target: item.to,
+                properties: transformProperties(item.properties)
               }
         } else {
           $notify({ title: `新增${typeMapper[type]}失败`, type: 'error' })
@@ -87,7 +88,8 @@ const graph = {
             : {
                 ...item,
                 source: item.from,
-                target: item.to
+                target: item.to,
+                properties: transformProperties(item.properties)
               }
         } else {
           $notify({ title: `修改${typeMapper[type]}失败`, type: 'error' })

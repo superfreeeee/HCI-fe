@@ -131,12 +131,12 @@ export default {
           updateNode: () => {
             const node = nodes.filter(node => node.id === item.id)[0]
             node &&
-              Reflect.ownKeys(node).forEach(prop => (node[prop] = item[prop]))
+              Reflect.ownKeys(item).forEach(prop => (node[prop] = item[prop]))
           },
           updateLink: () => {
             const link = links.filter(link => link.id === item.id)[0]
             link &&
-              Reflect.ownKeys(link).forEach(prop => (link[prop] = item[prop]))
+              Reflect.ownKeys(item).forEach(prop => (link[prop] = item[prop]))
           },
           deleteNode: () => {
             const node = nodes.filter(node => node.id === item.id)[0]
