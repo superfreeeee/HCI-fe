@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h4>实体类型</h4>
+    <h4>查看实体类型</h4>
     <el-checkbox
       :indeterminate="isIndeterminate"
       :value="selectAll"

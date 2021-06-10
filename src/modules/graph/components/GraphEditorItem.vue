@@ -1,6 +1,10 @@
 <template>
   <div>
-    <h4 v-if="!selectedItem.type">点击实体/关系查看细节</h4>
+    <div v-if="!selectedItem.type">
+      <slot />
+      <h4>或</h4>
+      <h3>点击实体/关系查看细节</h3>
+    </div>
     <div v-else>
       <!-- 编辑器头部 -->
       <div class="header">

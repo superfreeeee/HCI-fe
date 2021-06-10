@@ -1,4 +1,5 @@
-export const debounceAndThrottle = (fn, ms) => {
+export const debounceAndThrottle = (fn, ms, ms2) => {
+  ms2 = ms2 || ms
   let timer = null
   let valid = true
   return (...args) => {

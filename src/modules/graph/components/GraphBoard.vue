@@ -304,28 +304,34 @@ export default {
     // 设置 focus 节点
     setFocus(node) {
       const {
-        config: { baseRadius },
-        nodes,
         svgElements: { focusGroup: fg },
         flags: { enableFocus },
-        setNodeHighLight
+        setNodeHighLight,
+        updateHighLightNodes
       } = this
       if (!enableFocus) return
 
       if (fg.select(`#focus-node-${node.id}`).empty()) {
         setNodeHighLight(node, true)
-        const originFocus = fg.selectAll('circle')
-        fg.selectAll('circle')
-          .data(nodes.filter(node => node.highLight || node.focus))
-          .join('circle')
-          .attr('r', d => baseRadius + d.radius * 10 + 5)
-          .attr('fill', 'none')
-          .attr('id', d => `focus-node-${d.id}`)
-          .attr('cx', d => d.x)
-          .attr('cy', d => d.y)
-          .merge(originFocus)
-        // .join(fg.selectAll('circle'))
+        updateHighLightNodes()
       }
+    },
+    updateHighLightNodes() {
+      const {
+        config: { baseRadius },
+        nodes,
+        svgElements: { focusGroup: fg }
+      } = this
+      const originFocus = fg.selectAll('circle')
+      fg.selectAll('circle')
+        .data(nodes.filter(node => node.highLight || node.focus))
+        .join('circle')
+        .attr('r', d => baseRadius + d.radius * 10 + 5)
+        .attr('fill', 'none')
+        .attr('id', d => `focus-node-${d.id}`)
+        .attr('cx', d => d.x)
+        .attr('cy', d => d.y)
+        .merge(originFocus)
     },
     // 力导图更新
     tick() {
@@ -642,11 +648,25 @@ export default {
       setLocked(layoutMode === 'GRID')
       layoutMode === 'FORCE' ? unPin() : pin()
     },
+    // 选取类别
     selectGroups(groups) {
       // console.log('selectGroups', groups)
       this.setSelectedGroups(groups)
       this.updateNodesWithText()
       this.updateLinksWithText()
+    },
+    selectNode(nodeId) {
+      // console.log('graph selectNode', nodeId)
+      const node = this.getNodeById(nodeId)
+      this.setFocus(node)
+      this.setNodeFocus(node)
+    },
+    highLightMultiple(nodeIds) {
+      this.clearFocus()
+      // console.log('highLightMultiple', nodeIds)
+      const nodes = this.getNodesByIds(nodeIds)
+      nodes.forEach(node => this.setNodeHighLight(node, true))
+      this.updateHighLightNodes()
     },
     /********** 图谱操作 **********/
     // 设置高亮组

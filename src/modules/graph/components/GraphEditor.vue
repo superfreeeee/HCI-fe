@@ -4,10 +4,7 @@
     <!-- <graph-editor-search></graph-editor-search> -->
 
     <!-- 选取查看组别 -->
-    <GraphEditorGroup
-      :groups="nodeGroups"
-      @graph-action="passingGraphAction"
-    ></GraphEditorGroup>
+    <GraphEditorGroup :groups="nodeGroups" @graph-action="passingGraphAction" />
 
     <el-divider></el-divider>
     <!-- 图谱内容查看/修改 -->
@@ -17,7 +14,15 @@
       :nodeOptions="nodeOptions"
       :nodeGroups="nodeGroups"
       @graph-action="passingGraphAction"
-    />
+    >
+      <GraphEditorSearch
+        :projectId="graphData && graphData.projectId"
+        :nodes="safeNodes"
+        :links="safeLinks"
+        @editor-action="dispatchEditorAction"
+        @graph-action="passingGraphAction"
+      />
+    </GraphEditorItem>
 
     <el-divider></el-divider>
     <!-- 图谱统计数据 -->
@@ -59,6 +64,12 @@ export default {
     }
   },
   computed: {
+    safeNodes() {
+      return this.graphData ? this.graphData.nodes : []
+    },
+    safeLinks() {
+      return this.graphData ? this.graphData.links : []
+    },
     statisticsData() {
       const nodes = this.graphData && this.graphData.nodes
       const nodesScale = this.nodesScale
