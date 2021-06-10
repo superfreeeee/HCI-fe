@@ -4,9 +4,12 @@
     <!-- <graph-editor-search></graph-editor-search> -->
 
     <!-- 选取查看组别 -->
-    <!-- <graph-editor-group></graph-editor-group> -->
-    <el-divider></el-divider>
+    <GraphEditorGroup
+      :groups="nodeGroups"
+      @graph-action="passingGraphAction"
+    ></GraphEditorGroup>
 
+    <el-divider></el-divider>
     <!-- 图谱内容查看/修改 -->
     <GraphEditorItem
       ref="item"

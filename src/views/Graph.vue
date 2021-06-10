@@ -105,7 +105,7 @@ export default {
       this.$router.push('/')
     },
     dispatchGraphAction(name, ...args) {
-      console.log(`[GraphAction] ${name}`, args)
+      // console.log(`[GraphAction] ${name}`, args)
       if (name === 'switchLayout') {
         this.graphProperty.layoutMode = args[0]
       }
@@ -130,24 +130,17 @@ export default {
           },
           updateNode: () => {
             const node = nodes.filter(node => node.id === item.id)[0]
-            if (node) {
-              for (const prop in node) {
-                node[prop] = item[prop]
-              }
-            }
+            node &&
+              Reflect.ownKeys(node).forEach(prop => (node[prop] = item[prop]))
           },
           updateLink: () => {
             const link = links.filter(link => link.id === item.id)[0]
-            if (link) {
-              for (const prop in link) {
-                link[prop] = item[prop]
-              }
-            }
+            link &&
+              Reflect.ownKeys(link).forEach(prop => (link[prop] = item[prop]))
           },
           deleteNode: () => {
             const node = nodes.filter(node => node.id === item.id)[0]
             if (node) {
-              console.log('delete target ', node)
               nodes.splice(nodes.indexOf(node), 1)
               this.graphData.links = links.filter(
                 ({ from, to }) => from !== node.id && to !== node.id
@@ -156,22 +149,19 @@ export default {
           },
           deleteLink: () => {
             const target = links.filter(link => link.id === item.id)[0]
-            if (target) {
-              console.log('delete target ', target)
-              links.splice(links.indexOf(target), 1)
-            }
+            target && links.splice(links.indexOf(target), 1)
           }
         }[name]())
       }
       this.$refs.board[name](...args)
     },
     dispatchEditorAction(name, ...args) {
-      console.log(`[EditorAction] ${name}`, args)
+      // console.log(`[EditorAction] ${name}`, args)
       this.showEditor = true
       this.$refs.editor.dispatchEditorAction(name, ...args)
     },
     initPropertyHandler(name, value) {
-      console.log(`[InitProperty] ${name}`)
+      // console.log(`[InitProperty] ${name}`)
       this.graphProperty[name] = value
     },
     showDescription() {
@@ -186,12 +176,9 @@ export default {
   },
   async mounted() {
     const projectId = Number(this.$route.params.projectId)
-    console.log(`[Graph] mounted, projectId = ${projectId}`)
-
     const projectInfo = await this.getProjectInfoAct(projectId)
 
     // const projectInfo = deepCopy(_projectInfo)
-    console.log('projectInfo', projectInfo)
     if (!projectInfo) {
       // warning
       return
@@ -200,7 +187,6 @@ export default {
 
     const graphData = await this.getProjectGraphDataAct(projectId)
     // const graphData = deepCopy(_graphData)
-    console.log('graphData', graphData)
     if (!graphData) {
       // warning
       return
@@ -210,12 +196,11 @@ export default {
     const graphBoard = this.$refs.board
     graphBoard.mountGraphData(graphData, this.projectInfo)
 
-    // setTimeout(() => {
-    //   graphBoard.reset()
-    //   setTimeout(() => {
-    //     graphBoard.mountGraphData(graphData)
-    //   }, 5000)
-    // }, 5000)
+    console.group('[Graph] mounted success')
+    console.log('projectId:', projectId)
+    console.log('projectInfo:', projectInfo)
+    console.log('graphData:', graphData)
+    console.groupEnd()
   }
 }
 </script>

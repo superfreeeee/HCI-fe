@@ -9,6 +9,8 @@ const instance = axios.create({ baseURL, withCredentials: true })
 const expiredToken =
   'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImNyZWF0ZWQiOjE2MTgzODg2NjMzMTksInJvbGVzIjpudWxsLCJpZCI6MSwiZXhwIjoxNjE4Mzg4NjY0fQ.9aDvHMMAwFi4SiVkNsyjEhiMpPmZ4tTr0UAIJjmhjELO5daj2MCAwPm1CwXgufNoD2NZhN1tiRLPGOj31qX62g'
 
+const apiConsole = false
+
 instance.interceptors.request.use(
   config => {
     const token = localStorage.getItem('coin-token')
@@ -16,9 +18,11 @@ instance.interceptors.request.use(
       config.headers['coin-token'] = token
     }
     // config.headers['coin-token'] = expiredToken
-    consoleGroup(`[axios.request] ${config.url}`, () => {
-      console.log(config)
-    })
+    if (apiConsole) {
+      consoleGroup(`[axios.request] ${config.url}`, () => {
+        console.log(config)
+      })
+    }
     return config
   },
   err => {
@@ -29,9 +33,11 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
   response => {
     const config = response.config
-    consoleGroup(`[axios.response] ${config.url}`, () => {
-      console.log(response)
-    })
+    if (apiConsole) {
+      consoleGroup(`[axios.response] ${config.url}`, () => {
+        console.log(response)
+      })
+    }
     return response
   },
   err => {

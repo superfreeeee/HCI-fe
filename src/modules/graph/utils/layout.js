@@ -1,87 +1,4 @@
 import { consoleGroup } from '@/common/utils'
-import config from './config'
-/**
- * 布局操作选项
- */
-// 布局模式
-export const layoutModes = [
-  {
-    type: 'primary',
-    label: '力导图模式',
-    mode: 'FORCE'
-  },
-  {
-    type: 'danger',
-    label: '排版模式',
-    mode: 'GRID'
-  },
-  {
-    type: 'warning',
-    label: '定点模式',
-    mode: 'FIXED'
-  }
-]
-
-/**
- * 图谱布局相关
- */
-
-/**
- * 计算布局占用宽高
- * @param {*} layoutNodes
- * @param {*} radiusMapper
- * @returns { width, height }
- */
-export const getNodesSize = nodes => {
-  let [x1, y1, x2, y2] = Array(4).fill(0)
-  nodes.forEach(({ x, y, radius }) => {
-    x1 = Math.min(x1, x - radius)
-    y1 = Math.min(y1, y - radius)
-    x2 = Math.max(x2, x + radius)
-    y2 = Math.max(y2, y + radius)
-  })
-  const width = x2 - x1
-  const height = y2 - y1
-  return { width, height }
-}
-
-/**
- * 保存图谱布局(nodes 数据 -> layout 格式)
- * @param {*} nodes
- * @returns { nodes, width, height }
- */
-export const saveLayout = nodes => {
-  const layoutNodes = []
-  nodes.forEach(({ id, x, y }) => {
-    layoutNodes.push({
-      nodeId: id,
-      xaxis: x,
-      yaxis: y
-    })
-  })
-  const { width, height } = getNodesSize(nodes)
-  return { nodes: layoutNodes, width, height }
-}
-
-/**
- * 恢复布局(nodes 数据 <- layout 格式)
- * @param {*} mode
- * @param {*} nodes
- * @param {*} { nodes }
- * @returns newNodes
- */
-export const restoreLayout = (mode, nodes, { nodes: layoutNodes }) => {
-  const pos = {}
-  layoutNodes.forEach(({ nodeId, xaxis, yaxis }) => {
-    pos[nodeId] = [xaxis, yaxis]
-  })
-  return nodes.map(node => {
-    const [x, y] = Reflect.has(pos, node.id) ? pos[node.id] : [node.x, node.y]
-    return mode === 'FORCE'
-      ? { ...node, x, y, fx: null, fy: null }
-      : { ...node, fx: x, fy: y, x, y }
-  })
-}
 
 /**
  * 清理节点固定坐标 fx, fy
@@ -160,14 +77,7 @@ export const getGridLayout = (nodes, config) => {
   return layoutNodes
 }
 
-export const getScale = layout => {
-  if (!layout) return 1
-  const { width, height } = layout
-  const { width: boardWidth, height: boardHeight } = config
-  const zoom = 0.7
-  return Math.min(1, (boardWidth / width) * zoom, (boardHeight / height) * zoom)
-}
-
+// 计算节点缩放
 export const calcScale = (nodes, config) => {
   if (nodes.length === 0) return 1
   const node0 = nodes[0]
@@ -195,9 +105,9 @@ export const calcScale = (nodes, config) => {
     zoomAlpha
   )
 
-  console.log(`width = ${width}, height = ${height}`)
-  console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
-  console.log(`scale = ${scale}`)
+  // console.log(`width = ${width}, height = ${height}`)
+  // console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
+  // console.log(`scale = ${scale}`)
 
   return scale
 }

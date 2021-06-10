@@ -287,7 +287,7 @@ export default {
     /********** 外部操作事件 **********/
     createNode() {
       const newNode = this.getEditNode()
-      console.log('createNode')
+      // console.log('createNode')
 
       this.selectedItem.type = 'node'
       this.selectedItem.item = newNode
@@ -298,7 +298,7 @@ export default {
     },
     createLink() {
       const newLink = this.getEditLink()
-      console.log('createLink')
+      // console.log('createLink')
 
       this.selectedItem.type = 'link'
       this.selectedItem.item = newLink
@@ -309,7 +309,7 @@ export default {
     },
     selectNode(node) {
       const newNode = this.getEditNode(node)
-      console.log('selectNode', newNode)
+      // console.log('selectNode', newNode)
 
       this.selectedItem.type = 'node'
       this.selectedItem.item = { ...newNode }
@@ -319,7 +319,7 @@ export default {
     },
     selectLink(link) {
       const newLink = this.getEditLink(link)
-      console.log('selectLink', link)
+      // console.log('selectLink', link)
 
       this.selectedItem.type = 'link'
       this.selectedItem.item = { ...newLink }
@@ -328,7 +328,7 @@ export default {
       this.useGroupColor = true
     },
     selectNone() {
-      console.log('selectNone')
+      // console.log('selectNone')
       this.selectedItem.type = ''
       this.selectedItem.item = {}
       this.$emit('graph-action', 'clearFocus')
@@ -442,7 +442,6 @@ export default {
             this.selectNone()
           }
         }
-        console.log('res', res)
       })
     },
     queryGroup(inputGroup, cb) {

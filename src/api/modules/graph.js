@@ -82,15 +82,11 @@ export default {
     },
 
     /* 保存布局 */
-    updateLayout(type, layout, projectId) {
+    updateLayout(data) {
       return {
         path: '/updateLayout',
         method: 'POST',
-        data: {
-          ...layout, // nodes, width, height
-          projectId,
-          type
-        }
+        data
       }
     }
   }

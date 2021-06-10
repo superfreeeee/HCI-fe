@@ -25,6 +25,7 @@ export default {
       nodes: [],
       links: [],
       focusNodes: [],
+      selectedGroups: [],
       svgElements: {
         simulation: null,
         svg: null,
@@ -40,6 +41,7 @@ export default {
         scale: null
       },
       flags: {
+        loaded: false,
         singleFocus: true,
         enableFocus: true,
         pinned: false,
@@ -48,7 +50,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['saveAsPng', 'saveAsXml']),
+    ...mapActions(['updateLayout', 'saveAsPng', 'saveAsXml']),
     /***** 重新挂载图谱 *****/
     mountGraphData(data, projectInfo) {
       this.origin = deepCopy(data)
@@ -67,6 +69,7 @@ export default {
       }
 
       this.init()
+      this.flags.loaded = true
     },
     /***** 图谱绘制 *****/
     // 初始化图谱
@@ -365,8 +368,9 @@ export default {
         .attr('cy', d => d.y)
     },
     updateNodesWithText() {
+      if (!this.flags.loaded) return
       const {
-        config: { baseRadius, font },
+        config: { baseRadius, font, opacity },
         nodes,
         links,
         svgElements: {
@@ -379,9 +383,11 @@ export default {
         },
         clickNode,
         focus,
-        unfocus
+        unfocus,
+        updateAllOpacity
       } = this
-      console.log('updateNodesWithText', nodes)
+      // console.log('updateNodesWithText', nodes)
+      updateAllOpacity()
 
       // update nodes
       let _svgNodes = root
@@ -391,6 +397,7 @@ export default {
         .join('circle')
         .attr('r', d => baseRadius + d.radius * 10)
         .attr('fill', d => (d.color ? d.color : scale(d.group)))
+        .attr('opacity', d => (d.opacity ? opacity : 1))
         .attr('data-id', d => d.id)
         .attr('cx', d => d.x)
         .attr('cy', d => d.y)
@@ -427,14 +434,17 @@ export default {
       simulation.alpha(1).restart()
     },
     updateLinksWithText() {
+      if (!this.flags.loaded) return
       const {
-        config: { fontSize, font },
+        config: { fontSize, font, opacity },
         nodes,
         links,
         svgElements: { simulation, root, svgLinks, svgLinksText },
-        clickLink
+        clickLink,
+        updateAllOpacity
       } = this
-      console.log('updateLinksWithText', links)
+      // console.log('updateLinksWithText', links)
+      updateAllOpacity()
 
       // update links
       let _svgLinks = root
@@ -443,6 +453,7 @@ export default {
         .data(links)
         .join('line')
         .attr('stroke-width', d => d.value * 5)
+        .attr('opacity', d => (d.opacity ? opacity : 1))
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
         .on('click', clickLink)
@@ -458,6 +469,7 @@ export default {
         .join('text')
         .style('fill', '#000000')
         .style('font', `${fontSize}px ${font}`)
+        .attr('opacity', d => (d.opacity ? opacity : 1))
         .style('user-select', 'none')
         .attr('dominant-baseline', 'middle')
         .attr('text-anchor', 'middle')
@@ -489,7 +501,7 @@ export default {
     },
     /********** 外部节点操作 **********/
     createNode(node) {
-      console.log('[GraphBoard] createNode', node)
+      // console.log('[GraphBoard] createNode', node)
       const { nodes, updateNodesWithText, setNodeFocus, setFocus } = this
       nodes.push(node)
       updateNodesWithText()
@@ -497,13 +509,13 @@ export default {
       setFocus(node)
     },
     createLink(link) {
-      console.log('[GraphBoard] createLink', link)
+      // console.log('[GraphBoard] createLink', link)
       const { links, updateLinksWithText } = this
       links.push(link)
       updateLinksWithText()
     },
     updateNode(node) {
-      console.log('[GraphBoard]', node)
+      // console.log('[GraphBoard]', node)
       const _node = this.nodes.filter(_node => _node.id === node.id)[0]
       for (const prop in _node) {
         _node[prop] = node[prop]
@@ -513,7 +525,7 @@ export default {
       this.updateFocus()
     },
     updateLink(link) {
-      console.log('[GraphBoard]', link)
+      // console.log('[GraphBoard]', link)
       const _link = this.links.filter(_link => _link.id === link.id)[0]
       for (const prop in _link) {
         link[prop] = link[prop]
@@ -521,7 +533,7 @@ export default {
       this.updateLinksWithText()
     },
     deleteNode(nodeId) {
-      console.log('[GraphBoard]', nodeId)
+      // console.log('[GraphBoard]', nodeId)
       const { nodes, links } = this
 
       // delete node
@@ -537,13 +549,13 @@ export default {
       this.clearFocus()
     },
     deleteLink(linkId) {
-      console.log('[GraphBoard]', linkId)
+      // console.log('[GraphBoard]', linkId)
       const { links } = this
       const link = links.filter(link => link.id === linkId)[0]
       links.splice(links.indexOf(link), 1)
       this.updateLinksWithText()
     },
-    /********** 图谱操作 **********/
+    /********** 外部图谱操作 **********/
     // 重置缩放
     resetZoom() {
       const {
@@ -571,12 +583,6 @@ export default {
         })
         simulation.alphaTarget(0.3).restart()
       }
-
-      // this.mountGraphData(this.origin, this.projectInfo)
-      // if (this.flags.pinned) {
-      //   console.log('in pinned mode')
-      //   this.pin()
-      // }
     },
     // 切换布局
     switchLayout(mode) {
@@ -587,9 +593,18 @@ export default {
     },
     // 保存布局
     saveLayout() {
-      const layoutNodes = this.nodes.map(({ id, x, y }) => ({ id, x, y }))
-      this.layouts[this.layoutMode].nodes = layoutNodes
-      console.log(`saveLayout layout mode: ${this.layoutMode}`, layoutNodes)
+      const { layoutMode, nodes, layouts, updateLayout, projectInfo } = this
+      const layoutNodes = nodes.map(({ id, x, y }) => ({ id, x, y }))
+      console.log(`saveLayout layout mode: ${layoutMode}`, layoutNodes)
+      updateLayout({
+        type: layoutMode,
+        projectId: projectInfo.projectId,
+        nodes: layoutNodes
+      }).then(res => {
+        if (res) {
+          layouts[layoutMode].nodes = layoutNodes
+        }
+      })
     },
     // 恢复布局
     restoreLayout() {
@@ -627,6 +642,13 @@ export default {
       setLocked(layoutMode === 'GRID')
       layoutMode === 'FORCE' ? unPin() : pin()
     },
+    selectGroups(groups) {
+      // console.log('selectGroups', groups)
+      this.setSelectedGroups(groups)
+      this.updateNodesWithText()
+      this.updateLinksWithText()
+    },
+    /********** 图谱操作 **********/
     // 设置高亮组
     setFocusNodes(nodeIds) {
       const {
@@ -675,24 +697,21 @@ export default {
     unPin() {
       const {
         svgElements: { simulation },
-        nodes,
-        flags: { pinned }
+        nodes
       } = this
-      if (pinned) {
-        this.flags.pinned = false
-        nodes.forEach(node => {
-          node.fx = null
-          node.fy = null
-        })
-        simulation.alpha(1).restart()
-      }
+      this.flags.pinned = false
+      nodes.forEach(node => {
+        node.fx = null
+        node.fy = null
+      })
+      simulation.alpha(1).restart()
     },
     /********** 节点/关系操作事件 **********/
     // 点击节点
     clickNode(e) {
       const id = Number(e.target.attributes['data-id'].value)
       const node = this.getNodeById(id)
-      console.log(`click node: id=${id}, `, node)
+      // console.log(`click node: id=${id}, `, node)
 
       this.setNodeFocus(node)
       this.$emit('editor-action', 'selectNode', { ...node })
@@ -701,7 +720,7 @@ export default {
     clickLink(e) {
       const id = Number(e.target.attributes['data-id'].value)
       const link = this.getLinkById(id)
-      console.log(`click link: id=${id}, `, link)
+      // console.log(`click link: id=${id}, `, link)
 
       this.clearFocus()
       this.$emit('editor-action', 'selectLink', { ...link })
@@ -812,6 +831,20 @@ export default {
     getLinkById(id) {
       return this.links.filter(link => link.id === id)[0]
     },
+    // 设置选中组别
+    setSelectedGroups(groups) {
+      this.selectedGroups = groups
+      this.updateAllOpacity()
+    },
+    updateAllOpacity() {
+      const { selectedGroups: groups, nodes, links } = this
+      nodes.forEach(node => {
+        node.opacity = !groups.includes(node.group)
+      })
+      links.forEach(link => {
+        link.opacity = link.source.opacity || link.target.opacity
+      })
+    },
     // 设置节点高亮标志
     setNodeHighLight(nodeOrId, bool = false) {
       const node = this.getNode(nodeOrId)
@@ -856,7 +889,6 @@ export default {
     exportPng() {
       const projectName = this.projectInfo.name
       const svg = this.svgElements.svg
-      console.log(this.projectInfo)
       this.saveAsPng({ projectName, svg })
     },
     exportXml() {
