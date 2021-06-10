@@ -31,6 +31,7 @@
       <el-form
         v-if="selectedItem.type === 'node'"
         ref="editorItem"
+        label-position="top"
         :model="selectedItem.item"
         label-width="80px"
       >
@@ -92,6 +93,35 @@
             v-model="selectedItem.item.textSize"
           ></el-input>
         </el-form-item>
+        <el-form-item label="其他属性">
+          <div
+            class="properties"
+            v-for="(prop, idx) in selectedItem.item.properties"
+            :key="idx"
+          >
+            <el-input
+              clearable
+              :disabled="!editable"
+              placeholder="属性名"
+              v-model="prop.name"
+            ></el-input>
+            <el-input
+              clearable
+              :disabled="!editable"
+              placeholder="属性值"
+              v-model="prop.value"
+            ></el-input>
+            <el-button
+              v-if="editable"
+              type="danger"
+              icon="el-icon-close"
+              @click="removeProp(idx)"
+            ></el-button>
+          </div>
+          <el-button v-if="editable" icon="el-icon-plus" @click="addProp"
+            >添加属性</el-button
+          >
+        </el-form-item>
         <el-form-item class="options">
           <el-button type="primary" @click="primaryButton.handler">{{
             primaryButton.label
@@ -105,6 +135,7 @@
       <el-form
         v-if="selectedItem.type === 'link'"
         ref="editorItem"
+        label-position="top"
         :model="selectedItem.item"
         label-width="80px"
       >
@@ -313,7 +344,7 @@ export default {
     },
     selectNode(node) {
       const newNode = this.getEditNode(node)
-      // console.log('selectNode', newNode)
+      console.log('selectNode', newNode)
 
       this.selectedItem.type = 'node'
       this.selectedItem.item = { ...newNode }
@@ -350,6 +381,10 @@ export default {
           textSize,
           properties
         } = origin
+        const props = []
+        for (const name in properties) {
+          props.push({ name, value: properties[name] })
+        }
         const node = {
           id,
           name,
@@ -358,7 +393,7 @@ export default {
           color,
           figure,
           textSize,
-          properties
+          properties: props
         }
         return node
       } else {
@@ -369,7 +404,7 @@ export default {
           color: '',
           figure: '',
           textSize: '',
-          properties: {}
+          properties: []
         }
       }
     },
@@ -386,6 +421,12 @@ export default {
           value: ''
         }
       }
+    },
+    addProp() {
+      this.selectedItem.item.properties.push({ name: '', value: '' })
+    },
+    removeProp(idx) {
+      this.selectedItem.item.properties.splice(idx, 1)
     },
     reset() {
       const item = this.selectedItem.item
@@ -470,5 +511,14 @@ export default {
 .header > .left {
   display: flex;
   gap: 16px;
+}
+
+.properties {
+  display: flex;
+  justify-content: center;
+}
+
+.properties > el-button {
+  flex: 1;
 }
 </style>

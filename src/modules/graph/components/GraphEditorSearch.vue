@@ -4,7 +4,7 @@
       <h3>图谱搜索</h3>
       <el-button type="danger" size="medium" @click="clearHistory">
         清除搜索记录
-        <i class="el-icon-close"></i>
+        <i class="el-icon-delete"></i>
       </el-button>
     </div>
     <el-autocomplete

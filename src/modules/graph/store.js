@@ -2,7 +2,7 @@ import api from '@/api/dispatcher'
 import { $notify } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
-import { itemOptions, typeMapper, itemTransformer } from './utils/item'
+import { transformProperties, typeMapper, itemTransformer } from './utils/item'
 
 const graph = {
   state: {
@@ -50,7 +50,8 @@ const graph = {
             ? {
                 ...item,
                 radius: Number(item.radius),
-                id: res.data.nodeId
+                id: res.data.nodeId,
+                properties: transformProperties(item.properties)
               }
             : {
                 ...item,
@@ -80,7 +81,8 @@ const graph = {
           return type === 'node'
             ? {
                 ...item,
-                radius: Number(item.radius)
+                radius: Number(item.radius),
+                properties: transformProperties(item.properties)
               }
             : {
                 ...item,
