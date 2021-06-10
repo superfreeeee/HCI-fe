@@ -105,9 +105,11 @@ export const calcScale = (nodes, config) => {
     zoomAlpha
   )
 
-  // console.log(`width = ${width}, height = ${height}`)
-  // console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
-  // console.log(`scale = ${scale}`)
+  // consoleGroup('getScale', () => {
+  //   console.log(`width = ${width}, height = ${height}`)
+  //   console.log(`realWidth = ${realWidth}, realHeight = ${realHeight}`)
+  //   console.log(`scale = ${scale}`)
+  // })
 
   return scale
 }

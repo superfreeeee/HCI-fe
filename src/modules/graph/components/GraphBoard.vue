@@ -45,7 +45,8 @@ export default {
         singleFocus: true,
         enableFocus: true,
         pinned: false,
-        locked: false
+        locked: false,
+        selectingMode: false
       }
     }
   },
@@ -503,11 +504,19 @@ export default {
     /********** 外部节点操作 **********/
     createNode(node) {
       // console.log('[GraphBoard] createNode', node)
-      const { nodes, updateNodesWithText, setNodeFocus, setFocus } = this
+      const {
+        nodes,
+        updateNodesWithText,
+        setNodeFocus,
+        setFocus,
+        layoutMode,
+        restoreLayout
+      } = this
       nodes.push(node)
       updateNodesWithText()
       setNodeFocus(node)
       setFocus(node)
+      layoutMode === 'GRID' && restoreLayout(true)
     },
     createLink(link) {
       // console.log('[GraphBoard] createLink', link)
@@ -517,13 +526,22 @@ export default {
     },
     updateNode(node) {
       // console.log('[GraphBoard]', node)
-      const _node = this.nodes.filter(_node => _node.id === node.id)[0]
+      const {
+        nodes,
+        updateNodesWithText,
+        setNodeFocus,
+        updateFocus,
+        layoutMode,
+        restoreLayout
+      } = this
+      const _node = nodes.filter(_node => _node.id === node.id)[0]
       for (const prop in _node) {
         _node[prop] = node[prop]
       }
-      this.updateNodesWithText()
-      this.setNodeFocus(_node)
-      this.updateFocus()
+      updateNodesWithText()
+      setNodeFocus(_node)
+      updateFocus()
+      layoutMode === 'GRID' && restoreLayout(true)
     },
     updateLink(link) {
       // console.log('[GraphBoard]', link)
@@ -608,7 +626,7 @@ export default {
       })
     },
     // 恢复布局
-    restoreLayout() {
+    restoreLayout(bool) {
       const {
         config,
         layoutMode,
@@ -619,7 +637,10 @@ export default {
         flags: { pinned },
         setLocked
       } = this
-      if (layoutMode === 'GRID' && layouts.GRID.nodes.length !== nodes.length) {
+      if (
+        bool ||
+        (layoutMode === 'GRID' && layouts.GRID.nodes.length !== nodes.length)
+      ) {
         layouts.GRID.nodes = getGridLayout(nodes, config)
       }
       const layoutNodesMapper = {}
@@ -650,12 +671,14 @@ export default {
       this.updateNodesWithText()
       this.updateLinksWithText()
     },
+    // 直接选中单个节点
     selectNode(nodeId) {
       // console.log('graph selectNode', nodeId)
       const node = this.getNodeById(nodeId)
       this.setFocus(node)
       this.setNodeFocus(node)
     },
+    // 多个节点一次高亮
     highLightMultiple(nodeIds) {
       this.clearFocus()
       // console.log('highLightMultiple', nodeIds)
@@ -663,6 +686,11 @@ export default {
       nodes.forEach(node => this.setNodeHighLight(node, true))
       this.updateHighLightNodes()
     },
+    // 切换选中模式
+    setSelectingMode(mode) {
+      this.flags.selectingMode = mode
+    },
+    selectInSelectingMode() {},
     /********** 图谱操作 **********/
     // 设置高亮组
     setFocusNodes(nodeIds) {
@@ -728,11 +756,16 @@ export default {
       const node = this.getNodeById(id)
       // console.log(`click node: id=${id}, `, node)
 
-      this.setNodeFocus(node)
-      this.$emit('editor-action', 'selectNode', { ...node })
+      if (this.flags.selectingMode) {
+        this.$emit('editor-action', 'catchNode', node)
+      } else {
+        this.setNodeFocus(node)
+        this.$emit('editor-action', 'selectNode', { ...node })
+      }
     },
     // 点击关系
     clickLink(e) {
+      if (this.flags.selectingMode) return
       const id = Number(e.target.attributes['data-id'].value)
       const link = this.getLinkById(id)
       // console.log(`click link: id=${id}, `, link)
@@ -741,6 +774,7 @@ export default {
       this.$emit('editor-action', 'selectLink', { ...link })
     },
     clickView() {
+      if (this.flags.selectingMode) return
       this.clearFocus()
       this.$emit('editor-action', 'selectNone')
     },

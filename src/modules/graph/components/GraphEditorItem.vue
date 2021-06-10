@@ -163,17 +163,15 @@
                 :value="node.id"
               ></el-option>
             </el-select>
-            <!-- <el-button
+            <el-button
               title="点击选择目标节点"
               :disabled="!editable"
               :icon="
-                graphEditorSelect === option.attr
-                  ? 'el-icon-close'
-                  : 'el-icon-thumb'
+                selectingNode === 'from' ? 'el-icon-close' : 'el-icon-thumb'
               "
-              @click="setEditorSelect(option.attr)"
-              @blur="setEditorSelect('')"
-            ></el-button> -->
+              @click="toggleSelectingNode('from')"
+              @blur="toggleSelectingNode('from')"
+            ></el-button>
           </div>
         </el-form-item>
         <el-form-item label="关系实体2">
@@ -192,6 +190,13 @@
                 :value="node.id"
               ></el-option>
             </el-select>
+            <el-button
+              title="点击选择目标节点"
+              :disabled="!editable"
+              :icon="selectingNode === 'to' ? 'el-icon-close' : 'el-icon-thumb'"
+              @click="toggleSelectingNode('to')"
+              @blur="toggleSelectingNode('to')"
+            ></el-button>
           </div>
         </el-form-item>
         <el-form-item label="关系权重">
@@ -242,7 +247,9 @@ export default {
       options: {
         nodeOptions: [],
         nodeGroups: []
-      }
+      },
+      selectingNode: '',
+      selectingMode: false
     }
   },
   computed: {
@@ -344,7 +351,7 @@ export default {
     },
     selectNode(node) {
       const newNode = this.getEditNode(node)
-      console.log('selectNode', newNode)
+      // console.log('selectNode', newNode)
 
       this.selectedItem.type = 'node'
       this.selectedItem.item = { ...newNode }
@@ -422,18 +429,36 @@ export default {
         }
       }
     },
+    // 添加实体属性
     addProp() {
       this.selectedItem.item.properties.push({ name: '', value: '' })
     },
+    // 删除实体属性
     removeProp(idx) {
       this.selectedItem.item.properties.splice(idx, 1)
     },
+    toggleSelectingNode(attr) {
+      const mode = this.selectingNode !== attr
+      const node = mode ? attr : ''
+      this.selectingMode = mode
+      this.selectingNode = node
+      this.$emit('graph-action', 'setSelectingMode', mode)
+    },
+    catchNode(node) {
+      const { id, name } = node
+      // console.log(`catchNode: id=${id}, name=${name}`)
+      this.selectedItem.item[this.selectingNode] = node.id
+      this.selectingMode = false
+      this.selectingNode = ''
+    },
+    // 重置选项
     reset() {
       const item = this.selectedItem.item
       for (const prop in item) {
         item[prop] = ''
       }
     },
+    // 重置属性
     cancel() {
       this.editable = false
       // reset attribute
