@@ -42,6 +42,13 @@
       >
         项目：{{ project.name }}
       </el-button>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="1000"
+        @current-change="switchPageOwn"
+        :current-page="ownPageNo"
+      >
+      </el-pagination>
     </div>
     <div class="list" v-else>
       <el-button
@@ -57,8 +64,8 @@
       <el-pagination
         layout="prev, pager, next"
         :total="1000"
-        @current-change="switchPage"
-        :current-page="pageNo"
+        @current-change="switchPageAll"
+        :current-page="allPageNo"
       >
       </el-pagination>
     </div>
@@ -78,6 +85,7 @@ export default {
   data() {
     return {
       activeIndex: '1',
+      userId: null,
     }
   },
   computed: {
@@ -87,16 +95,24 @@ export default {
       'userInfo',
       'showCreatePanel',
       'allProjects',
-      'pageNo',
+      'allPageNo',
+      'ownProjects',
+      'ownPageNo',
     ]),
   },
   methods: {
-    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel', 'setPageNo']),
+    ...mapMutations([
+      'setGraphProjectId',
+      'setShowCreatePanel',
+      'setAllPageNo',
+      'setOwnPageNo',
+    ]),
     ...mapActions([
-      'getListByUserId',
+      // 'getListByUserId',
       'userLogout',
       'getUserInfo',
       'getAllListByPageNo',
+      'getOwnListByPageNo',
     ]),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
@@ -111,18 +127,28 @@ export default {
     handleSelect(key) {
       this.activeIndex = key
     },
-    switchPage(currPageNo) {
+    switchPageOwn(currPageNo) {
+      this.setOwnPageNo(currPageNo)
+      this.getOwnListByPageNo({
+        userId: this.userId,
+        pageNo: this.ownPageNo,
+      })
+    },
+    switchPageAll(currPageNo) {
       // console.log('switchPage', currPageNo)
-      this.setPageNo(currPageNo)
+      this.setAllPageNo(currPageNo)
       this.getAllListByPageNo(currPageNo)
     },
   },
   mounted() {
     this.getUserInfo().then((success) => {
       if (success) {
-        const userId = this.userInfo.id
-        this.getListByUserId(userId)
-        this.getAllListByPageNo(this.pageNo)
+        this.userId = this.userInfo.id
+        this.getOwnListByPageNo({
+          userId: this.userId,
+          pageNo: this.ownPageNo,
+        })
+        this.getAllListByPageNo(this.allPageNo)
       }
     })
   },

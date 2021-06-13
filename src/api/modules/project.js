@@ -7,9 +7,6 @@ export default {
     getListByUserId(userId) {
       return { path: `/listByUserId/${userId}` }
     },
-    getAllListByPageNo(pageNo) {
-      return { path: `/publicProject/${pageNo}` }
-    },
     createProject(projectInfo) {
       return { path: '/create', method: 'POST', data: projectInfo }
     },
@@ -24,6 +21,12 @@ export default {
     },
     updateStatus(data) {
       return { path: '/updateProjectStatus', method: 'POST', data }
+    },
+    getAllListByPageNo(pageNo) {
+      return { path: `/publicProject/${pageNo}` }
+    },
+    getOwnListByPageNo(data) {
+      return { path: `/listByUserId/${data.userId}/${data.pageNo}` }
     }
   }
 }

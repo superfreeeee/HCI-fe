@@ -7,7 +7,8 @@ const home = {
     allProjects: [],
     projectInfo: {},
     showCreatePanel: false,
-    pageNo: 1
+    allPageNo: 1,
+    ownPageNo: 1,
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -22,8 +23,11 @@ const home = {
     setShowCreatePanel(state, data) {
       state.showCreatePanel = data
     },
-    setPageNo(state, data) {
-      state.pageNo = data
+    setAllPageNo(state, data) {
+      state.allPageNo = data
+    },
+    setOwnPageNo(state, data) {
+      state.ownPageNo = data
     }
   },
   actions: {
@@ -33,7 +37,7 @@ const home = {
         const projects = res.data
         commit('setOwnProjects', projects)
       } else {
-        console.log('getListByUserId error')
+        console.error('getListByUserId error')
       }
     },
     getAllListByPageNo: async ({ commit }, pageNo) => {
@@ -42,7 +46,16 @@ const home = {
         const projects = res.data
         commit('setAllProjects', projects)
       } else {
-        console.log('getAllListByPageNo error')
+        console.error('getAllListByPageNo error')
+      }
+    },
+    getOwnListByPageNo: async ({ commit }, data) => {
+      const res = await api.getOwnListByPageNo(data)
+      if (res.status === 200) {
+        const projects = res.data
+        commit('setOwnProjects', projects)
+      } else {
+        console.error('getOwnListByPageNo error')
       }
     },
     getProjectInfo: async ({ commit, state }, projectId) => {
@@ -52,7 +65,7 @@ const home = {
         commit('setProjectInfo', res.data)
         return res.data
       } else {
-        console.log('getProjectInfo error')
+        console.error('getProjectInfo error')
         return null
       }
     },
@@ -65,18 +78,19 @@ const home = {
       } else if (res.status === 500) {
         return Promise.reject(res.data.msg)
       } else {
-        console.log('[home/store/createProject] createProject error')
+        console.error('[home/store/createProject] createProject error')
         return Promise.reject('unknown error')
       }
-    },
-    getAllProjects: () => {}
+    }
   },
   getters: {
     ownProjects: state => state.ownProjects,
     projectInfo: state => state.projectInfo,
     showCreatePanel: state => state.showCreatePanel,
     allProjects: state => state.allProjects,
-    pageNo: state => state.pageNo
+    allPageNo: state => state.allPageNo,
+    ownProjects: state => state.ownProjects,
+    ownPageNo: state => state.ownPageNo
   }
 }
 

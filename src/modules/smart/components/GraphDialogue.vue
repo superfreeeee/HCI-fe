@@ -53,11 +53,11 @@ export default {
     }
   },
   async mounted() {
-    this.graphDialogueinput = this.graphDialogueQues
-    const graphData = deepCopy(_graphData)
-    this.graphData = graphData
-    const graphDialogueBoard = this.$refs.graphDialogueBoard
-    graphDialogueBoard.mountGraphData(graphData)
+    // this.graphDialogueinput = this.graphDialogueQues
+    // const graphData = deepCopy(_graphData)
+    // this.graphData = graphData
+    // const graphDialogueBoard = this.$refs.graphDialogueBoard
+    // graphDialogueBoard.mountGraphData(graphData)
   },
   computed: {
     ...mapGetters(['graphDialogueQues']),
