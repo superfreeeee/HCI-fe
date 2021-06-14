@@ -94,13 +94,14 @@ export default {
             status: this.statusRadio === '私密' ? 'PRIVATE' : 'PUBLIC',
             xml: xml === '空项目' ? '' : xml,
           }
-          console.log('projectParam', projectParam)
+          // console.log('projectParam', projectParam)
           this.createProject(projectParam)
             .catch((msg) => {
               $message(msg, 'error')
             })
             .then((projectId) => {
               this.$router.push(`/graph/${projectId}`)
+              this.setShowCreatePanel(false)
             })
             .catch((msg) => {
               $message('router fail')

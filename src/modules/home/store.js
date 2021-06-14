@@ -9,6 +9,8 @@ const home = {
     showCreatePanel: false,
     allPageNo: 1,
     ownPageNo: 1,
+    allListCount: 0,
+    ownListCount: 0
   },
   mutations: {
     setOwnProjects(state, data) {
@@ -28,18 +30,24 @@ const home = {
     },
     setOwnPageNo(state, data) {
       state.ownPageNo = data
+    },
+    setAllListCount(state, data) {
+      state.allListCount = data
+    },
+    setOwnListCount(state, data) {
+      state.ownListCount = data
     }
   },
   actions: {
-    getListByUserId: async ({ commit }, userId) => {
-      const res = await api.getListByUserId(userId)
-      if (res.status === 200) {
-        const projects = res.data
-        commit('setOwnProjects', projects)
-      } else {
-        console.error('getListByUserId error')
-      }
-    },
+    // getListByUserId: async ({ commit }, userId) => {
+    //   const res = await api.getListByUserId(userId)
+    //   if (res.status === 200) {
+    //     const projects = res.data
+    //     commit('setOwnProjects', projects)
+    //   } else {
+    //     console.error('getListByUserId error')
+    //   }
+    // },
     getAllListByPageNo: async ({ commit }, pageNo) => {
       const res = await api.getAllListByPageNo(pageNo)
       if (res.status === 200) {
@@ -57,6 +65,14 @@ const home = {
       } else {
         console.error('getOwnListByPageNo error')
       }
+    },
+    getAllListAmount: async ({ commit }) => {
+      const res = await api.getAllListCount()
+      commit('setAllListCount', res.data)
+    },
+    getOwnListAmount: async ({ commit }, userId) => {
+      const res = await api.getOwnListCount(userId)
+      commit('setOwnListCount', res.data)
     },
     getProjectInfo: async ({ commit, state }, projectId) => {
       if (projectId === state.projectId) return true
@@ -89,8 +105,10 @@ const home = {
     showCreatePanel: state => state.showCreatePanel,
     allProjects: state => state.allProjects,
     allPageNo: state => state.allPageNo,
+    allListCount: state => state.allListCount,
     ownProjects: state => state.ownProjects,
-    ownPageNo: state => state.ownPageNo
+    ownPageNo: state => state.ownPageNo,
+    ownListCount: state => state.ownListCount
   }
 }
 

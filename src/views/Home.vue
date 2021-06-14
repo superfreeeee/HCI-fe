@@ -44,7 +44,7 @@
       </el-button>
       <el-pagination
         layout="prev, pager, next"
-        :total="1000"
+        :total="ownListCount"
         @current-change="switchPageOwn"
         :current-page="ownPageNo"
       >
@@ -63,7 +63,7 @@
       </el-button>
       <el-pagination
         layout="prev, pager, next"
-        :total="1000"
+        :total="allListCount"
         @current-change="switchPageAll"
         :current-page="allPageNo"
       >
@@ -96,8 +96,10 @@ export default {
       'showCreatePanel',
       'allProjects',
       'allPageNo',
+      'allListCount',
       'ownProjects',
       'ownPageNo',
+      'ownListCount',
     ]),
   },
   methods: {
@@ -113,6 +115,8 @@ export default {
       'getUserInfo',
       'getAllListByPageNo',
       'getOwnListByPageNo',
+      'getAllListAmount',
+      'getOwnListAmount',
     ]),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
@@ -144,6 +148,8 @@ export default {
     this.getUserInfo().then((success) => {
       if (success) {
         this.userId = this.userInfo.id
+        this.getOwnListAmount(this.userId)
+        this.getAllListAmount()
         this.getOwnListByPageNo({
           userId: this.userId,
           pageNo: this.ownPageNo,

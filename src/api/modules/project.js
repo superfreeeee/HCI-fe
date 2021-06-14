@@ -27,6 +27,12 @@ export default {
     },
     getOwnListByPageNo(data) {
       return { path: `/listByUserId/${data.userId}/${data.pageNo}` }
+    },
+    getAllListCount() {
+      return { path: '/countPublicProject' }
+    },
+    getOwnListCount(userId) {
+      return { path: `/countByUserId/${userId}` }
     }
   }
 }
