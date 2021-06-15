@@ -1,7 +1,7 @@
 import {
   responseItemTranformer,
-  itemTransformer
 } from '@/modules/graph/utils/item'
+import { linebreakFormat } from '../../modules/smart/utils/function'
 
 export default {
   prefix: '/app',
@@ -16,7 +16,20 @@ export default {
       return {
         path: '/question',
         method: 'POST',
-        data: question
+        data: question,
+        mapper(data) {
+          const { projectId, nodes, relations, layout } = data.graph
+          const text = data.text
+          return {
+            graph: {
+              projectId,
+              nodes: nodes.map(n => responseItemTranformer('node', n)),
+              links: relations.map(r => responseItemTranformer('link', r)),
+              layouts: layout
+            },
+            text: linebreakFormat(text)
+          }
+        }
       }
     },
     verifyInitiate(projectId) {

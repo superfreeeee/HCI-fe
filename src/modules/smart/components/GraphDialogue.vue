@@ -25,6 +25,9 @@
     </div>
     <div class="answer">
       <span class="header">答案</span>
+      <div class="text" v-html="this.dialogueAnswer">
+        {{ this.dialogueAnswer }}
+      </div>
     </div>
     <div class="graph">
       <span class="header">图谱演示</span>
@@ -39,7 +42,6 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import GraphBoard from '../../graph/components/GraphBoard'
 import { _graphData } from '../../graph/utils/data'
-import { deepCopy } from '../../../common/utils/object'
 
 export default {
   name: 'GraphDialogue',
@@ -52,22 +54,44 @@ export default {
       graphData: null,
     }
   },
-  async mounted() {
-    // this.graphDialogueinput = this.graphDialogueQues
-    // const graphData = deepCopy(_graphData)
-    // this.graphData = graphData
-    // const graphDialogueBoard = this.$refs.graphDialogueBoard
-    // graphDialogueBoard.mountGraphData(graphData)
+  mounted() {
+    this.graphDialogueinput = this.graphDialogueQues
+    if (!this.dialogueQueryGraphData) {
+      return
+    } else {
+      this.renderGraph()
+    }
   },
   computed: {
-    ...mapGetters(['graphDialogueQues']),
+    ...mapGetters([
+      'graphDialogueQues',
+      'dialogueQueryGraphData',
+      'dialogueAnswer',
+    ]),
   },
   methods: {
     ...mapMutations(['setGraphDialogueQues']),
-    ...mapActions(['getProjectInfo']),
+    ...mapActions(['getProjectInfo', 'smartDialogueQuery']),
+    renderGraph() {
+      this.graphData = this.dialogueQueryGraphData
+      const graphDialogueBoard = this.$refs.graphDialogueBoard
+      graphDialogueBoard.mountGraphData(this.graphData)
+    },
     graphDialogueSearch() {
-      console.log('graphDialogueSearch')
       this.setGraphDialogueQues(this.graphDialogueinput)
+      const projectId = Number(this.$route.params.projectId)
+      const question = {
+        text: this.graphDialogueinput,
+        projectId,
+      }
+      this.smartDialogueQuery(question).then((res) => {
+        console.log('ertyuiop', res)
+        if (res.nodes.length === 0) {
+          this.$message.warning('查无结果！')
+        } else {
+          this.renderGraph()
+        }
+      })
     },
   },
   // async mounted() {
@@ -122,6 +146,14 @@ export default {
 }
 .graphd > .graph > .show {
   height: calc(100% - 35px);
+}
+.graphd > .answer > .text {
+  width: calc(100% - 20px);
+  height: calc(100% - 55px);
+  padding: 10px;
+  font-family: serif;
+  font-size: 15px;
+  overflow: scroll;
 }
 /* .el-input-group {
   height: 100%;

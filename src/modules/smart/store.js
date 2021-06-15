@@ -23,7 +23,9 @@ const smart = {
     },
     entityQueryGraphData: null,
     relationQueryGraphData: null,
-    relationNames: []
+    dialogueQueryGraphData: null,
+    relationNames: [],
+    dialogueAnswer: ''
   },
   mutations: {
     setTaleList(state, data) {
@@ -50,6 +52,12 @@ const smart = {
     },
     setRelationNames(state, data) {
       state.relationNames = data
+    },
+    setDialogueQueryGraphData(state, data) {
+      state.dialogueQueryGraphData = data
+    },
+    setDialogueAnswer(state, data) {
+      state.dialogueAnswer = data
     }
   },
   actions: {
@@ -65,6 +73,7 @@ const smart = {
       const { question, username } = data
       const res = await api.askQuestion(question)
       const { text } = res.data
+      console.log('chattext', text)
       const reqTale = {
         text: { text: data.question.text },
         mine: true,
@@ -72,7 +81,7 @@ const smart = {
         img: logoPng
       }
       const resTale = {
-        text: { text: linebreakFormat(text) },
+        text: { text: text },
         mine: false,
         name: 'coin小助手',
         img: coinPng
@@ -94,6 +103,14 @@ const smart = {
       commit('setRelationQueryGraphData', graphData)
       return Promise.resolve(graphData)
     },
+    smartDialogueQuery: async ({ commit }, data) => {
+      const res = await api.askQuestion(data)
+      console.log('smartDialogueQuery', res)
+      const { graph, text } = res.data
+      commit('setDialogueQueryGraphData', graph)
+      commit('setDialogueAnswer', text)
+      return Promise.resolve(graph)
+    },
     getRelationNames: async ({ commit }, projectId) => {
       const res = await api.getRelations(projectId)
       // console.log('getRelationNames', res)
@@ -107,7 +124,9 @@ const smart = {
     relationQueryQues: state => state.relationQueryQues,
     entityQueryGraphData: state => state.entityQueryGraphData,
     relationQueryGraphData: state => state.relationQueryGraphData,
-    relationNames: state => state.relationNames
+    relationNames: state => state.relationNames,
+    dialogueQueryGraphData: state => state.dialogueQueryGraphData,
+    dialogueAnswer: state => state.dialogueAnswer
   }
 }
 
