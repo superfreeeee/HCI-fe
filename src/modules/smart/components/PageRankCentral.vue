@@ -1,10 +1,41 @@
 <template>
-  <div class="pagerankC">pagerankC</div>
+  <div class="pagerankC">
+    <el-collapse v-model="activeNames" @change="handleChange">
+      <el-collapse-item
+        v-for="item in pageRankCentralData"
+        :key="item.group"
+        :title="item.group"
+      >
+        <el-table :data="item.items" style="width: 100%">
+          <el-table-column prop="rank" label="排名"></el-table-column>
+          <el-table-column prop="nodeId" label="nodeId"></el-table-column>
+          <el-table-column prop="name" label="名称"></el-table-column>
+          <el-table-column prop="score" label="得分"></el-table-column>
+        </el-table>
+      </el-collapse-item>
+    </el-collapse>
+  </div>
 </template>
 
 <script>
+import { mockPageRankCentral } from '../utils/data'
+
 export default {
   name: 'PageRankCentral',
+  data() {
+    return {
+      activeNames: '1',
+      pageRankCentralData: null,
+    }
+  },
+  mounted() {
+    this.pageRankCentralData = mockPageRankCentral
+  },
+  methods: {
+    handleChange(val) {
+      // console.log(val)
+    },
+  },
 }
 </script>
 
@@ -12,5 +43,6 @@ export default {
 .pagerankC {
   width: 100%;
   height: 100%;
+  overflow: scroll;
 }
 </style>
