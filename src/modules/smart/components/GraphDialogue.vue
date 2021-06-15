@@ -85,7 +85,6 @@ export default {
         projectId,
       }
       this.smartDialogueQuery(question).then((res) => {
-        console.log('ertyuiop', res)
         if (res.nodes.length === 0) {
           this.$message.warning('查无结果！')
         } else {

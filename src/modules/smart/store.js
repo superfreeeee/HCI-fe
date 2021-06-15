@@ -1,7 +1,6 @@
 import api from '@/api/dispatcher'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
-import { linebreakFormat } from './utils/function'
 
 const smart = {
   state: {
