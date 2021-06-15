@@ -2,6 +2,7 @@ import {
   responseItemTranformer,
   itemTransformer
 } from '@/modules/graph/utils/item'
+import { layoutsTransformer } from '../../modules/graph/utils/layout'
 
 export default {
   prefix: '/graph',
@@ -13,18 +14,7 @@ export default {
         mapper(data) {
           // console.log('origin', data)
           const { projectId, nodes, relations, layout } = data
-          const layouts = {}
-          layout.forEach(l => {
-            const layout = {
-              ...l,
-              nodes: l.nodes.map(node => ({
-                id: node.nodeId,
-                x: node.xaxis,
-                y: node.yaxis
-              }))
-            }
-            layouts[l.type] = layout
-          })
+          const layouts = layoutsTransformer(layout)
           return {
             projectId,
             nodes: nodes.map(n => responseItemTranformer('node', n)),

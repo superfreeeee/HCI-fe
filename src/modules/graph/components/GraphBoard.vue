@@ -5,6 +5,7 @@
 <script>
 import { mapActions } from 'vuex'
 import { deepCopy } from '../../../common/utils/object'
+import { consoleGroup } from '../../../common/utils/message'
 import config from '../utils/config'
 import { getGridLayout, calcScale } from '../utils/layout'
 
@@ -61,6 +62,12 @@ export default {
       this.nodes = [...nodes]
       this.links = [...links]
       this.layouts = deepCopy(layouts)
+
+      consoleGroup('mountGraphData', () => {
+        console.log('nodes:', this.nodes)
+        console.log('links:', this.links)
+        console.log('layouts:', this.layouts)
+      })
 
       this.init()
       this.flags.loaded = true
@@ -159,7 +166,9 @@ export default {
             .forceLink(links)
             .id(d => d.id)
             .distance(
-              d => (d.source.radius + d.target.radius) * 20 + baseRadius * 5
+              d =>
+                (Number(d.source.radius) + Number(d.target.radius)) * 20 +
+                baseRadius * 5
             )
         )
         .force(
@@ -652,6 +661,8 @@ export default {
         layouts.GRID.nodes = getGridLayout(nodes, config)
       }
       const layoutNodesMapper = {}
+      console.log('layouts:', layouts)
+      console.log('layoutMode:', layoutMode)
       layouts[layoutMode].nodes.forEach(({ id, x, y }) => {
         layoutNodesMapper[id] = { x, y }
       })

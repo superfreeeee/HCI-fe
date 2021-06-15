@@ -9,6 +9,22 @@ export const clearFixed = nodes => {
   return nodes.map(node => ({ ...node, fx: null, fy: null }))
 }
 
+export const layoutsTransformer = layoutsArr => {
+  const layouts = {}
+  layoutsArr.forEach(l => {
+    const layout = {
+      ...l,
+      nodes: l.nodes.map(node => ({
+        id: node.nodeId,
+        x: node.xaxis,
+        y: node.yaxis
+      }))
+    }
+    layouts[l.type] = layout
+  })
+  return layouts
+}
+
 const ascOrder = (x, y) => x - y
 
 // 计算排版模式布局
