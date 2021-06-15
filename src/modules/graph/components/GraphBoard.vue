@@ -63,11 +63,11 @@ export default {
       this.links = [...links]
       this.layouts = deepCopy(layouts)
 
-      consoleGroup('mountGraphData', () => {
-        console.log('nodes:', this.nodes)
-        console.log('links:', this.links)
-        console.log('layouts:', this.layouts)
-      })
+      // consoleGroup('mountGraphData', () => {
+      //   console.log('nodes:', this.nodes)
+      //   console.log('links:', this.links)
+      //   console.log('layouts:', this.layouts)
+      // })
 
       this.init()
       this.flags.loaded = true
@@ -848,7 +848,6 @@ export default {
         if (!e.active) simulation.alphaTarget(0.3).restart()
         setEnableFocus(false)
         if (flags.locked) {
-          console.log('target', d)
           const group = d.group
           nodes
             .filter(node => node.group === group)

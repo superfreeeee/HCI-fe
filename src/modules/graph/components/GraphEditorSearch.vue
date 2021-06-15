@@ -27,8 +27,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
-import { $notify } from '@/common/utils'
+import { mapGetters } from 'vuex'
 import {
   buildSearchHistoryKey,
   getSearchHistory,
@@ -40,8 +39,6 @@ import { debounceAndThrottle } from '../utils/function'
 function optionStr(option) {
   return `${typeMapper[option.type]} ${option.id}：${option.name}`
 }
-
-const toLowerCase = String.prototype.toLowerCase
 
 export default {
   name: 'GraphEditorSearch',
@@ -88,8 +85,11 @@ export default {
             String(id),
             name,
             group,
-            ...propNames.map(toLowerCase),
-            ...propNames.map(prop => props[prop]).map(toLowerCase)
+            ...propNames.map(prop => prop.toLowerCase()),
+            ...propNames
+              .map(prop => props[prop])
+              .filter(s => !!s)
+              .map(val => val.toLowerCase())
           ]
         }
         option.keys.push(optionStr(option).toLowerCase())

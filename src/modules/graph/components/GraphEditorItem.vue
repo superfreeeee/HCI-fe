@@ -307,6 +307,7 @@
 
 <script>
 import { mapActions } from 'vuex'
+import { deepCopy } from '../../../common/utils/object'
 export default {
   name: 'GraphEditorItem',
   props: {
@@ -378,28 +379,6 @@ export default {
     },
     createNew() {
       return !this.selectedItem.item.id
-    },
-    statisticsData() {
-      const nodes = this.graphData && this.graphData.nodes
-      const nodesScale = this.nodesScale
-      if (!nodes || !nodesScale) return []
-
-      const dataMapper = {}
-      nodes.forEach(({ group }) => {
-        if (!Reflect.has(dataMapper, group)) {
-          dataMapper[group] = 0
-        }
-        dataMapper[group]++
-      })
-      const data = Reflect.ownKeys(dataMapper).map(group => ({
-        name: group,
-        value: dataMapper[group],
-        itemStyle: {
-          color: nodesScale(group)
-        }
-      }))
-      data.sort(({ name: x }, { name: y }) => (x < y ? -1 : x === y ? 0 : 1))
-      return data
     },
     primaryButton() {
       return !this.createNew
@@ -488,8 +467,8 @@ export default {
       // console.log('selectNode', newNode)
 
       this.selectedItem.type = 'node'
-      this.selectedItem.item = { ...newNode }
-      this.originItem = newNode
+      this.selectedItem.item = newNode
+      this.originItem = deepCopy(newNode)
       this.editable = false
       this.useGroupColor = !node.color
     },
@@ -498,8 +477,8 @@ export default {
       // console.log('selectLink', link)
 
       this.selectedItem.type = 'link'
-      this.selectedItem.item = { ...newLink }
-      this.originItem = newLink
+      this.selectedItem.item = newLink
+      this.originItem = deepCopy(newLink)
       this.editable = false
       this.useGroupColor = true
     },
@@ -601,7 +580,7 @@ export default {
     cancel() {
       this.editable = false
       // reset attribute
-      this.selectedItem.item = { ...this.originItem }
+      this.selectedItem.item = deepCopy(this.originItem)
     },
     validate() {
       return new Promise(resolve => {
