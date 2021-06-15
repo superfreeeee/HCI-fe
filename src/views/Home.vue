@@ -8,8 +8,10 @@
       >
         <el-menu-item index="1">我的项目</el-menu-item>
         <el-menu-item index="2">广场</el-menu-item>
+        <el-menu-item index="3">co$in手册</el-menu-item>
       </el-menu>
-      <h1>欢迎使用 co$in</h1>
+      <h1 v-if="this.activeIndex !== '3'">欢迎使用 co$in</h1>
+      <h1 v-else>co$in 使用说明手册</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
@@ -50,7 +52,7 @@
       >
       </el-pagination>
     </div>
-    <div class="list" v-else>
+    <div class="list" v-if="this.activeIndex === '2'">
       <el-button
         v-for="project in allProjects"
         :key="project.projectId"
@@ -69,6 +71,9 @@
       >
       </el-pagination>
     </div>
+    <div class="tutorial" v-if="this.activeIndex === '3'">
+      <Tutorial />
+    </div>
     <NewProjectPanel />
   </div>
 </template>
@@ -76,11 +81,13 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import NewProjectPanel from '../modules/home/components/NewProjectPanel'
+import Tutorial from '../modules/home/components/Tutorial'
 
 export default {
   name: 'Home',
   components: {
     NewProjectPanel,
+    Tutorial,
   },
   data() {
     return {
@@ -207,5 +214,10 @@ export default {
   align-items: center;
   justify-content: center;
   width: 400px;
+}
+
+.box > .tutorial {
+  width: 100%;
+  height: 100%;
 }
 </style>
