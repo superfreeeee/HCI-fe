@@ -1,7 +1,6 @@
-import {
-  responseItemTranformer,
-} from '@/modules/graph/utils/item'
-import { linebreakFormat } from '../../modules/smart/utils/function'
+// import { responseItemTranformer } from '@/modules/graph/utils/item'
+import { graphDataTransformer } from '@/modules/graph/utils/data'
+import { linebreakFormat } from '@/modules/smart/utils/function'
 
 export default {
   prefix: '/app',
@@ -18,16 +17,9 @@ export default {
         method: 'POST',
         data: question,
         mapper(data) {
-          const { projectId, nodes, relations, layout } = data.graph
-          const text = data.text
           return {
-            graph: {
-              projectId,
-              nodes: nodes.map(n => responseItemTranformer('node', n)),
-              links: relations.map(r => responseItemTranformer('link', r)),
-              layouts: layout
-            },
-            text: linebreakFormat(text)
+            graph: graphDataTransformer(data.graph),
+            text: linebreakFormat(data.text)
           }
         }
       }
@@ -44,13 +36,7 @@ export default {
         method: 'POST',
         data: question,
         mapper(data) {
-          const { projectId, nodes, relations, layout } = data
-          return {
-            projectId,
-            nodes: nodes.map(n => responseItemTranformer('node', n)),
-            links: relations.map(r => responseItemTranformer('link', r)),
-            layouts: layout
-          }
+          return graphDataTransformer(data)
         }
       }
     },
@@ -60,13 +46,7 @@ export default {
         method: 'POST',
         data: question,
         mapper(data) {
-          const { projectId, nodes, relations, layout } = data
-          return {
-            projectId,
-            nodes: nodes.map(n => responseItemTranformer('node', n)),
-            links: relations.map(r => responseItemTranformer('link', r)),
-            layouts: layout
-          }
+          return graphDataTransformer(data)
         }
       }
     },
