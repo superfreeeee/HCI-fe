@@ -22,8 +22,8 @@
       <el-tab-pane label="关系查询" :name="relationQueryName">
         <RelationQuery v-if="show.relationQuery" />
       </el-tab-pane>
-      <el-tab-pane label="实体识别" :name="entityIdentifyName">
-        <EntityIdentify v-if="show.entityIdentify" />
+      <el-tab-pane label="中心识别" :name="pageRankCentralName">
+        <PageRankCentral v-if="show.pageRankCentral" />
       </el-tab-pane>
     </el-tabs>
   </div>
@@ -33,14 +33,14 @@
 import GraphDialogue from '../modules/smart/components/GraphDialogue.vue'
 import EntityQuery from '../modules/smart/components/EntityQuery.vue'
 import RelationQuery from '../modules/smart/components/RelationQuery.vue'
-import EntityIdentify from '../modules/smart/components/EntityIdentify.vue'
+import PageRankCentral from '../modules/smart/components/PageRankCentral.vue'
 
 export default {
   components: {
     GraphDialogue,
     EntityQuery,
     RelationQuery,
-    EntityIdentify,
+    PageRankCentral,
   },
   name: 'Smarthelper',
   data() {
@@ -49,12 +49,12 @@ export default {
       graphDialogueName: 'graphDialogue',
       entityQueryName: 'entityQuery',
       relationQueryName: 'relationQuery',
-      entityIdentifyName: 'entityIdentify',
+      pageRankCentralName: 'pageRankCentral',
       show: {
         graphDialogue: true,
         entityQuery: false,
         relationQuery: false,
-        entityIdentify: false,
+        pageRankCentral: false,
       },
     }
   },
