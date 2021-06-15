@@ -6,3 +6,11 @@ export const linebreakFormat = text => {
   }
   return text
 }
+
+export const adapter = adaptee => {
+  const target = []
+  adaptee.forEach(value => {
+    target.push({ value })
+  })
+  return target
+}

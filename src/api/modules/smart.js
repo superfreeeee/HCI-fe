@@ -55,6 +55,12 @@ export default {
         path: `/relationNames/${projectId}`,
         method: 'GET'
       }
+    },
+    getHotQuestions(projectId) {
+      return {
+        path: `/hotQuestion/${projectId}`,
+        method: 'GET'
+      }
     }
   }
 }

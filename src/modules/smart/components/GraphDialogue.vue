@@ -9,10 +9,11 @@
         图谱问答
       </span>
       <div class="input">
-        <el-input
+        <el-autocomplete
           placeholder="请输入问题"
           v-model="graphDialogueinput"
           clearable
+          :fetch-suggestions="recommendQues"
           style="width: 100%"
         >
           <el-button
@@ -20,7 +21,7 @@
             icon="el-icon-search"
             @click="graphDialogueSearch()"
           ></el-button>
-        </el-input>
+        </el-autocomplete>
       </div>
     </div>
     <div class="answer">
@@ -52,9 +53,12 @@ export default {
     return {
       graphDialogueinput: '',
       graphData: null,
+      recommendHotQues: [],
     }
   },
   mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    this.getHotQuestionList(projectId)
     this.graphDialogueinput = this.graphDialogueQues
     if (!this.dialogueQueryGraphData) {
       return
@@ -67,11 +71,16 @@ export default {
       'graphDialogueQues',
       'dialogueQueryGraphData',
       'dialogueAnswer',
+      'hotQuestions',
     ]),
   },
   methods: {
     ...mapMutations(['setGraphDialogueQues']),
-    ...mapActions(['getProjectInfo', 'smartDialogueQuery']),
+    ...mapActions([
+      'getProjectInfo',
+      'smartDialogueQuery',
+      'getHotQuestionList',
+    ]),
     renderGraph() {
       this.graphData = this.dialogueQueryGraphData
       const graphDialogueBoard = this.$refs.graphDialogueBoard
@@ -91,6 +100,10 @@ export default {
           this.renderGraph()
         }
       })
+    },
+    recommendQues(queryString, cb) {
+      this.recommendHotQues = this.hotQuestions
+      cb(this.recommendHotQues)
     },
   },
   // async mounted() {

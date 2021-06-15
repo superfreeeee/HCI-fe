@@ -1,6 +1,7 @@
 import api from '@/api/dispatcher'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
+import { adapter } from './utils/function'
 
 const smart = {
   state: {
@@ -24,7 +25,8 @@ const smart = {
     relationQueryGraphData: null,
     dialogueQueryGraphData: null,
     relationNames: [],
-    dialogueAnswer: ''
+    dialogueAnswer: '',
+    hotQuestions: []
   },
   mutations: {
     setTaleList(state, data) {
@@ -57,6 +59,9 @@ const smart = {
     },
     setDialogueAnswer(state, data) {
       state.dialogueAnswer = data
+    },
+    setHotQuestions(state, data) {
+      state.hotQuestions = data
     }
   },
   actions: {
@@ -114,6 +119,12 @@ const smart = {
       const res = await api.getRelations(projectId)
       // console.log('getRelationNames', res)
       commit('setRelationNames', res.data)
+    },
+    getHotQuestionList: async ({ commit }, projectId) => {
+      const res = await api.getHotQuestions(projectId)
+      // console.log('getHotQuestionList', res)
+      const hotListTarget = adapter(res.data)
+      commit('setHotQuestions', hotListTarget)
     }
   },
   getters: {
@@ -125,7 +136,8 @@ const smart = {
     relationQueryGraphData: state => state.relationQueryGraphData,
     relationNames: state => state.relationNames,
     dialogueQueryGraphData: state => state.dialogueQueryGraphData,
-    dialogueAnswer: state => state.dialogueAnswer
+    dialogueAnswer: state => state.dialogueAnswer,
+    hotQuestions: state => state.hotQuestions
   }
 }
 
