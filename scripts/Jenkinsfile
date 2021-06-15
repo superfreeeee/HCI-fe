@@ -8,7 +8,7 @@ node {
     sh 'cnpm install'
   }
   stage('build') {
-    sh "npm run build"
+    sh "yarn build"
   }   
   stage('Deploy') {
       sh "/bin/bash '${workspace}/scripts/deploy.sh' ${workspace}"
