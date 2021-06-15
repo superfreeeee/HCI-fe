@@ -1,8 +1,4 @@
-import {
-  responseItemTranformer,
-  itemTransformer
-} from '@/modules/graph/utils/item'
-import { layoutsTransformer } from '../../modules/graph/utils/layout'
+import { graphDataTransformer } from '../../modules/graph/utils/data'
 
 export default {
   prefix: '/graph',
@@ -11,17 +7,7 @@ export default {
     getGraphByProjectId(projectId) {
       return {
         path: `/${projectId}`,
-        mapper(data) {
-          // console.log('origin', data)
-          const { projectId, nodes, relations, layout } = data
-          const layouts = layoutsTransformer(layout)
-          return {
-            projectId,
-            nodes: nodes.map(n => responseItemTranformer('node', n)),
-            links: relations.map(r => responseItemTranformer('link', r)),
-            layouts
-          }
-        }
+        mapper: graphDataTransformer
       }
     },
 

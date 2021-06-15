@@ -1,3 +1,6 @@
+import { responseItemTranformer } from './item'
+import { layoutsTransformer } from './layout'
+
 export const _projectInfo = {
   projectId: 3,
   name: '国家知识图谱',
@@ -294,4 +297,16 @@ export const _graphData = {
       nodes: []
     }
   ]
+}
+
+export const graphDataTransformer = data => {
+  // console.log('origin', data)
+  const { projectId, nodes, relations, layout } = data
+  const layouts = layoutsTransformer(layout)
+  return {
+    projectId,
+    nodes: nodes.map(n => responseItemTranformer('node', n)),
+    links: relations.map(r => responseItemTranformer('link', r)),
+    layouts
+  }
 }
