@@ -1,102 +1,79 @@
 <template>
-  <div class="layout">
-    <h3>布局设置</h3>
-    <div class="modes">
-      <el-button
-        v-for="mode in modes"
-        :key="mode.label"
-        :type="mode.type"
-        :plain="mode.mode !== graphBoardMode"
-        size="large"
-        @click="switchMode($event, mode)"
-        >{{ mode.label }}</el-button
-      >
-    </div>
-    <div class="actions">
-      <el-button
-        v-for="action in actions"
-        :key="action.label"
-        size="medium"
-        type="info"
-        round
-        @click="action.handler"
-        >{{ action.label }}</el-button
-      >
-    </div>
+  <div class="container">
+    <el-button
+      v-for="action in actions"
+      :key="action.label"
+      :type="action.type"
+      :plain="action.mode && layoutMode !== action.mode"
+      size="medium"
+      @click="buttonHandlerWrapper($event, action.handler)"
+      >{{ action.label }}</el-button
+    >
   </div>
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex'
 import { buttonAutoBlur } from '@/common/utils'
-import { layoutModes } from '../utils/layout'
 
 export default {
   name: 'GraphLayout',
+  props: {
+    layoutMode: {
+      type: String
+    }
+  },
   data() {
     return {
-      modes: layoutModes,
       actions: [
         {
+          label: '力导图模式',
+          mode: 'FORCE',
+          type: 'primary',
+          handler: () => this.$emit('graph-action', 'switchLayout', 'FORCE')
+        },
+        {
+          label: '排版模式',
+          mode: 'GRID',
+          type: 'danger',
+          handler: () => this.$emit('graph-action', 'switchLayout', 'GRID')
+        },
+        {
+          label: '定点模式',
+          mode: 'FIXED',
+          type: 'warning',
+          handler: () => this.$emit('graph-action', 'switchLayout', 'FIXED')
+        },
+        {
           label: '保存布局',
-          handler: () => this.saveLayout()
+          type: 'info',
+          handler: () => this.$emit('graph-action', 'saveLayout')
         },
         {
           label: '恢复布局',
-          handler: () => this.restoreLayout()
+          type: 'info',
+          handler: () => this.$emit('graph-action', 'restoreLayout')
         }
       ]
     }
   },
-  computed: {
-    ...mapGetters(['graphBoardMode'])
-  },
   methods: {
-    ...mapActions(['switchLayoutMode', 'saveLayout', 'restoreLayout']),
-    switchMode(e, { mode }) {
+    buttonHandlerWrapper(e, handler) {
       buttonAutoBlur(e)
-      if (mode !== this.graphBoardMode) {
-        this.switchLayoutMode(mode)
-      }
+      handler()
     }
   }
 }
 </script>
 
 <style scoped>
-.layout {
-  background-color: #fff;
-  position: absolute;
-  left: 50%;
-  top: 0;
-  padding: 0 5px 5px;
-  transform: translate(-50%, 0);
-  border: 1px groove;
-  border-top: none;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+.container {
+  width: 100%;
+  height: 100%;
 }
-h3 {
-  position: sticky;
-  top: 0;
-  background-color: #fff;
-  text-align: center;
-  padding-top: 5px;
-  margin: 0;
-  border-bottom: 1px solid #bbbbbb;
-}
-.modes {
-  display: flex;
-  justify-content: center;
-  /* gap: 5px; */
-  cursor: pointer;
-}
-.actions {
-  display: flex;
-  justify-content: center;
-}
-.actions > * {
-  flex: 1;
+
+.el-button {
+  margin: unset;
+  margin-bottom: 10px;
+  width: 100%;
 }
 </style>

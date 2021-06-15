@@ -3,40 +3,22 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 export default {
   name: 'GraphEditorStatistics',
+  props: {
+    statisticsData: {
+      type: Array
+    }
+  },
   data() {
     return {
       container: null,
       chart: null
     }
   },
-  computed: {
-    ...mapGetters(['graphNodes', 'graphBoardColorMapper']),
-    statisticsData() {
-      const { graphNodes, graphBoardColorMapper } = this
-      const dataMapper = {}
-      graphNodes.forEach(({ group }) => {
-        if (!Reflect.has(dataMapper, group)) {
-          dataMapper[group] = 1
-        } else {
-          dataMapper[group]++
-        }
-      })
-      const data = Reflect.ownKeys(dataMapper).map(group => ({
-        name: group,
-        value: dataMapper[group],
-        itemStyle: {
-          color: graphBoardColorMapper[group]
-        }
-      }))
-      data.sort(({ name: x }, { name: y }) => (x < y ? -1 : x === y ? 0 : 1))
-      return data
-    }
-  },
   watch: {
-    graphNodes() {
+    statisticsData() {
+      console.log('draw statisticsData', this.statisticsData)
       this.draw()
     }
   },
@@ -86,7 +68,6 @@ export default {
     const chart = this.$echarts.init(container)
     this.container = container
     this.chart = chart
-
     this.draw()
   }
 }

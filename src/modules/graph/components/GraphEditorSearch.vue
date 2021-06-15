@@ -1,124 +1,182 @@
 <template>
-  <el-autocomplete
-    style="width: 100%"
-    ref="searchInput"
-    clearable
-    placeholder="搜索实体（输入 id / 实体名称）"
-    :fetch-suggestions="queryNodes"
-    v-model="searchNodeName"
-    @select="searchNode"
-  >
-    <el-button
-      slot="append"
-      icon="el-icon-search"
-      @click="searchNode"
-    ></el-button>
-  </el-autocomplete>
+  <div>
+    <div class="title">
+      <h3>图谱搜索</h3>
+      <el-button type="danger" size="medium" @click="clearHistory">
+        清除搜索记录
+        <i class="el-icon-delete"></i>
+      </el-button>
+    </div>
+    <el-autocomplete
+      style="width: 100%"
+      ref="searchInput"
+      clearable
+      placeholder="搜索关键字(实体id/名称/关系)"
+      :fetch-suggestions="queryNodes"
+      v-model="searchNodeName"
+      @select="dSearch(true)"
+      @input="dtSearch(false)"
+    >
+      <el-button
+        slot="append"
+        icon="el-icon-search"
+        @click="dSearch(true)"
+      ></el-button>
+    </el-autocomplete>
+  </div>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex'
 import { $notify } from '@/common/utils'
-import { getSearchHistory, setSearchHistory } from '../utils/search'
+import {
+  buildSearchHistoryKey,
+  getSearchHistory,
+  setSearchHistory
+} from '../utils/search'
+import { typeMapper } from '../utils/item'
+import { debounceAndThrottle } from '../utils/function'
+
+function optionStr(option) {
+  return `${typeMapper[option.type]} ${option.id}：${option.name}`
+}
+
+const toLowerCase = String.prototype.toLowerCase
 
 export default {
   name: 'GraphEditorSearch',
+  props: {
+    projectId: {
+      type: Number
+    },
+    nodes: {
+      type: Array
+    },
+    links: {
+      type: Array
+    }
+  },
   data() {
     return {
       searchNodeName: '',
-      searchHistory: []
+      dtSearch: () => {},
+      dSearch: () => {},
+      history: {
+        key: '',
+        list: []
+      }
     }
   },
   computed: {
-    ...mapGetters(['graphNodes', 'userId', 'projectId']),
-    graphNodesOption() {
-      const { graphNodes, searchHistory, suggestHistory } = this
-      const appearedIds = new Set(
-        searchHistory.map(name => Number(name.split('：')[0]))
-      )
-      console.log('appearedIds', appearedIds)
-      const options = graphNodes
-        .filter(({ id }) => !appearedIds.has(id))
-        .map(({ id, name }) => ({
+    ...mapGetters(['userId']),
+    suggestOptions() {
+      const { nodes, links } = this
+      // console.log('nodes', nodes)
+      // console.log('links', links)
+
+      const options = []
+      nodes.forEach(node => {
+        const { id, name, group, properties: props } = node
+        const propNames = Reflect.ownKeys(props).filter(
+          prop => prop !== '__ob__'
+        )
+        const option = {
+          type: 'node',
           id,
-          value: `${id}：${name}`
-        }))
-      options.sort(({ id: x }, { id: y }) => x - y)
-      return suggestHistory.concat(options)
-    },
-    suggestHistory() {
-      return this.searchHistory.map(name => {
-        const [id] = name.split('：')
-        return { id: Number(id), value: name }
+          name,
+          keys: [
+            String(id),
+            name,
+            group,
+            ...propNames.map(toLowerCase),
+            ...propNames.map(prop => props[prop]).map(toLowerCase)
+          ]
+        }
+        option.keys.push(optionStr(option).toLowerCase())
+
+        options.push(option)
       })
+      return options
+    },
+    historyInputs() {
+      return this.history.list.map(value => ({ value }))
     }
   },
   methods: {
-    ...mapActions(['editorSelect']),
-    queryNodes(inputName, cb) {
-      const { graphNodesOption } = this
+    queryNodes(input, cb) {
+      const suggestions = this.getSuggestions(input)
+        .map(option => ({
+          value: optionStr(option)
+        }))
+        .filter(({ value }) => !this.history.list.includes(value))
+      return cb(this.historyInputs.concat(suggestions))
+    },
+    getSuggestions(input) {
+      const options = this.suggestOptions
+      // console.log('options', options)
 
-      let inputId = inputName
-      if (inputName.indexOf('：') >= 0) {
-        inputId = Number(inputName.substring(0, inputName.indexOf('：')))
-        inputName = inputName.substring(inputName.indexOf('：') + 1)
-      }
-      const suggestNodes = inputName
-        ? graphNodesOption.filter(({ value }) => {
-            const [id, name] = value.toLowerCase().split('：')
-            return (
-              id.indexOf(inputId) === 0 ||
-              name.indexOf(inputName.toLowerCase()) === 0
-            )
-          })
-        : graphNodesOption
-      return cb(suggestNodes)
+      const target = input.toLowerCase()
+
+      const suggestion = options.filter(({ keys }) => {
+        // console.log('keys', keys)
+        return keys.some(key => key.includes(target))
+      })
+      return suggestion
     },
-    searchNode() {
-      const { searchNodeName, editorSelect, updateSearchHistory } = this
-      if (searchNodeName.indexOf('：') >= 0 || !isNaN(Number(searchNodeName))) {
-        const [id] = searchNodeName.split('：')
-        editorSelect({ type: 'node', id: Number(id) })
-        updateSearchHistory()
-      } else {
-        $notify({
-          title: '请输入 id 或从搜索推荐内选择',
-          type: 'warning'
-        })
+    search(jump = false) {
+      const { searchNodeName, getSuggestions, updateHistory } = this
+      const suggestions = getSuggestions(searchNodeName)
+      // console.log('searchNodeName', searchNodeName)
+      // console.log('suggestions', suggestions)
+
+      if (suggestions.length > 0) {
+        updateHistory(searchNodeName)
       }
-      this.$refs.searchInput.activated = false
+
+      const highLightNodeIds = searchNodeName
+        ? suggestions.filter(i => i.type === 'node').map(i => i.id)
+        : []
+      // console.log('highLightNodeIds', highLightNodeIds)
+      if (highLightNodeIds.length === 1 && jump) {
+        // console.log('single selection')
+        const nodeId = highLightNodeIds[0]
+        this.$emit('graph-action', 'selectNode', nodeId)
+
+        const node = this.nodes.filter(node => node.id === nodeId)[0]
+        this.$emit('editor-action', 'selectNode', node)
+      } else {
+        // console.log('multiple selection')
+        this.$emit('graph-action', 'highLightMultiple', highLightNodeIds)
+      }
     },
-    updateSearchHistory() {
-      const {
-        graphNodes,
-        searchNodeName,
-        searchHistory,
-        userId,
-        projectId
-      } = this
-      if (searchHistory.includes(searchNodeName)) {
-        searchHistory.splice(searchHistory.indexOf(searchNodeName), 1)
+    updateHistory(input) {
+      const { list, key } = this.history
+      if (!list.includes(input)) {
+        list.push(input)
+        setSearchHistory(key, list)
       }
-      searchHistory.unshift(searchNodeName)
-      if (searchHistory.length > graphNodes.length) {
-        const currentIds = new Set(graphNodes.map(node => node.id))
-        const newHistory = searchHistory.filter(name =>
-          currentIds.has(Number(name.split('：')[0]))
-        )
-        setSearchHistory(userId, projectId, newHistory)
-      } else {
-        setSearchHistory(userId, projectId, searchHistory)
-      }
+    },
+    clearHistory() {
+      const list = (this.history.list = [])
+      setSearchHistory(this.history.key, list)
     }
   },
   mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    const { userId } = this
-    this.searchHistory = getSearchHistory(userId, projectId) || []
-    console.log(
-      `search history, userId:${userId}, projectId:${projectId}`,
-      this.searchHistory
-    )
+    const { search, userId, projectId, history } = this
+    let key
+    this.dtSearch = debounceAndThrottle(search, 500, 1000)
+    this.dSearch = debounceAndThrottle(search, 1000, 0)
+    history.key = key = buildSearchHistoryKey(userId, projectId)
+    history.list = getSearchHistory(key)
+    // console.log('history', history)
   }
 }
 </script>
+
+<style scoped>
+.title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>

@@ -1,8 +1,21 @@
 <template>
   <div class="box">
     <div class="title">
+      <el-menu
+        :default-active="activeIndex"
+        mode="horizontal"
+        @select="handleSelect"
+      >
+        <el-menu-item index="1">我的项目</el-menu-item>
+        <el-menu-item index="2">广场</el-menu-item>
+      </el-menu>
       <h1>欢迎使用 co$in</h1>
-      <el-button icon="el-icon-plus" class="add" @click="createNewGraph()">
+      <el-button
+        icon="el-icon-plus"
+        class="add"
+        @click="createNewGraph()"
+        v-if="activeIndex === '1'"
+      >
         新建项目
       </el-button>
       <el-popover placement="bottom" trigger="click" class="user">
@@ -18,16 +31,44 @@
         ></el-button>
       </el-popover>
     </div>
-    <el-button
-      v-for="project in ownProjects"
-      :key="project.projectId"
-      type="primary"
-      style="width: 30%; margin: 0 0 15px 0"
-      round
-      @click="gotoProject(project.projectId)"
-    >
-      项目：{{ project.name }}
-    </el-button>
+    <div class="list" v-if="this.activeIndex === '1'">
+      <el-button
+        v-for="project in ownProjects"
+        :key="project.projectId"
+        type="primary"
+        style="width: 100%; margin: 0 0 15px 0"
+        round
+        @click="gotoProject(project.projectId)"
+      >
+        项目：{{ project.name }}
+      </el-button>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="ownListCount"
+        @current-change="switchPageOwn"
+        :current-page="ownPageNo"
+      >
+      </el-pagination>
+    </div>
+    <div class="list" v-else>
+      <el-button
+        v-for="project in allProjects"
+        :key="project.projectId"
+        type="primary"
+        style="width: 100%; margin: 0 0 15px 0"
+        round
+        @click="gotoProject(project.projectId)"
+      >
+        项目：{{ project.name }}
+      </el-button>
+      <el-pagination
+        layout="prev, pager, next"
+        :total="allListCount"
+        @current-change="switchPageAll"
+        :current-page="allPageNo"
+      >
+      </el-pagination>
+    </div>
     <NewProjectPanel />
   </div>
 </template>
@@ -39,17 +80,44 @@ import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel
+    NewProjectPanel,
   },
   data() {
-    return {}
+    return {
+      activeIndex: '1',
+      userId: null,
+    }
   },
   computed: {
-    ...mapGetters(['ownProjects', 'projectId', 'userInfo', 'showCreatePanel'])
+    ...mapGetters([
+      'ownProjects',
+      'projectId',
+      'userInfo',
+      'showCreatePanel',
+      'allProjects',
+      'allPageNo',
+      'allListCount',
+      'ownProjects',
+      'ownPageNo',
+      'ownListCount',
+    ]),
   },
   methods: {
-    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
-    ...mapActions(['getListByUserId', 'userLogout', 'getUserInfo']),
+    ...mapMutations([
+      'setGraphProjectId',
+      'setShowCreatePanel',
+      'setAllPageNo',
+      'setOwnPageNo',
+    ]),
+    ...mapActions([
+      // 'getListByUserId',
+      'userLogout',
+      'getUserInfo',
+      'getAllListByPageNo',
+      'getOwnListByPageNo',
+      'getAllListAmount',
+      'getOwnListAmount',
+    ]),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
     },
@@ -59,19 +127,41 @@ export default {
     logout() {
       localStorage.removeItem('coin-token')
       this.$router.push('/user')
-    }
+    },
+    handleSelect(key) {
+      this.activeIndex = key
+    },
+    switchPageOwn(currPageNo) {
+      this.setOwnPageNo(currPageNo)
+      this.getOwnListByPageNo({
+        userId: this.userId,
+        pageNo: this.ownPageNo,
+      })
+    },
+    switchPageAll(currPageNo) {
+      // console.log('switchPage', currPageNo)
+      this.setAllPageNo(currPageNo)
+      this.getAllListByPageNo(currPageNo)
+    },
   },
   mounted() {
-    this.getUserInfo().then(success => {
+    this.getUserInfo().then((success) => {
       if (success) {
-        this.getListByUserId(this.userInfo.id)
+        this.userId = this.userInfo.id
+        this.getOwnListAmount(this.userId)
+        this.getAllListAmount()
+        this.getOwnListByPageNo({
+          userId: this.userId,
+          pageNo: this.ownPageNo,
+        })
+        this.getAllListByPageNo(this.allPageNo)
       }
     })
-  }
+  },
 }
 </script>
 
-<style scoped>
+<style>
 .box {
   display: flex;
   flex-direction: column;
@@ -87,6 +177,7 @@ export default {
 .box > .title {
   position: sticky;
   width: 100%;
+  height: 23%;
   top: 0;
   background-color: #ffffff;
 }
@@ -99,7 +190,7 @@ export default {
 
 .box > .title > .user {
   position: fixed;
-  top: 25px;
+  top: 15px;
   right: 50px;
 }
 
@@ -108,5 +199,13 @@ export default {
   border-bottom: 1px solid black;
   padding-bottom: 5px;
   margin-bottom: 5px;
+}
+
+.box > .list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 400px;
 }
 </style>

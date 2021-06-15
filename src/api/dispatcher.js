@@ -2,9 +2,12 @@ import axios from './axios'
 import graph from './modules/graph'
 import project from './modules/project'
 import user from './modules/user'
+import smart from './modules/smart'
+
+const registerSymbol = Symbol('dispatcher register')
 
 class APIDispatcher {
-  register({ prefix, configs = {} }) {
+  [registerSymbol]({ prefix, configs = {} }) {
     for (const name of Reflect.ownKeys(configs)) {
       const fn = configs[name]
       const request = (...args) => {
@@ -33,8 +36,9 @@ class APIDispatcher {
 }
 
 const dispatcher = new APIDispatcher()
-dispatcher.register(graph)
-dispatcher.register(project)
-dispatcher.register(user)
+dispatcher[registerSymbol](graph)
+dispatcher[registerSymbol](project)
+dispatcher[registerSymbol](user)
+dispatcher[registerSymbol](smart)
 
 export default dispatcher

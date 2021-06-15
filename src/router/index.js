@@ -42,6 +42,22 @@ const router = new Router({
       }
     },
     {
+      path: '/chat/:projectId',
+      name: 'Chat',
+      component: () => import('@/views/Chat.vue'),
+      meta: {
+        requireLogin: true
+      }
+    },
+    {
+      path: '/smarthelper/:projectId',
+      name: 'Smarthelper',
+      component: () => import('@/views/Smarthelper.vue'),
+      meta: {
+        requireLogin: true
+      }
+    },
+    {
       path: '/notfound',
       name: 'Notfound',
       component: () => import('@/views/Notfound.vue')

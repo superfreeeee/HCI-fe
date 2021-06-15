@@ -33,11 +33,31 @@ export const typeMapper = {
 // d3 item 转 后端 item
 export const itemTransformer = (type, item, projectId) => {
   return {
-    node({ id: nodeId, ...rest }) {
-      return { projectId, nodeId, ...rest }
+    node({ id: nodeId, properties, ...rest }) {
+      return {
+        projectId,
+        nodeId,
+        properties: transformProperties(properties),
+        ...rest
+      }
     },
-    link({ name, id: relationId, from: source, to: target, value: width }) {
-      return { projectId, relationId, name, source, target, width }
+    link({
+      name,
+      id: relationId,
+      from: source,
+      to: target,
+      value: width,
+      properties
+    }) {
+      return {
+        projectId,
+        relationId,
+        name,
+        source,
+        target,
+        width,
+        properties: transformProperties(properties)
+      }
     }
   }[type](item)
 }
@@ -52,6 +72,14 @@ export const responseItemTranformer = (type, item) => {
       return { name, id, source, target, value, from: source, to: target }
     }
   }[type](item)
+}
+
+export const transformProperties = propsList => {
+  const props = {}
+  for (const { name, value } of propsList) {
+    props[name] = value
+  }
+  return props
 }
 
 // 转换格式

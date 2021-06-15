@@ -1,18 +1,18 @@
 <template>
   <div>
-    <h4>实体类型</h4>
+    <h4>查看实体类型</h4>
     <el-checkbox
       :indeterminate="isIndeterminate"
-      :value="checkAll"
-      @change="changeAll"
+      :value="selectAll"
+      @change="selectAllChange"
       >全选</el-checkbox
     >
-    <el-checkbox-group :value="graphBoardGroups">
+    <el-checkbox-group :value="selectedGroups">
       <el-checkbox
-        v-for="group in graphNodeGroups"
+        v-for="group in sortedGroups"
         :key="group"
         :label="group"
-        @change="changeSingle(group)"
+        @change="toggleGroup(group)"
         >{{ group }}</el-checkbox
       >
     </el-checkbox-group>
@@ -20,35 +20,52 @@
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'GraphEditorGroup',
+  props: {
+    groups: {
+      type: Array
+    }
+  },
+  data() {
+    return {
+      selectedGroups: [],
+      selectAll: false
+    }
+  },
   computed: {
-    ...mapGetters(['graphBoardGroups', 'graphNodeGroups']),
-    checkAll() {
-      const { graphBoardGroups, graphNodeGroups } = this
-      return graphBoardGroups.length === graphNodeGroups.length
+    sortedGroups() {
+      // console.log('groups update', this.groups)
+      const newGroups = this.groups.sort((g1, g2) =>
+        g1 < g2 ? -1 : g1 === g2 ? 0 : 1
+      )
+      this.selectedGroups = this.groups.slice()
+      this.selectAll = true
+      return newGroups
     },
     isIndeterminate() {
-      const { graphBoardGroups, checkAll } = this
-      return graphBoardGroups.length > 0 && !checkAll
+      const { selectedGroups, selectAll } = this
+      return selectedGroups.length > 0 && !selectAll
+    }
+  },
+  watch: {
+    selectedGroups(groups) {
+      this.$emit('graph-action', 'selectGroups', groups.slice())
     }
   },
   methods: {
-    ...mapMutations(['setGraphBoardGroups']),
-    changeAll(bool) {
-      const { setGraphBoardGroups, graphNodeGroups } = this
-      const groups = bool ? graphNodeGroups : []
-      setGraphBoardGroups(groups)
-    },
-    changeSingle(group) {
-      const groups = [...this.graphBoardGroups]
-      if (groups.indexOf(group) >= 0) {
-        groups.splice(groups.indexOf(group), 1)
+    toggleGroup(group) {
+      const { selectedGroups, sortedGroups } = this
+      if (selectedGroups.includes(group)) {
+        selectedGroups.splice(selectedGroups.indexOf(group), 1)
       } else {
-        groups.push(group)
+        selectedGroups.push(group)
       }
-      this.setGraphBoardGroups(groups)
+      this.selectAll = selectedGroups.length === sortedGroups.length
+    },
+    selectAllChange(bool) {
+      this.selectedGroups = bool ? this.groups.slice() : []
+      this.selectAll = bool
     }
   }
 }

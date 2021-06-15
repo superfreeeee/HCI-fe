@@ -1,7 +1,4 @@
-import {
-  responseItemTranformer,
-  itemTransformer
-} from '@/modules/graph/utils/item'
+import { graphDataTransformer } from '../../modules/graph/utils/data'
 
 export default {
   prefix: '/graph',
@@ -10,32 +7,24 @@ export default {
     getGraphByProjectId(projectId) {
       return {
         path: `/${projectId}`,
-        mapper(data) {
-          const { projectId, nodes, relations, layout } = data
-          return {
-            projectId,
-            nodes: nodes.map(n => responseItemTranformer('node', n)),
-            links: relations.map(r => responseItemTranformer('link', r)),
-            layouts: layout
-          }
-        }
+        mapper: graphDataTransformer
       }
     },
 
     /* 插入实体 */
-    graphInsertNode(node, projectId) {
+    graphInsertNode(data) {
       return {
         path: '/insertNode',
         method: 'POST',
-        data: itemTransformer('node', node, projectId)
+        data
       }
     },
     /* 插入关系 */
-    graphInsertRel(relation, projectId) {
+    graphInsertRel(data) {
       return {
         path: '/insertRel',
         method: 'POST',
-        data: itemTransformer('link', relation, projectId)
+        data
       }
     },
 
@@ -65,32 +54,28 @@ export default {
     },
 
     /* 更新实体 */
-    graphUpdateNode(node, projectId) {
+    graphUpdateNode(data) {
       return {
         path: '/updateNode',
         method: 'POST',
-        data: itemTransformer('node', node, projectId)
+        data
       }
     },
     /* 更新关系 */
-    graphUpdateRel(relation, projectId) {
+    graphUpdateRel(data) {
       return {
         path: '/updateRel',
         method: 'POST',
-        data: itemTransformer('link', relation, projectId)
+        data
       }
     },
 
     /* 保存布局 */
-    updateLayout(type, layout, projectId) {
+    updateLayout(data) {
       return {
         path: '/updateLayout',
         method: 'POST',
-        data: {
-          ...layout, // nodes, width, height
-          projectId,
-          type
-        }
+        data
       }
     }
   }

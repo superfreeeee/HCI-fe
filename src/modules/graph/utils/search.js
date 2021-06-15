@@ -1,13 +1,11 @@
-const buildSearchHistoryKey = (userId, projectId) => {
+export const buildSearchHistoryKey = (userId, projectId) => {
   return `searchHistory:${userId}:${projectId}`
 }
 
-export const getSearchHistory = (userId, projectId) => {
-  const key = buildSearchHistoryKey(userId, projectId)
-  return JSON.parse(localStorage.getItem(key))
+export const getSearchHistory = key => {
+  return JSON.parse(localStorage.getItem(key)) || []
 }
 
-export const setSearchHistory = (userId, projectId, history) => {
-  const key = buildSearchHistoryKey(userId, projectId)
+export const setSearchHistory = (key, history) => {
   localStorage.setItem(key, JSON.stringify(history))
 }

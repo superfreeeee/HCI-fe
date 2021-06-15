@@ -12,6 +12,27 @@ export default {
     },
     exportProjectXml(projectId) {
       return { path: `/export/${projectId}` }
+    },
+    updateName(data) {
+      return { path: '/updateProjectName', method: 'POST', data }
+    },
+    updateDescription(data) {
+      return { path: '/updateProjectDescription', method: 'POST', data }
+    },
+    updateStatus(data) {
+      return { path: '/updateProjectStatus', method: 'POST', data }
+    },
+    getAllListByPageNo(pageNo) {
+      return { path: `/publicProject/${pageNo}` }
+    },
+    getOwnListByPageNo(data) {
+      return { path: `/listByUserId/${data.userId}/${data.pageNo}` }
+    },
+    getAllListCount() {
+      return { path: '/countPublicProject' }
+    },
+    getOwnListCount(userId) {
+      return { path: `/countByUserId/${userId}` }
     }
   }
 }
