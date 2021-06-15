@@ -4,23 +4,30 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import vuex from 'vuex'
-import elementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
 import store from './store'
 
-import * as d3 from 'd3'
-import axios from './api/axios'
-import * as echarts from 'echarts'
-import Chat from 'jwchat'
-
 Vue.use(vuex)
-Vue.use(elementUI)
-Vue.use(Chat)
 
-Vue.config.productionTip = false
+// element-ui
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+Vue.use(ElementUI)
+
+// d3
+import * as d3 from 'd3'
 Vue.prototype.$d3 = d3
+
+// axios
+import axios from './api/axios'
 Vue.prototype.$axios = axios
+Vue.config.productionTip = false
+
+// echarts
+import * as echarts from 'echarts'
 Vue.prototype.$echarts = echarts
+
+import Chat from 'jwchat'
+Vue.use(Chat)
 
 /* eslint-disable no-new */
 new Vue({
