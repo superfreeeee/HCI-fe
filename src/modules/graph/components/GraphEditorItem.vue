@@ -45,7 +45,7 @@
           ></el-input>
         </el-form-item>
         <el-form-item required label="实体类别" prop="group">
-          <el-select
+          <!-- <el-select
             clearable
             :disabled="!editable"
             placeholder="实体类别"
@@ -56,14 +56,14 @@
               :key="group"
               :value="group"
             ></el-option>
-          </el-select>
-          <!-- <el-autocomplete
+          </el-select> -->
+          <el-autocomplete
             clearable
             :disabled="!editable"
             :fetch-suggestions="queryGroup"
-            placeholder="输入/选择实体类别"
+            placeholder="实体类别"
             v-model="selectedItem.item.group"
-          ></el-autocomplete> -->
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item required label="实体权重" prop="radius">
           <el-input
@@ -112,13 +112,7 @@
             v-for="(prop, idx) in selectedItem.item.properties"
             :key="idx"
           >
-            <!-- <el-input
-              clearable
-              :disabled="!editable"
-              placeholder="属性名"
-              v-model="prop.name"
-            ></el-input> -->
-            <el-select
+            <!-- <el-select
               clearable
               :disabled="!editable"
               placeholder="属性名"
@@ -129,24 +123,33 @@
                 :key="prop"
                 :value="prop"
               ></el-option>
-            </el-select>
+            </el-select> -->
+            <div class="name">
+              <el-autocomplete
+                clearable
+                :disabled="!editable"
+                :fetch-suggestions="queryAttributes"
+                placeholder="属性名"
+                v-model="prop.name"
+              ></el-autocomplete>
+              <el-button
+                v-if="editable"
+                type="danger"
+                icon="el-icon-close"
+                @click="removeProp(idx)"
+                >移除</el-button
+              >
+            </div>
             <el-input
               clearable
               :disabled="!editable"
+              type="textarea"
+              :autosize="{ maxRows: '5' }"
               placeholder="属性值"
               v-model="prop.value"
             ></el-input>
-            <el-button
-              v-if="editable"
-              type="danger"
-              icon="el-icon-close"
-              @click="removeProp(idx)"
-            ></el-button>
           </div>
-          <el-button
-            v-if="editable && restProperties.length > 0"
-            icon="el-icon-plus"
-            @click="addProp"
+          <el-button v-if="editable" icon="el-icon-plus" @click="addProp"
             >添加属性</el-button
           >
         </el-form-item>
@@ -169,7 +172,7 @@
         label-width="80px"
       >
         <el-form-item required label="关系名称" prop="name">
-          <el-select
+          <!-- <el-select
             clearable
             :disabled="!editable"
             placeholder="关系名称"
@@ -180,13 +183,14 @@
               :key="name"
               :value="name"
             ></el-option>
-          </el-select>
-          <!-- <el-input
+          </el-select> -->
+          <el-autocomplete
             clearable
             :disabled="!editable"
+            :fetch-suggestions="queryLinkName"
             placeholder="关系名称"
             v-model="selectedItem.item.name"
-          ></el-input> -->
+          ></el-autocomplete>
         </el-form-item>
         <el-form-item required label="关系实体1" prop="from">
           <div>
@@ -254,7 +258,7 @@
             v-for="(prop, idx) in selectedItem.item.properties"
             :key="idx"
           >
-            <el-select
+            <!-- <el-select
               clearable
               :disabled="!editable"
               placeholder="属性名"
@@ -265,30 +269,33 @@
                 :key="prop"
                 :value="prop"
               ></el-option>
-            </el-select>
-            <!-- <el-input
-              clearable
-              :disabled="!editable"
-              placeholder="属性名"
-              v-model="prop.name"
-            ></el-input> -->
+            </el-select> -->
+            <div class="name">
+              <el-autocomplete
+                clearable
+                :disabled="!editable"
+                :fetch-suggestions="queryAttributes"
+                placeholder="属性名"
+                v-model="prop.name"
+              ></el-autocomplete>
+              <el-button
+                v-if="editable"
+                type="danger"
+                icon="el-icon-close"
+                @click="removeProp(idx)"
+                >移除</el-button
+              >
+            </div>
             <el-input
               clearable
               :disabled="!editable"
+              type="textarea"
+              :autosize="{ maxRows: '5' }"
               placeholder="属性值"
               v-model="prop.value"
             ></el-input>
-            <el-button
-              v-if="editable"
-              type="danger"
-              icon="el-icon-close"
-              @click="removeProp(idx)"
-            ></el-button>
           </div>
-          <el-button
-            v-if="editable && restProperties.length > 0"
-            icon="el-icon-plus"
-            @click="addProp"
+          <el-button v-if="editable" icon="el-icon-plus" @click="addProp"
             >添加属性</el-button
           >
         </el-form-item>
@@ -325,6 +332,9 @@ export default {
     return {
       useGroupColor: false,
       editable: false,
+      projectInfo: {
+        id: null
+      },
       selectedItem: {
         type: null,
         item: {}
@@ -397,29 +407,29 @@ export default {
         ? { label: '重置选项', handler: this.reset }
         : { label: '取消修改', handler: this.cancel }
     },
-    restProperties() {
-      const {
-        selectedItem: {
-          type,
-          item: { name, group, properties }
-        },
-        options: { nodeProperties, linkProperties }
-      } = this
-      const prop = type === 'node' ? group : name
-      const props = type === 'node' ? nodeProperties : linkProperties
-      const options = props[prop] || []
-      const usedProperties = properties.map(prop => prop.name)
-      const rest = options.filter(option => !usedProperties.includes(option))
-      // console.log('restProperties', rest)
-      return rest
-    },
+    // restProperties() {
+    //   const {
+    //     selectedItem: {
+    //       type,
+    //       item: { name, group, properties }
+    //     },
+    //     options: { nodeProperties, linkProperties }
+    //   } = this
+    //   const prop = type === 'node' ? group : name
+    //   const props = type === 'node' ? nodeProperties : linkProperties
+    //   const options = props[prop] || []
+    //   const usedProperties = properties.map(prop => prop.name)
+    //   const rest = options.filter(option => !usedProperties.includes(option))
+    //   // console.log('restProperties', rest)
+    //   return rest
+    // },
     activeRules() {
       return this.rules[this.selectedItem.type]
     }
   },
   watch: {
     projectId(id) {
-      this.projectId = id
+      this.projectInfo.id = id
     },
     useGroupColor(bool) {
       if (bool) {
@@ -591,7 +601,7 @@ export default {
     },
     async createItem() {
       const {
-        projectId,
+        projectInfo: { id: projectId },
         selectedItem: { type, item },
         validate
       } = this
@@ -612,7 +622,7 @@ export default {
     },
     async updateItem() {
       const {
-        projectId,
+        projectInfo: { id: projectId },
         selectedItem: { type, item },
         validate
       } = this
@@ -633,7 +643,7 @@ export default {
     },
     deleteItem() {
       const {
-        projectId,
+        projectInfo: { id: projectId },
         selectedItem: { type, item }
       } = this
       this.deleteItemAct({ projectId, type, id: item.id }).then(res => {
@@ -647,14 +657,24 @@ export default {
         }
       })
     },
-    queryGroup(inputGroup, cb) {
-      const groups = this.options.nodeGroups
-      const suggestGroups = inputGroup
-        ? groups.filter(
-            group => group.toLowerCase().indexOf(inputGroup.toLowerCase()) === 0
-          )
-        : groups
-      return cb(suggestGroups.map(group => ({ value: group })))
+    queryGroup(_, cb) {
+      return cb(this.options.itemGroups.map(group => ({ value: group })))
+    },
+    queryLinkName(_, cb) {
+      return cb(this.options.linkNames.map(name => ({ value: name })))
+    },
+    queryAttributes(_, cb) {
+      const {
+        selectedItem: {
+          type,
+          item: { name, group }
+        },
+        options: { nodeProperties, linkProperties }
+      } = this
+      const prop = type === 'node' ? group : name
+      const props = type === 'node' ? nodeProperties : linkProperties
+      const suggestions = props[prop] || []
+      return cb(suggestions.map(option => ({ value: option })))
     }
   }
 }
@@ -673,10 +693,22 @@ export default {
 
 .properties {
   display: flex;
+  flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+}
+
+.properties > .name {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.properties + .properties {
+  margin-top: 10px;
 }
 
 .properties > el-button {
-  flex: 1;
+  /* flex: 1; */
 }
 </style>
