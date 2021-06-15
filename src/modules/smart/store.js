@@ -26,7 +26,8 @@ const smart = {
     dialogueQueryGraphData: null,
     relationNames: [],
     dialogueAnswer: '',
-    hotQuestions: []
+    hotQuestions: [],
+    centralityTableData: []
   },
   mutations: {
     setTaleList(state, data) {
@@ -62,6 +63,9 @@ const smart = {
     },
     setHotQuestions(state, data) {
       state.hotQuestions = data
+    },
+    setCentralityTableData(state, data) {
+      state.centralityTableData = data
     }
   },
   actions: {
@@ -125,6 +129,11 @@ const smart = {
       // console.log('getHotQuestionList', res)
       const hotListTarget = adapter(res.data)
       commit('setHotQuestions', hotListTarget)
+    },
+    getCentralityData: async ({ commit }, projectId) => {
+      const res = await api.getCentrality(projectId)
+      // console.log('getCentralityData', res.data)
+      commit('setCentralityTableData', res.data)
     }
   },
   getters: {
@@ -137,7 +146,8 @@ const smart = {
     relationNames: state => state.relationNames,
     dialogueQueryGraphData: state => state.dialogueQueryGraphData,
     dialogueAnswer: state => state.dialogueAnswer,
-    hotQuestions: state => state.hotQuestions
+    hotQuestions: state => state.hotQuestions,
+    centralityTableData: state => state.centralityTableData
   }
 }
 

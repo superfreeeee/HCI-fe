@@ -106,18 +106,6 @@ export default {
       cb(this.recommendHotQues)
     },
   },
-  // async mounted() {
-  //   const projectId = Number(this.$route.params.projectId)
-  //   console.log(`[Graph] mounted, projectId = ${projectId}`)
-
-  //   console.log(`[Graph] getProjectInfo`)
-  //   if (!(await this.getProjectInfo(projectId))) return
-
-  //   console.log(`[Graph] graphInit`)
-  //   const board = this.$refs.graphDialogueBoard
-  //   if (!(await board.graphInit(projectId))) return
-  //   board.init()
-  // },
 }
 </script>
 

@@ -1,6 +1,6 @@
 <template>
   <div class="pagerankC">
-    <el-collapse v-model="activeNames" @change="handleChange">
+    <el-collapse v-model="activeNames">
       <el-collapse-item
         v-for="item in pageRankCentralData"
         :key="item.group"
@@ -18,7 +18,8 @@
 </template>
 
 <script>
-import { mockPageRankCentral } from '../utils/data'
+import { mapActions, mapGetters } from 'vuex'
+// import { mockPageRankCentral } from '../utils/data'
 
 export default {
   name: 'PageRankCentral',
@@ -28,13 +29,16 @@ export default {
       pageRankCentralData: null,
     }
   },
-  mounted() {
-    this.pageRankCentralData = mockPageRankCentral
+  async mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    await this.getCentralityData(projectId)
+    this.pageRankCentralData = this.centralityTableData
+  },
+  computed: {
+    ...mapGetters(['centralityTableData']),
   },
   methods: {
-    handleChange(val) {
-      // console.log(val)
-    },
+    ...mapActions(['getCentralityData']),
   },
 }
 </script>

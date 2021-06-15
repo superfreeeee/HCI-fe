@@ -61,6 +61,12 @@ export default {
         path: `/hotQuestion/${projectId}`,
         method: 'GET'
       }
+    },
+    getCentrality(projectId) {
+      return {
+        path: `/centrality/${projectId}`,
+        method: 'GET'
+      }
     }
   }
 }
