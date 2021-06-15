@@ -22,6 +22,9 @@
       <el-tab-pane label="关系查询" :name="relationQueryName">
         <RelationQuery v-if="show.relationQuery" />
       </el-tab-pane>
+      <el-tab-pane label="实体识别" :name="entityIdentifyName">
+        <EntityIdentify v-if="show.entityIdentify" />
+      </el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -29,13 +32,15 @@
 <script>
 import GraphDialogue from '../modules/smart/components/GraphDialogue.vue'
 import EntityQuery from '../modules/smart/components/EntityQuery.vue'
-import RelationQuery from '../modules/smart/components/RelationQuery'
+import RelationQuery from '../modules/smart/components/RelationQuery.vue'
+import EntityIdentify from '../modules/smart/components/EntityIdentify.vue'
 
 export default {
   components: {
     GraphDialogue,
     EntityQuery,
     RelationQuery,
+    EntityIdentify,
   },
   name: 'Smarthelper',
   data() {
@@ -44,10 +49,12 @@ export default {
       graphDialogueName: 'graphDialogue',
       entityQueryName: 'entityQuery',
       relationQueryName: 'relationQuery',
+      entityIdentifyName: 'entityIdentify',
       show: {
         graphDialogue: true,
         entityQuery: false,
         relationQuery: false,
+        entityIdentify: false,
       },
     }
   },
@@ -56,7 +63,7 @@ export default {
       this.$router.back()
     },
     tabClick(activeName, oldActiveName) {
-      console.log(activeName, oldActiveName)
+      // console.log(activeName, oldActiveName)
       this.show[activeName] = true
       this.show[oldActiveName] = false
     },
