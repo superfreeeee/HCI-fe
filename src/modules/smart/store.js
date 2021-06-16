@@ -1,4 +1,5 @@
 import api from '@/api/dispatcher'
+import graph from '../../api/modules/graph'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
 import { adapter } from './utils/function'
@@ -100,14 +101,14 @@ const smart = {
       // console.log('smartEntityQuery', res.data)
       const graphData = res.data
       commit('setEntityQueryGraphData', graphData)
-      return Promise.resolve(graphData)
+      return graphData
     },
     smartRelationQuery: async ({ commit }, data) => {
       const res = await api.relationQuery(data)
       // console.log('smartRelationQuery', res.data)
       const graphData = res.data
       commit('setRelationQueryGraphData', graphData)
-      return Promise.resolve(graphData)
+      return graphData
     },
     smartDialogueQuery: async ({ commit }, data) => {
       const res = await api.askQuestion(data)
@@ -115,7 +116,7 @@ const smart = {
       const { graph, text } = res.data
       commit('setDialogueQueryGraphData', graph)
       commit('setDialogueAnswer', text)
-      return Promise.resolve(graph)
+      return graph
     },
     getRelationNames: async ({ commit }, projectId) => {
       const res = await api.getRelations(projectId)
