@@ -1,12 +1,12 @@
 <template>
   <div class="chatbox">
-    <div class="chat-header">co$in 小助手</div>
+    <!-- <div class="chat-header">co$in 小助手</div>
     <el-button
       circle
       icon="el-icon-arrow-left"
       class="back"
       @click="goback()"
-    ></el-button>
+    ></el-button> -->
     <JwChat
       :taleList="taleList"
       @enter="bindEnter"
@@ -28,14 +28,14 @@ export default {
       text: '',
       tool: {
         // file img video 现在只配置了三个图标
-        show: ['file', 'img', 'video'],
+        // show: ['file', 'img', 'video'],
         callback: this.toolEvent,
       },
     }
   },
   mounted() {
-    console.log(this.taleList)
-    console.log(this.userInfo)
+    // console.log(this.taleList)
+    // console.log(this.userInfo)
   },
   computed: {
     ...mapGetters(['taleList', 'userInfo']),
@@ -58,9 +58,9 @@ export default {
       }
       this.sendQuestionChat(data)
     },
-    goback() {
-      this.$router.back()
-    },
+    // goback() {
+    //   this.$router.back()
+    // },
   },
 }
 </script>
@@ -69,7 +69,7 @@ export default {
 .chatbox {
   width: 100%;
   height: 100%;
-  background-color: hsl(207, 100%, 91%);
+  /* background-color: hsl(207, 100%, 91%); */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,7 +78,7 @@ export default {
   width: 70vw !important;
   height: 80vh !important;
 }
-.chatbox .chat-header {
+/* .chatbox .chat-header {
   position: fixed;
   top: 5%;
   font-size: larger;
@@ -91,12 +91,12 @@ export default {
   margin-bottom: 50px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-.chatbox .back {
+} */
+/* .chatbox .back {
   position: fixed;
   top: 3vh;
   left: 5vw;
-}
+} */
 .wrapper {
   width: 100% !important;
   height: 100% !important;
@@ -121,7 +121,7 @@ export default {
   .chatbox {
     width: 100%;
     height: 100%;
-    background-color: hsl(207, 100%, 91%);
+    /* background-color: hsl(207, 100%, 91%); */
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -147,7 +147,7 @@ export default {
   .chatbox {
     width: 100%;
     height: 100%;
-    background-color: hsl(207, 100%, 91%);
+    /* background-color: hsl(207, 100%, 91%); */
     display: flex;
     align-items: center;
     justify-content: center;

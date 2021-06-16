@@ -96,12 +96,12 @@ export default {
           label: '初始化图谱',
           handler: () => this.initGraph(),
         },
+        // {
+        //   label: '智能小助手 PC 端',
+        //   handler: () => this.gotoSmarthelper('/chat'),
+        // },
         {
-          label: '智能小助手 PC 端',
-          handler: () => this.gotoSmarthelper('/chat'),
-        },
-        {
-          label: '智能小助手 Web 端',
+          label: '智能小助手',
           handler: () => this.gotoSmarthelper('/smarthelper'),
         },
       ],

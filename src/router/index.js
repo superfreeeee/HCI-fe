@@ -41,14 +41,14 @@ const router = new Router({
         requireLogin: true
       }
     },
-    {
-      path: '/chat/:projectId',
-      name: 'Chat',
-      component: () => import('@/views/Chat.vue'),
-      meta: {
-        requireLogin: true
-      }
-    },
+    // {
+    //   path: '/chat/:projectId',
+    //   name: 'Chat',
+    //   component: () => import('@/views/Chat.vue'),
+    //   meta: {
+    //     requireLogin: true
+    //   }
+    // },
     {
       path: '/smarthelper/:projectId',
       name: 'Smarthelper',

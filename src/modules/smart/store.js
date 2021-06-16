@@ -8,7 +8,7 @@ const smart = {
     taleList: [
       {
         // date: '2020/04/25 21:19:07',
-        text: { text: 'Hi~有什么需要帮忙的？' },
+        text: { text: '您好~我是 co$in helper，今天想找什么菜呢？' },
         mine: false,
         name: 'coin小助手',
         img: coinPng

@@ -8,10 +8,13 @@
       >
         <el-menu-item index="1">我的项目</el-menu-item>
         <el-menu-item index="2">广场</el-menu-item>
-        <el-menu-item index="3">co$in手册</el-menu-item>
+        <el-menu-item index="3">co$in Helper</el-menu-item>
+        <el-menu-item index="4">co$in手册</el-menu-item>
       </el-menu>
-      <h1 v-if="this.activeIndex !== '3'">欢迎使用 co$in</h1>
-      <h1 v-else>co$in 使用说明手册</h1>
+      <h1 v-if="this.activeIndex === '1' || this.activeIndex === '2'">
+        欢迎使用 co$in
+      </h1>
+      <h1 v-if="this.activeIndex === '4'">co$in 使用说明手册</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
@@ -71,7 +74,10 @@
       >
       </el-pagination>
     </div>
-    <div class="tutorial" v-if="this.activeIndex === '3'">
+    <div v-if="this.activeIndex === '3'">
+      <Chat />
+    </div>
+    <div class="tutorial" v-if="this.activeIndex === '4'">
       <Tutorial />
     </div>
     <NewProjectPanel />
@@ -82,12 +88,14 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 import Tutorial from '../modules/home/components/Tutorial'
+import Chat from '../modules/home/components/Chat'
 
 export default {
   name: 'Home',
   components: {
     NewProjectPanel,
     Tutorial,
+    Chat,
   },
   data() {
     return {
