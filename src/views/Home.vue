@@ -62,7 +62,7 @@
         type="primary"
         style="width: 100%; margin: 0 0 15px 0"
         round
-        @click="gotoProject(project.projectId)"
+        @click="gotoSmarthelper(project.projectId)"
       >
         项目：{{ project.name }}
       </el-button>
@@ -135,6 +135,9 @@ export default {
     ]),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
+    },
+    gotoSmarthelper(id) {
+      this.$router.push(`/smarthelper/${id}`)
     },
     createNewGraph() {
       this.setShowCreatePanel(true)

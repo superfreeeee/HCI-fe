@@ -83,16 +83,13 @@ const smart = {
     sendQuestionChat: async ({ commit }, data) => {
       const { question, username } = data
       const res = await api.askQuestion(question)
-
       const reqTale = {
         text: { text: question.text },
         mine: true,
         name: username,
         img: logoPng
       }
-
       const text = res.status === 200 ? res.data.text : 'server error'
-      // console.log('resTale', text)
       const resTale = {
         text: { text },
         mine: false,

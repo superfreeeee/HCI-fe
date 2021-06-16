@@ -81,10 +81,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-/* .chatbox .jwchat {
+.chatbox .jwchat {
   width: 70vw !important;
   height: 80vh !important;
-} */
+}
 /* .chatbox .chat-header {
   position: fixed;
   top: 5%;

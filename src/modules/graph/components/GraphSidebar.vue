@@ -92,10 +92,10 @@ export default {
     return {
       // flag: true, // mock verifyInitiate
       smartOptions: [
-        {
-          label: '初始化图谱',
-          handler: () => this.initGraph(),
-        },
+        // {
+        //   label: '初始化图谱',
+        //   handler: () => this.initGraph(),
+        // },
         // {
         //   label: '智能小助手 PC 端',
         //   handler: () => this.gotoSmarthelper('/chat'),
@@ -130,7 +130,7 @@ export default {
       'setShowModifyDescModal',
       'setShowModifyStatusModal',
     ]),
-    ...mapActions(['switchLayoutMode', 'initiateGraph', 'verifyInitiate']),
+    ...mapActions(['switchLayoutMode', 'verifyInitiate']),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
     },
@@ -154,17 +154,6 @@ export default {
         } else {
           this.$router.push(`/graph/${projectId}`)
           this.$message.error('请先初始化图谱!')
-        }
-      })
-    },
-    initGraph() {
-      const projectId = Number(this.$route.params.projectId)
-      this.initiateGraph(projectId).then((res) => {
-        const { success, msg } = res.data
-        if (success) {
-          this.$message.success(msg)
-        } else {
-          this.$message.error(msg)
         }
       })
     },

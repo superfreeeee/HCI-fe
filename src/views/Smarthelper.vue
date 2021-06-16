@@ -34,6 +34,7 @@ import GraphDialogue from '../modules/smart/components/GraphDialogue.vue'
 import EntityQuery from '../modules/smart/components/EntityQuery.vue'
 import RelationQuery from '../modules/smart/components/RelationQuery.vue'
 import PageRankCentral from '../modules/smart/components/PageRankCentral.vue'
+import { mapActions } from 'vuex'
 
 export default {
   components: {
@@ -58,7 +59,11 @@ export default {
       },
     }
   },
+  mounted() {
+    this.initGraph()
+  },
   methods: {
+    ...mapActions(['initiateGraph']),
     goback() {
       this.$router.back()
     },
@@ -66,6 +71,17 @@ export default {
       // console.log(activeName, oldActiveName)
       this.show[activeName] = true
       this.show[oldActiveName] = false
+    },
+    initGraph() {
+      const projectId = Number(this.$route.params.projectId)
+      this.initiateGraph(projectId).then((res) => {
+        const { success, msg } = res.data
+        if (success) {
+          this.$message.success(msg)
+        } else {
+          this.$message.error(msg)
+        }
+      })
     },
   },
 }
