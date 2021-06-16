@@ -1,8 +1,8 @@
 import api from '@/api/dispatcher'
-import graph from '../../api/modules/graph'
 import coinPng from '../../assets/coin.png'
 import logoPng from '../../assets/logo.png'
 import { adapter } from './utils/function'
+import { linebreakFormat } from '../smart/utils/function'
 
 const smart = {
   state: {
@@ -87,7 +87,8 @@ const smart = {
         name: username,
         img: logoPng
       }
-      const answer = res.status === 200 ? res.data.msg : 'server error'
+      const answer =
+        res.status === 200 ? linebreakFormat(res.data.msg) : 'server error'
       const resTale = {
         text: { text: answer },
         mine: false,
