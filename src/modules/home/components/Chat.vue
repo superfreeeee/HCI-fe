@@ -34,24 +34,18 @@ export default {
       alert(type)
     },
     async bindEnter() {
-      const projectId = Number(this.$route.params.projectId)
-      const question = {
-        projectId,
-        text: this.text,
-      }
       const data = {
-        question,
+        text: this.text,
         username: this.userInfo.username,
       }
       const { reqTale, resTale } = await this.sendQuestionChat(data)
-
       this.pushTaleList(reqTale)
       this.$nextTick(() => {
         setTimeout(() => {
           this.pushTaleList(resTale)
         }, 1000)
       })
-    }
+    },
   },
 }
 </script>

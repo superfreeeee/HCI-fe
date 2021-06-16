@@ -35,10 +35,6 @@ const smart = {
     },
     pushTaleList(state, data) {
       state.taleList.push(data)
-      // state.taleList = [
-      //   ...state.taleList,
-      //   data
-      // ]
     },
     setGraphDialogueQues(state, data) {
       state.graphDialogueQues = data
@@ -81,17 +77,18 @@ const smart = {
       return Promise.resolve(res)
     },
     sendQuestionChat: async ({ commit }, data) => {
-      const { question, username } = data
-      const res = await api.askQuestion(question)
+      const { text, username } = data
+      const res = await api.getProjectQuery(text)
+      console.log('sendQuestionChat', res)
       const reqTale = {
-        text: { text: question.text },
+        text: { text: text },
         mine: true,
         name: username,
         img: logoPng
       }
-      const text = res.status === 200 ? res.data.text : 'server error'
+      const answer = res.status === 200 ? res.data.msg : 'server error'
       const resTale = {
-        text: { text },
+        text: { text: answer },
         mine: false,
         name: 'coin小助手',
         img: coinPng

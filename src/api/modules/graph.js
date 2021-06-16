@@ -77,6 +77,14 @@ export default {
         method: 'POST',
         data
       }
+    },
+
+    /* 查询相关的项目 */
+    getProjectQuery(question) {
+      return {
+        path: `/projectQuery/${question}`,
+        method: 'GET'
+      }
     }
   }
 }
