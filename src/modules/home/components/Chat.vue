@@ -46,7 +46,7 @@ export default {
     toolEvent(type /* 当前点击的按钮类型 */) {
       alert(type)
     },
-    bindEnter() {
+    async bindEnter() {
       const projectId = Number(this.$route.params.projectId)
       const question = {
         projectId,
@@ -56,7 +56,14 @@ export default {
         question,
         username: this.userInfo.username,
       }
-      this.sendQuestionChat(data)
+      const { reqTale, resTale } = await this.sendQuestionChat(data)
+
+      this.pushTaleList(reqTale)
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.pushTaleList(resTale)
+        }, 1000)
+      })
     },
     // goback() {
     //   this.$router.back()
@@ -74,10 +81,10 @@ export default {
   align-items: center;
   justify-content: center;
 }
-.chatbox .jwchat {
+/* .chatbox .jwchat {
   width: 70vw !important;
   height: 80vh !important;
-}
+} */
 /* .chatbox .chat-header {
   position: fixed;
   top: 5%;

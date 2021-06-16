@@ -34,8 +34,11 @@ const smart = {
       state.taleList = data
     },
     pushTaleList(state, data) {
-      state.taleList.push(data.reqTale)
-      setTimeout(() => state.taleList.push(data.resTale), 1000)
+      state.taleList.push(data)
+      // state.taleList = [
+      //   ...state.taleList,
+      //   data
+      // ]
     },
     setGraphDialogueQues(state, data) {
       state.graphDialogueQues = data
@@ -80,22 +83,23 @@ const smart = {
     sendQuestionChat: async ({ commit }, data) => {
       const { question, username } = data
       const res = await api.askQuestion(question)
-      const { text } = res.data
-      console.log('chattext', text)
+
       const reqTale = {
-        text: { text: data.question.text },
+        text: { text: question.text },
         mine: true,
         name: username,
         img: logoPng
       }
+
+      const text = res.status === 200 ? res.data.text : 'server error'
+      // console.log('resTale', text)
       const resTale = {
-        text: { text: text },
+        text: { text },
         mine: false,
         name: 'coin小助手',
         img: coinPng
       }
-      const newTales = { reqTale, resTale }
-      commit('pushTaleList', newTales)
+      return { reqTale, resTale }
     },
     smartEntityQuery: async ({ commit }, data) => {
       const res = await api.entityQuery(data)
