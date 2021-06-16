@@ -1,12 +1,5 @@
 <template>
   <div class="chatbox">
-    <!-- <div class="chat-header">co$in 小助手</div>
-    <el-button
-      circle
-      icon="el-icon-arrow-left"
-      class="back"
-      @click="goback()"
-    ></el-button> -->
     <JwChat
       :taleList="taleList"
       @enter="bindEnter"
@@ -27,15 +20,9 @@ export default {
       height: '80vh',
       text: '',
       tool: {
-        // file img video 现在只配置了三个图标
-        // show: ['file', 'img', 'video'],
         callback: this.toolEvent,
       },
     }
-  },
-  mounted() {
-    // console.log(this.taleList)
-    // console.log(this.userInfo)
   },
   computed: {
     ...mapGetters(['taleList', 'userInfo']),
@@ -64,10 +51,7 @@ export default {
           this.pushTaleList(resTale)
         }, 1000)
       })
-    },
-    // goback() {
-    //   this.$router.back()
-    // },
+    }
   },
 }
 </script>
@@ -85,25 +69,6 @@ export default {
   width: 70vw !important;
   height: 80vh !important;
 }
-/* .chatbox .chat-header {
-  position: fixed;
-  top: 5%;
-  font-size: larger;
-  width: 200px;
-  text-align: center;
-  color: rgb(244, 153, 146);
-  background-color: #fdfcf8;
-  border-radius: 20px;
-  box-shadow: 1px 1px 1px 1px slategrey;
-  margin-bottom: 50px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-} */
-/* .chatbox .back {
-  position: fixed;
-  top: 3vh;
-  left: 5vw;
-} */
 .wrapper {
   width: 100% !important;
   height: 100% !important;
