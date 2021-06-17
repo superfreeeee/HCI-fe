@@ -181,7 +181,7 @@ export default {
   left: 0;
   top: 100px;
 }
-.el-button+.el-button[bottom] {
-  margin: unset;
+.el-button+.el-button {
+  margin: 0;
 }
 </style>

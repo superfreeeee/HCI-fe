@@ -6,6 +6,7 @@
       :key="option.label"
       :type="option.type"
       @click="buttonHandlerWrapper($event, option.handler)"
+      style="margin-bottom: 10px; width: 100%"
       >{{ option.label }}</el-button
     >
   </div>
