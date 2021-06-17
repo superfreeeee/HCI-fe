@@ -76,19 +76,19 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: '',
+        password: ''
       },
       loginRules: {
         username: [{ validator: validateUsername, trigger: 'blur' }],
-        password: [{ validator: validateLoginPassword, trigger: 'blur' }],
-      },
+        password: [{ validator: validateLoginPassword, trigger: 'blur' }]
+      }
     }
   },
   methods: {
     ...mapActions(['userLogin']),
     login() {
       const userInfo = { ...this.loginForm }
-      this.userLogin(userInfo).then((success) => {
+      this.userLogin(userInfo).then(success => {
         if (success) {
           this.$router.push('/')
         }
@@ -97,17 +97,18 @@ export default {
     gotoRegister() {
       this.$router.push('/user/register')
     },
-    bindEnter() {
-      document.onkeydown = (e) => {
-        if (e.keyCode === 13) {
-          this.login()
-        }
+    bindEnter(e) {
+      if (e.keyCode === 13) {
+        this.login()
       }
-    },
+    }
   },
-  created() {
-    this.bindEnter()
+  mounted() {
+    document.addEventListener('onkeydown', this.bindEnter)
   },
+  destroyed() {
+    document.removeEventListener('onkeydown', this.bindEnter)
+  }
 }
 </script>
 
