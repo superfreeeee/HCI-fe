@@ -174,7 +174,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .graph > .main > .sidemenu {
   width: 150px;
   position: fixed;
