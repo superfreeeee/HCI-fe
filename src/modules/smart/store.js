@@ -80,7 +80,7 @@ const smart = {
     sendQuestionChat: async ({ commit }, data) => {
       const { text, username } = data
       const res = await api.getProjectQuery(text)
-      console.log('sendQuestionChat', res)
+      // console.log('sendQuestionChat', res)
       const reqTale = {
         text: { text: text },
         mine: true,
@@ -113,7 +113,7 @@ const smart = {
     },
     smartDialogueQuery: async ({ commit }, data) => {
       const res = await api.askQuestion(data)
-      console.log('smartDialogueQuery', res)
+      // console.log('smartDialogueQuery', res)
       const { graph, text } = res.data
       commit('setDialogueQueryGraphData', graph)
       commit('setDialogueAnswer', text)
