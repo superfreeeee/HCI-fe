@@ -174,14 +174,14 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .graph > .main > .sidemenu {
   width: 150px;
   position: fixed;
   left: 0;
   top: 100px;
 }
-.el-button+.el-button {
-  margin: 0;
+.el-button+.el-button[bottom] {
+  margin: unset;
 }
 </style>
