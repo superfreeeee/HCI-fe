@@ -5000,6 +5000,11 @@ jsdom@^11.5.1:
     ws "^5.2.0"
     xml-name-validator "^3.0.0"
 
+jsencrypt@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.nlark.com/jsencrypt/download/jsencrypt-3.2.0.tgz?cache=0&sync_timestamp=1619388058064&other_urls=https%3A%2F%2Fregistry.nlark.com%2Fjsencrypt%2Fdownload%2Fjsencrypt-3.2.0.tgz#09242aabf1984165dcd7698fe6ed163be77c05f8"
+  integrity sha1-CSQqq/GYQWXc12mP5u0WO+d8Bfg=
+
 jsesc@^1.3.0:
   version "1.3.0"
   resolved "https://registry.npm.taobao.org/jsesc/download/jsesc-1.3.0.tgz?cache=0&sync_timestamp=1603891161295&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fjsesc%2Fdownload%2Fjsesc-1.3.0.tgz#46c3fec8c1892b12b0833db9bc7622176dbab34b"
