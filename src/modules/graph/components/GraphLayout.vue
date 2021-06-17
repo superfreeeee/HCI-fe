@@ -79,4 +79,8 @@ export default {
 .el-button+.el-button[style] {
   margin: 0;
 }
+
+.el-button + .el-button {
+  margin: 0;
+}
 </style>
