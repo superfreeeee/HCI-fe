@@ -7,6 +7,7 @@
       :plain="action.mode && layoutMode !== action.mode"
       size="medium"
       @click="buttonHandlerWrapper($event, action.handler)"
+      style="margin-bottom: 10px; width: 100%"
       >{{ action.label }}</el-button
     >
   </div>
@@ -70,11 +71,13 @@ export default {
   width: 100%;
   height: 100%;
 }
-
-.el-button {
+/* .el-button {
   margin: unset;
   margin-bottom: 10px;
   width: 100%;
+} */
+.el-button+.el-button[style] {
+  margin: 0;
 }
 
 .el-button + .el-button {
