@@ -7,7 +7,7 @@ export default {
   name: 'Tutorial',
   data() {
     return {
-      src: '../../static/docs.html',
+      src: '../../static/guide.html',
     }
   },
 }
