@@ -41,9 +41,9 @@ scp_dist(){
     WORKSPACE=$1
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
-      cp -r ${WORKSPACE}/dist ${REMOTE_DIR}
+      cp -r ${WORKSPACE}/dist ${REMOTE_DIR}/webapps
       write_log "cp ${WORKSPACE}/dist to ${REMOTE_DIR}/webapps complete."
-      mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT
+      mv ${REMOTE_DIR}/webapps/dist ${REMOTE_DIR}/webapps/ROOT
       write_log "mv ${REMOTE_DIR}/webapps/dist ${REMOTE_DIR}/webapps/ROOT complete."
     done
 } 
@@ -51,13 +51,16 @@ scp_dist(){
 cluster_node_remove(){
     write_log "Kill all runing project on the cluster..."
     ${REMOTE_DIR}/bin/shutdown.sh
+    write_log "${REMOTE_DIR}/bin/shutdown.sh"
     rm -rf ${REMOTE_DIR}/webapps/ROOT
+    write_log "rm -rf ${REMOTE_DIR}/webapps/ROOT"
 } 
 #在远程服务器上启动项目
 cluster_deploy(){
     write_log "Up all project on the cluster..."
     for project in $NEED_DEPLOY_PROJECT;do
         ${REMOTE_DIR}/bin/startup.sh
+        write_log "${REMOTE_DIR}/bin/startup.sh"
     done
 } 
 #回滚（暂未实现）
