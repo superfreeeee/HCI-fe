@@ -37,7 +37,13 @@
           >
           </el-input>
         </el-form-item>
-        <el-button type="success" @click="login()" class="login-btn">
+        <el-button
+          id="login"
+          type="success"
+          @click="login()"
+          @keyup.enter.native="bindEnter()"
+          class="login-btn"
+        >
           登录
         </el-button>
         <a type="warning" @click="gotoRegister()" class="register-btn">
@@ -70,19 +76,19 @@ export default {
     return {
       loginForm: {
         username: '',
-        password: ''
+        password: '',
       },
       loginRules: {
         username: [{ validator: validateUsername, trigger: 'blur' }],
-        password: [{ validator: validateLoginPassword, trigger: 'blur' }]
-      }
+        password: [{ validator: validateLoginPassword, trigger: 'blur' }],
+      },
     }
   },
   methods: {
     ...mapActions(['userLogin']),
     login() {
       const userInfo = { ...this.loginForm }
-      this.userLogin(userInfo).then(success => {
+      this.userLogin(userInfo).then((success) => {
         if (success) {
           this.$router.push('/')
         }
@@ -90,8 +96,18 @@ export default {
     },
     gotoRegister() {
       this.$router.push('/user/register')
-    }
-  }
+    },
+    bindEnter() {
+      document.onkeydown = (e) => {
+        if (e.keyCode === 13) {
+          this.login()
+        }
+      }
+    },
+  },
+  created() {
+    this.bindEnter()
+  },
 }
 </script>
 
