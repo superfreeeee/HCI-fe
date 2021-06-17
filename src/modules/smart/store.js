@@ -79,7 +79,7 @@ const smart = {
     },
     sendQuestionChat: async ({ commit }, data) => {
       const { text, username } = data
-      const res = await api.getProjectQuery(text)
+      const res = await api.getProjectQuery({ text })
       // console.log('sendQuestionChat', res)
       const reqTale = {
         text: { text: text },
