@@ -56,7 +56,7 @@ cluster_node_remove(){
 #在远程服务器上启动项目
 cluster_deploy(){
     write_log "Up all project on the cluster..."
-    ${REMOTE_DIR}/bin/startup.sh
+    ssh $NODE "${REMOTE_DIR}/bin/startup.sh"
     write_log "${REMOTE_DIR}/bin/startup.sh"
 } 
 #回滚（暂未实现）
