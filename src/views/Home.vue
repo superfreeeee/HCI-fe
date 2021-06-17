@@ -10,11 +10,13 @@
         <el-menu-item index="2">广场</el-menu-item>
         <el-menu-item index="3">Helper</el-menu-item>
         <el-menu-item index="4">文档</el-menu-item>
+        <el-menu-item index="5">系统设计</el-menu-item>
       </el-menu>
       <h1 v-if="this.activeIndex === '1' || this.activeIndex === '2'">
         欢迎使用 co$in
       </h1>
-      <h1 v-if="this.activeIndex === '4'">co$in 使用说明手册</h1>
+      <h1 v-if="this.activeIndex === '4'">co$in 文档</h1>
+      <h1 v-if="this.activeIndex === '5'">co$in 系统设计</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
@@ -77,8 +79,11 @@
     <div v-if="this.activeIndex === '3'">
       <Chat />
     </div>
-    <div class="tutorial" v-if="this.activeIndex === '4'">
+    <div class="document" v-if="this.activeIndex === '4'">
       <Tutorial />
+    </div>
+    <div class="document" v-if="this.activeIndex === '5'">
+      <SystemDesign />
     </div>
     <NewProjectPanel />
   </div>
@@ -89,6 +94,7 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 import Tutorial from '../modules/home/components/Tutorial'
 import Chat from '../modules/home/components/Chat'
+import SystemDesign from '../modules/home/components/SystemDesign'
 
 export default {
   name: 'Home',
@@ -96,6 +102,7 @@ export default {
     NewProjectPanel,
     Tutorial,
     Chat,
+    SystemDesign,
   },
   data() {
     return {
@@ -227,7 +234,7 @@ export default {
   width: 400px;
 }
 
-.box > .tutorial {
+.box > .document {
   width: 100%;
   height: 100%;
 }
