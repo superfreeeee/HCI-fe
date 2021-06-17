@@ -8,8 +8,8 @@
       >
         <el-menu-item index="1">我的项目</el-menu-item>
         <el-menu-item index="2">广场</el-menu-item>
-        <el-menu-item index="3">co$in Helper</el-menu-item>
-        <el-menu-item index="4">co$in手册</el-menu-item>
+        <el-menu-item index="3">Helper</el-menu-item>
+        <el-menu-item index="4">文档</el-menu-item>
       </el-menu>
       <h1 v-if="this.activeIndex === '1' || this.activeIndex === '2'">
         欢迎使用 co$in

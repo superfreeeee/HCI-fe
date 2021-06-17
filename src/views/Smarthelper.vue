@@ -3,9 +3,13 @@
     <el-button
       circle
       icon="el-icon-arrow-left"
-      style="margin-bottom: 15px"
+      style="margin: 0 10px 15px 0"
       @click="goback()"
     ></el-button>
+    <span>项目：{{ projectInfo.name }}</span>
+    <el-button round type="text" icon="el-icon-info" @click="showDescription()"
+      >关于</el-button
+    >
     <el-tabs
       :tab-position="tabPosition"
       :before-leave="tabClick"
@@ -57,13 +61,16 @@ export default {
         relationQuery: false,
         pageRankCentral: false,
       },
+      projectInfo: {},
     }
   },
-  mounted() {
+  async mounted() {
+    const projectId = Number(this.$route.params.projectId)
+    this.projectInfo = await this.getProjectInfo(projectId)
     this.initGraph()
   },
   methods: {
-    ...mapActions(['initiateGraph']),
+    ...mapActions(['initiateGraph', 'getProjectInfo']),
     goback() {
       this.$router.back()
     },
@@ -81,6 +88,15 @@ export default {
         } else {
           this.$message.error(msg)
         }
+      })
+    },
+    showDescription() {
+      this.$notify({
+        title: `关于 ${this.projectInfo.name}`,
+        message: this.projectInfo.description,
+        duration: 5000,
+        type: 'info',
+        position: 'bottom-left',
       })
     },
   },

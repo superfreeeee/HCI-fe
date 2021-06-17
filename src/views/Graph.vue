@@ -58,8 +58,7 @@ import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescMod
 import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal'
 import { mapGetters, mapActions } from 'vuex'
 
-import { _projectInfo, _graphData } from '../modules/graph/utils/data'
-import { deepCopy } from '../common/utils/object'
+// import { _projectInfo, _graphData } from '../modules/graph/utils/data'
 
 export default {
   name: 'Graph',
