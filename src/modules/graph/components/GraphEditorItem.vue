@@ -707,8 +707,4 @@ export default {
 .properties + .properties {
   margin-top: 10px;
 }
-
-.properties > el-button {
-  /* flex: 1; */
-}
 </style>

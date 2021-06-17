@@ -80,4 +80,8 @@ export default {
   margin-bottom: 10px;
   width: 100%;
 }
+
+.el-button + .el-button {
+  margin: 0;
+}
 </style>

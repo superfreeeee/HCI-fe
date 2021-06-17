@@ -81,12 +81,12 @@ export default {
   props: {
     layoutMode: {
       type: String,
-      default: 'FORCE',
-    },
+      default: 'FORCE'
+    }
   },
   components: {
     GraphLayout,
-    GraphActions,
+    GraphActions
   },
   data() {
     return {
@@ -102,33 +102,33 @@ export default {
         // },
         {
           label: '智能小助手',
-          handler: () => this.gotoSmarthelper('/smarthelper'),
-        },
+          handler: () => this.gotoSmarthelper('/smarthelper')
+        }
       ],
       settingOptions: [
         {
           label: '修改项目名称',
-          handler: () => this.changeName(),
+          handler: () => this.changeName()
         },
         {
           label: '修改项目描述',
-          handler: () => this.changeDesc(),
+          handler: () => this.changeDesc()
         },
         {
           label: '修改项目权限',
-          handler: () => this.changeStatus(),
-        },
-      ],
+          handler: () => this.changeStatus()
+        }
+      ]
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId']),
+    ...mapGetters(['graphBoardMode', 'projectId'])
   },
   methods: {
     ...mapMutations([
       'setShowModifyNameModal',
       'setShowModifyDescModal',
-      'setShowModifyStatusModal',
+      'setShowModifyStatusModal'
     ]),
     ...mapActions(['switchLayoutMode', 'verifyInitiate']),
     passingGraphAction(...args) {
@@ -148,7 +148,7 @@ export default {
     },
     gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId)
-      this.verifyInitiate(projectId).then((res) => {
+      this.verifyInitiate(projectId).then(res => {
         if (res) {
           this.$router.push(`${path}/${projectId}`)
         } else {
@@ -169,19 +169,20 @@ export default {
     },
     changeStatus() {
       this.setShowModifyStatusModal(true)
-    },
-  },
+    }
+  }
 }
 </script>
 
-<style>
+<style scoped>
 .graph > .main > .sidemenu {
   width: 150px;
   position: fixed;
   left: 0;
   top: 100px;
 }
-.el-button+.el-button {
+
+.el-button + .el-button {
   margin: 0;
 }
 </style>
