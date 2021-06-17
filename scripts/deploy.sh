@@ -1,9 +1,9 @@
 #!/bin/bash
 #集群IP列表，多个用空格分开
 #NODE_LIST="192.168.161.118 192.168.161.117"
-NODE_LIST="39.97.124.144"
+NODE="121.4.125.198"
 #应用部署到的远程服务器目录
-REMOTE_DIR="/opt/apache-tomcat-9.0.36/webapps" 
+REMOTE_DIR="/opt/software/apache-tomcat-8.5.68/webapps" 
 # Date/Time Veriables
 LOG_DATE='date "+%Y-%m-%d"'
 LOG_TIME='date "+%H:%M:%S"' 
@@ -41,27 +41,23 @@ scp_dist(){
     WORKSPACE=$1
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
-      scp -r ${WORKSPACE}/dist $node:${REMOTE_DIR}
-      write_log "Scp ${WORKSPACE}/dist to $node:${REMOTE_DIR} complete."
-      ssh $node "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT"
+      cp -r ${WORKSPACE}/dist ${REMOTE_DIR}
+      write_log "cp ${WORKSPACE}/dist to ${REMOTE_DIR} complete."
+      mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT
       write_log "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT complete."
     done
 } 
 # 杀掉远程服务器上正在运行的项目
 cluster_node_remove(){
     write_log "Kill all runing project on the cluster..."
-    for node in $NODE_LIST;do
-        ssh $node "/opt/apache-tomcat-9.0.36/bin/shutdown.sh"
-        ssh $node "rm -rf /opt/apache-tomcat-9.0.36/webapps/ROOT"
-    done
+    ${REMOTE_DIR}/bin/shutdown.sh
+    rm -rf ${REMOTE_DIR}/webapps/ROOT
 } 
 #在远程服务器上启动项目
 cluster_deploy(){
     write_log "Up all project on the cluster..."
     for project in $NEED_DEPLOY_PROJECT;do
-      for node in $NODE_LIST;do
-        ssh $node "/opt/apache-tomcat-9.0.36/bin/startup.sh"
-      done
+        ${REMOTE_DIR}/bin/startup.sh
     done
 } 
 #回滚（暂未实现）
