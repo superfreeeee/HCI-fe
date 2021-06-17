@@ -3,7 +3,7 @@
 #NODE_LIST="192.168.161.118 192.168.161.117"
 NODE="121.4.125.198"
 #应用部署到的远程服务器目录
-REMOTE_DIR="/opt/software/apache-tomcat-8.5.68/webapps" 
+REMOTE_DIR="/opt/software/apache-tomcat-8.5.68" 
 # Date/Time Veriables
 LOG_DATE='date "+%Y-%m-%d"'
 LOG_TIME='date "+%H:%M:%S"' 
@@ -42,9 +42,9 @@ scp_dist(){
     write_log "Scp jar file to remote machine..."
     for node in $NODE_LIST;do
       cp -r ${WORKSPACE}/dist ${REMOTE_DIR}
-      write_log "cp ${WORKSPACE}/dist to ${REMOTE_DIR} complete."
+      write_log "cp ${WORKSPACE}/dist to ${REMOTE_DIR}/webapps complete."
       mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT
-      write_log "mv ${REMOTE_DIR}/dist ${REMOTE_DIR}/ROOT complete."
+      write_log "mv ${REMOTE_DIR}/webapps/dist ${REMOTE_DIR}/webapps/ROOT complete."
     done
 } 
 # 杀掉远程服务器上正在运行的项目
