@@ -12,9 +12,7 @@
         <el-menu-item index="4">文档</el-menu-item>
         <el-menu-item index="5">系统设计</el-menu-item>
       </el-menu>
-      <h1 v-if="activeIndex === '1' || activeIndex === '2'">
-        欢迎使用 co$in
-      </h1>
+      <h1 v-if="activeIndex === '1' || activeIndex === '2'">欢迎使用 co$in</h1>
       <h1 v-if="activeIndex === '4'">co$in 文档</h1>
       <h1 v-if="activeIndex === '5'">co$in 系统设计</h1>
       <el-button
@@ -50,16 +48,17 @@ import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel
+    NewProjectPanel,
   },
   data() {
     return {
       activeIndex: '1',
-      userId: null
+      userId: null,
+      childRouteList: [, '/', '/square', '/chat', '/tutorial', '/systemdesign'],
     }
   },
   computed: {
-    ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo'])
+    ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo']),
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
@@ -70,7 +69,7 @@ export default {
       'getAllListByPageNo',
       'getOwnListByPageNo',
       'getAllListAmount',
-      'getOwnListAmount'
+      'getOwnListAmount',
     ]),
     createNewGraph() {
       this.setShowCreatePanel(true)
@@ -81,37 +80,26 @@ export default {
     },
     handleSelect(key) {
       this.activeIndex = key
-      const path = [, '/', '/square', '/chat', '/tutorial', '/system-design'][
-        key
-      ]
+      const path = this.childRouteList[key]
       this.$router.push(path)
-    }
+    },
   },
   mounted() {
-    console.log(`path: ${this.$route.path}`)
-    this.activeIndex = [
-      ,
-      '/',
-      '/square',
-      '/chat',
-      '/tutorial',
-      '/system-design'
-    ]
-      .indexOf(this.$route.path)
-      .toString()
-    this.getUserInfo().then(success => {
+    // console.log(`path: ${this.$route.path}`)
+    this.activeIndex = this.childRouteList.indexOf(this.$route.path).toString()
+    this.getUserInfo().then((success) => {
       if (success) {
         this.userId = this.userInfo.id
         this.getOwnListAmount(this.userId)
         this.getAllListAmount()
         this.getOwnListByPageNo({
           userId: this.userId,
-          pageNo: this.ownPageNo
+          pageNo: this.ownPageNo,
         })
         this.getAllListByPageNo(this.allPageNo)
       }
     })
-  }
+  },
 }
 </script>
 
