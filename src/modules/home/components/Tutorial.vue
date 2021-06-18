@@ -1,5 +1,7 @@
 <template>
-  <iframe :src="src" frameborder="0" class="iframeTutorial"></iframe>
+  <div class="document">
+    <iframe :src="src" frameborder="0" class="iframeTutorial"></iframe>
+  </div>
 </template>
 
 <script>
@@ -7,13 +9,18 @@ export default {
   name: 'Tutorial',
   data() {
     return {
-      src: '../../static/guide.html',
+      src: '../../static/guide.html'
     }
-  },
+  }
 }
 </script>
 
-<style>
+<style scoped>
+.document {
+  width: 100%;
+  height: 100%;
+}
+
 .iframeTutorial {
   width: 100%;
   height: 100%;

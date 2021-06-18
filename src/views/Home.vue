@@ -12,11 +12,11 @@
         <el-menu-item index="4">文档</el-menu-item>
         <el-menu-item index="5">系统设计</el-menu-item>
       </el-menu>
-      <h1 v-if="this.activeIndex === '1' || this.activeIndex === '2'">
+      <h1 v-if="activeIndex === '1' || activeIndex === '2'">
         欢迎使用 co$in
       </h1>
-      <h1 v-if="this.activeIndex === '4'">co$in 文档</h1>
-      <h1 v-if="this.activeIndex === '5'">co$in 系统设计</h1>
+      <h1 v-if="activeIndex === '4'">co$in 文档</h1>
+      <h1 v-if="activeIndex === '5'">co$in 系统设计</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
@@ -38,76 +38,38 @@
         ></el-button>
       </el-popover>
     </div>
-    <div class="list" v-if="this.activeIndex === '1'">
-      <el-button
-        v-for="project in ownProjects"
-        :key="project.projectId"
-        type="primary"
-        style="width: 100%; margin: 0 0 15px 0"
-        round
-        @click="gotoProject(project.projectId)"
-      >
-        项目：{{ project.name }}
-      </el-button>
-      <el-pagination
-        layout="prev, pager, next"
-        :total="ownListCount"
-        @current-change="switchPageOwn"
-        :current-page="ownPageNo"
-      >
-      </el-pagination>
-    </div>
-    <div class="list" v-if="this.activeIndex === '2'">
-      <el-button
-        v-for="project in allProjects"
-        :key="project.projectId"
-        type="primary"
-        style="width: 100%; margin: 0 0 15px 0"
-        round
-        @click="gotoSmarthelper(project.projectId)"
-      >
-        项目：{{ project.name }}
-      </el-button>
-      <el-pagination
-        layout="prev, pager, next"
-        :total="allListCount"
-        @current-change="switchPageAll"
-        :current-page="allPageNo"
-      >
-      </el-pagination>
-    </div>
-    <div v-if="this.activeIndex === '3'">
-      <Chat />
-    </div>
-    <div class="document" v-if="this.activeIndex === '4'">
-      <Tutorial />
-    </div>
-    <div class="document" v-if="this.activeIndex === '5'">
-      <SystemDesign />
-    </div>
+    <HomeProjects v-if="activeIndex === '1'" />
+    <HomeSquare v-else-if="activeIndex === '2'" />
+    <Chat v-else-if="activeIndex === '3'" />
+    <Tutorial v-else-if="activeIndex === '4'" />
+    <SystemDesign v-else-if="activeIndex === '5'" />
     <NewProjectPanel />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import NewProjectPanel from '../modules/home/components/NewProjectPanel'
+import HomeProjects from '../modules/home/components/HomeProjects'
+import HomeSquare from '../modules/home/components/HomeSquare'
 import Tutorial from '../modules/home/components/Tutorial'
 import Chat from '../modules/home/components/Chat'
 import SystemDesign from '../modules/home/components/SystemDesign'
+import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 
 export default {
   name: 'Home',
   components: {
-    NewProjectPanel,
+    HomeProjects,
+    HomeSquare,
     Tutorial,
     Chat,
     SystemDesign,
+    NewProjectPanel
   },
   data() {
     return {
       activeIndex: '1',
-      userId: null,
+      userId: null
     }
   },
   computed: {
@@ -119,17 +81,16 @@ export default {
       'allProjects',
       'allPageNo',
       'allListCount',
-      'ownProjects',
       'ownPageNo',
-      'ownListCount',
-    ]),
+      'ownListCount'
+    ])
   },
   methods: {
     ...mapMutations([
       'setGraphProjectId',
       'setShowCreatePanel',
       'setAllPageNo',
-      'setOwnPageNo',
+      'setOwnPageNo'
     ]),
     ...mapActions([
       // 'getListByUserId',
@@ -138,14 +99,8 @@ export default {
       'getAllListByPageNo',
       'getOwnListByPageNo',
       'getAllListAmount',
-      'getOwnListAmount',
+      'getOwnListAmount'
     ]),
-    gotoProject(id) {
-      this.$router.push(`/graph/${id}`)
-    },
-    gotoSmarthelper(id) {
-      this.$router.push(`/smarthelper/${id}`)
-    },
     createNewGraph() {
       this.setShowCreatePanel(true)
     },
@@ -155,34 +110,22 @@ export default {
     },
     handleSelect(key) {
       this.activeIndex = key
-    },
-    switchPageOwn(currPageNo) {
-      this.setOwnPageNo(currPageNo)
-      this.getOwnListByPageNo({
-        userId: this.userId,
-        pageNo: this.ownPageNo,
-      })
-    },
-    switchPageAll(currPageNo) {
-      // console.log('switchPage', currPageNo)
-      this.setAllPageNo(currPageNo)
-      this.getAllListByPageNo(currPageNo)
-    },
+    }
   },
   mounted() {
-    this.getUserInfo().then((success) => {
+    this.getUserInfo().then(success => {
       if (success) {
         this.userId = this.userInfo.id
         this.getOwnListAmount(this.userId)
         this.getAllListAmount()
         this.getOwnListByPageNo({
           userId: this.userId,
-          pageNo: this.ownPageNo,
+          pageNo: this.ownPageNo
         })
         this.getAllListByPageNo(this.allPageNo)
       }
     })
-  },
+  }
 }
 </script>
 
@@ -224,18 +167,5 @@ export default {
   border-bottom: 1px solid black;
   padding-bottom: 5px;
   margin-bottom: 5px;
-}
-
-.box > .list {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 400px;
-}
-
-.box > .document {
-  width: 100%;
-  height: 100%;
 }
 </style>
