@@ -8,7 +8,6 @@ import { deepCopy } from '../../../common/utils/object'
 import { consoleGroup } from '../../../common/utils/message'
 import config from '../utils/config'
 import { getGridLayout, calcScale } from '../utils/layout'
-import { distance } from '../utils/distance'
 
 export default {
   name: 'GraphBoard',
@@ -221,10 +220,7 @@ export default {
       this.svgElements.focusGroup = focusGroup
     },
     setLinks(root) {
-      const {
-        links,
-        clickLink,
-      } = this
+      const { links, clickLink } = this
 
       // 设置关系线段
       const svgLinks = root
@@ -248,6 +244,7 @@ export default {
     setLinksText(root) {
       const {
         config: { font, fontSize },
+        setLinksPositionRaio,
         links,
         clickLink
       } = this
@@ -266,6 +263,9 @@ export default {
         .text(d => d.name)
         .on('click', clickLink)
       this.svgElements.svgLinksText = svgLinksText
+
+      setLinksPositionRaio()
+
       return svgLinksText
     },
     setNodes(root, boundDrag, scale) {
@@ -374,21 +374,19 @@ export default {
       svgLinksText
         .attr('x', d => {
           const {
-            source: { x: x1, radius: r1 },
-            target: { x: x2, radius: r2 }
+            source: { x: x1 },
+            target: { x: x2 },
+            positionRatio
           } = d
-          const br = this.config.baseRadius
-          const ratio = (br + r1 * 20) / ((r1 + r2) * 30 + br)
-          return x1 + (x2 - x1) * ratio
+          return x1 + (x2 - x1) * positionRatio
         })
         .attr('y', d => {
           const {
-            source: { y: y1, radius: r1 },
-            target: { y: y2, radius: r2 }
+            source: { y: y1 },
+            target: { y: y2 },
+            positionRatio
           } = d
-          const br = this.config.baseRadius
-          const ratio = (br + r1 * 20) / ((r1 + r2) * 30 + br)
-          return y1 + (y2 - y1) * ratio
+          return y1 + (y2 - y1) * positionRatio
         })
 
       svgNodes.attr('cx', d => d.x).attr('cy', d => d.y)
@@ -469,48 +467,16 @@ export default {
       if (!this.flags.loaded) return
       const {
         $d3,
-        config: { baseRadius, fontSize, font, opacity },
+        config: { fontSize, font, opacity },
         nodes,
         links,
-        svgElements: { simulation, root, defs, marker, svgLinks, svgLinksText },
+        svgElements: { simulation, root, svgLinks, svgLinksText },
+        setLinksPositionRaio,
         clickLink,
         updateAllOpacity
       } = this
       // console.log('updateLinksWithText', links)
       updateAllOpacity()
-
-      // update markers
-      // let _marker = defs
-      //   .selectAll('marker')
-      //   .data(links)
-      //   .join('marker')
-      //   .attr('id', d => `arrow-${d.id}`)
-      //   .attr('markerUnits', 'strokeWidth')
-      //   .attr('markerWidth', '4')
-      //   .attr('markerHeight', '4')
-      //   .attr('viewBox', d => {
-      //     // const r = baseRadius + d.target.radius * 10
-      //     // return `0 0 ${r} ${r}`
-      //     const v = ((baseRadius + d.target.radius) * 10) / d.value
-      //     return `0 0 ${v} ${v}`
-      //     // return `0 0 100 100`
-      //   })
-      //   .attr('refX', 50)
-      //   // .attr('refY', d => (baseRadius + d.target.radius * 10) / 2)
-      //   .attr('refY', 50)
-      //   .attr('orient', 'auto')
-      //   .each(function(d) {
-      //     const marker = $d3.select(this)
-      //     if (marker.select('path').empty()) {
-      //       const r = baseRadius + d.target.radius * 10
-      //       marker
-      //         .append('path')
-      //         // .attr('d', `M0,${r / 3} L${r / 2},${r / 2} L0,${(r / 3) * 2} Z`)
-      //         .attr('d', 'M0,0 L100,100 L0,200 Z')
-      //     }
-      //   })
-      // _marker = _marker.merge(marker)
-      // this.svgElements.marker = _marker
 
       // update links
       let _svgLinks = root
@@ -527,6 +493,8 @@ export default {
       _svgLinks.append('title').text(d => d.name)
       _svgLinks = _svgLinks.merge(svgLinks)
       this.svgElements.svgLinks = _svgLinks
+
+      setLinksPositionRaio()
 
       // update links text
       const _svgLinksText = root
@@ -549,6 +517,20 @@ export default {
       simulation.nodes(nodes)
       simulation.force('link').links(links)
       simulation.alpha(1).restart()
+    },
+    setLinksPositionRaio() {
+      const {
+        config: { baseRadius },
+        links
+      } = this
+      links.forEach(link => {
+        const {
+          source: { radius: r1 },
+          target: { radius: r2 }
+        } = link
+        link.positionRatio =
+          (baseRadius + r1 * 20) / ((r1 + r2) * 30 + baseRadius)
+      })
     },
     updateFocus() {
       const {
