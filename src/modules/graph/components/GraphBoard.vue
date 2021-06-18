@@ -8,6 +8,7 @@ import { deepCopy } from '../../../common/utils/object'
 import { consoleGroup } from '../../../common/utils/message'
 import config from '../utils/config'
 import { getGridLayout, calcScale } from '../utils/layout'
+import { distance } from '../utils/distance'
 
 export default {
   name: 'GraphBoard',
@@ -30,6 +31,8 @@ export default {
       svgElements: {
         simulation: null,
         svg: null,
+        defs: null,
+        marker: null,
         view: null,
         root: null,
         focusGroup: null,
@@ -83,6 +86,7 @@ export default {
         // 子例程
         reset,
         setSimulation,
+        setDefs,
         setView,
         setRoot,
         setFocusGroup,
@@ -109,6 +113,9 @@ export default {
         .select($el)
         .attr('viewBox', [-width / 2, -height / 2, width, height])
       this.svgElements.svg = svg
+
+      // 设置 defs 定义组
+      // setDefs(svg)
 
       // 设置透明操作板
       const view = setView(svg)
@@ -166,9 +173,7 @@ export default {
             .forceLink(links)
             .id(d => d.id)
             .distance(
-              d =>
-                (Number(d.source.radius) + Number(d.target.radius)) * 20 +
-                baseRadius * 5
+              d => (d.source.radius + d.target.radius) * 30 + baseRadius
             )
         )
         .force(
@@ -179,6 +184,11 @@ export default {
         .force('y', $d3.forceY())
       this.svgElements.simulation = simulation
       return simulation
+    },
+    setDefs(svg) {
+      const defs = this.svgElements.defs || svg.append('defs')
+      this.svgElements.defs = defs
+      return defs
     },
     // 设置拖曳背景图
     setView(svg) {
@@ -211,7 +221,12 @@ export default {
       this.svgElements.focusGroup = focusGroup
     },
     setLinks(root) {
-      const { links, clickLink } = this
+      const {
+        links,
+        clickLink,
+      } = this
+
+      // 设置关系线段
       const svgLinks = root
         .append('g')
         .attr('class', 'links')
@@ -223,8 +238,10 @@ export default {
         .attr('stroke-width', d => d.value * 5)
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
+        .attr('marker-end', d => `url(#arrow-${d.id})`)
         .on('click', clickLink)
       svgLinks.append('title').text(d => d.name)
+
       this.svgElements.svgLinks = svgLinks
       return svgLinks
     },
@@ -357,17 +374,21 @@ export default {
       svgLinksText
         .attr('x', d => {
           const {
-            source: { x: x1 },
-            target: { x: x2 }
+            source: { x: x1, radius: r1 },
+            target: { x: x2, radius: r2 }
           } = d
-          return (x1 + x2) / 2
+          const br = this.config.baseRadius
+          const ratio = (br + r1 * 20) / ((r1 + r2) * 30 + br)
+          return x1 + (x2 - x1) * ratio
         })
         .attr('y', d => {
           const {
-            source: { y: y1 },
-            target: { y: y2 }
+            source: { y: y1, radius: r1 },
+            target: { y: y2, radius: r2 }
           } = d
-          return (y1 + y2) / 2
+          const br = this.config.baseRadius
+          const ratio = (br + r1 * 20) / ((r1 + r2) * 30 + br)
+          return y1 + (y2 - y1) * ratio
         })
 
       svgNodes.attr('cx', d => d.x).attr('cy', d => d.y)
@@ -447,15 +468,49 @@ export default {
     updateLinksWithText() {
       if (!this.flags.loaded) return
       const {
-        config: { fontSize, font, opacity },
+        $d3,
+        config: { baseRadius, fontSize, font, opacity },
         nodes,
         links,
-        svgElements: { simulation, root, svgLinks, svgLinksText },
+        svgElements: { simulation, root, defs, marker, svgLinks, svgLinksText },
         clickLink,
         updateAllOpacity
       } = this
       // console.log('updateLinksWithText', links)
       updateAllOpacity()
+
+      // update markers
+      // let _marker = defs
+      //   .selectAll('marker')
+      //   .data(links)
+      //   .join('marker')
+      //   .attr('id', d => `arrow-${d.id}`)
+      //   .attr('markerUnits', 'strokeWidth')
+      //   .attr('markerWidth', '4')
+      //   .attr('markerHeight', '4')
+      //   .attr('viewBox', d => {
+      //     // const r = baseRadius + d.target.radius * 10
+      //     // return `0 0 ${r} ${r}`
+      //     const v = ((baseRadius + d.target.radius) * 10) / d.value
+      //     return `0 0 ${v} ${v}`
+      //     // return `0 0 100 100`
+      //   })
+      //   .attr('refX', 50)
+      //   // .attr('refY', d => (baseRadius + d.target.radius * 10) / 2)
+      //   .attr('refY', 50)
+      //   .attr('orient', 'auto')
+      //   .each(function(d) {
+      //     const marker = $d3.select(this)
+      //     if (marker.select('path').empty()) {
+      //       const r = baseRadius + d.target.radius * 10
+      //       marker
+      //         .append('path')
+      //         // .attr('d', `M0,${r / 3} L${r / 2},${r / 2} L0,${(r / 3) * 2} Z`)
+      //         .attr('d', 'M0,0 L100,100 L0,200 Z')
+      //     }
+      //   })
+      // _marker = _marker.merge(marker)
+      // this.svgElements.marker = _marker
 
       // update links
       let _svgLinks = root
@@ -467,6 +522,7 @@ export default {
         .attr('opacity', d => (d.opacity ? opacity : 1))
         .attr('id', d => `link-${d.id}`)
         .attr('data-id', d => d.id)
+        .attr('marker-end', d => `url(#arrow-${d.id})`)
         .on('click', clickLink)
       _svgLinks.append('title').text(d => d.name)
       _svgLinks = _svgLinks.merge(svgLinks)

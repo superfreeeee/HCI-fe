@@ -43,6 +43,7 @@
           @click="login()"
           @keyup.enter.native="bindEnter()"
           class="login-btn"
+          style="margin-bottom: 10px"
         >
           登录
         </el-button>
@@ -104,10 +105,10 @@ export default {
     }
   },
   mounted() {
-    document.addEventListener('onkeydown', this.bindEnter)
+    document.addEventListener('keydown', this.bindEnter)
   },
   destroyed() {
-    document.removeEventListener('onkeydown', this.bindEnter)
+    document.removeEventListener('keydown', this.bindEnter)
   }
 }
 </script>
