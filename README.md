@@ -2,7 +2,7 @@
 
 > co$in project frontend code
 
-http://39.97.124.144:8002/
+deploy url: http://121.4.125.198:8002/#/
 
 ## Build Setup
 
