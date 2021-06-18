@@ -71,11 +71,11 @@ const smart = {
   actions: {
     verifyInitiate: async ({ commit }, projectId) => {
       const res = await api.verifyInitiate(projectId)
-      return Promise.resolve(res.data)
+      return res.data
     },
     initiateGraph: async ({ commit }, projectId) => {
       const res = await api.initGraph(projectId)
-      return Promise.resolve(res)
+      return res
     },
     sendQuestionChat: async ({ commit }, data) => {
       const { text, username } = data

@@ -81,56 +81,56 @@ export default {
   props: {
     layoutMode: {
       type: String,
-      default: 'FORCE'
-    }
+      default: 'FORCE',
+    },
   },
   components: {
     GraphLayout,
-    GraphActions
+    GraphActions,
   },
   data() {
     return {
       // flag: true, // mock verifyInitiate
       smartOptions: [
-        // {
-        //   label: '初始化图谱',
-        //   handler: () => this.initGraph(),
-        // },
+        {
+          label: '初始化图谱',
+          handler: () => this.initGraph(),
+        },
         // {
         //   label: '智能小助手 PC 端',
         //   handler: () => this.gotoSmarthelper('/chat'),
         // },
         {
           label: '智能小助手',
-          handler: () => this.gotoSmarthelper('/smarthelper')
-        }
+          handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
       ],
       settingOptions: [
         {
           label: '修改项目名称',
-          handler: () => this.changeName()
+          handler: () => this.changeName(),
         },
         {
           label: '修改项目描述',
-          handler: () => this.changeDesc()
+          handler: () => this.changeDesc(),
         },
         {
           label: '修改项目权限',
-          handler: () => this.changeStatus()
-        }
-      ]
+          handler: () => this.changeStatus(),
+        },
+      ],
     }
   },
   computed: {
-    ...mapGetters(['graphBoardMode', 'projectId'])
+    ...mapGetters(['graphBoardMode', 'projectId']),
   },
   methods: {
     ...mapMutations([
       'setShowModifyNameModal',
       'setShowModifyDescModal',
-      'setShowModifyStatusModal'
+      'setShowModifyStatusModal',
     ]),
-    ...mapActions(['switchLayoutMode', 'verifyInitiate']),
+    ...mapActions(['switchLayoutMode', 'verifyInitiate', 'initiateGraph']),
     passingGraphAction(...args) {
       this.passingEmit('graph-action', ...args)
     },
@@ -147,8 +147,10 @@ export default {
       // console.log(key, keyPath)
     },
     gotoSmarthelper(path) {
+      this.initiateGraph()
       const projectId = Number(this.$route.params.projectId)
-      this.verifyInitiate(projectId).then(res => {
+      this.verifyInitiate(projectId).then((res) => {
+        // console.log('res', res)
         if (res) {
           this.$router.push(`${path}/${projectId}`)
         } else {
@@ -169,8 +171,19 @@ export default {
     },
     changeStatus() {
       this.setShowModifyStatusModal(true)
-    }
-  }
+    },
+    initGraph() {
+      const projectId = Number(this.$route.params.projectId)
+      this.initiateGraph(projectId).then((res) => {
+        const { success, msg } = res.data
+        if (success) {
+          this.$message.success(msg)
+        } else {
+          this.$message.error(msg)
+        }
+      })
+    },
+  },
 }
 </script>
 
@@ -181,7 +194,7 @@ export default {
   left: 0;
   top: 100px;
 }
-.el-button+.el-button[style] {
+.el-button + .el-button[style] {
   margin: 0;
 }
 </style>
