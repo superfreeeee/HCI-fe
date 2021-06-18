@@ -85,10 +85,8 @@ export default {
     },
   },
   mounted() {
-    console.log(`path: ${this.$route.path}`)
-    this.activeIndex = [, '/', '/square', '/chat', '/tutorial', '/systemdesign']
-      .indexOf(this.$route.path)
-      .toString()
+    // console.log(`path: ${this.$route.path}`)
+    this.activeIndex = this.childRouteList.indexOf(this.$route.path).toString()
     this.getUserInfo().then((success) => {
       if (success) {
         this.userId = this.userInfo.id
