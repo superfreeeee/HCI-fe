@@ -54,7 +54,7 @@ const router = new Router({
           component: () => import('@/modules/home/components/Tutorial.vue')
         },
         {
-          path: 'system-design',
+          path: 'systemdesign',
           name: 'SystemDesign',
           component: () => import('@/modules/home/components/SystemDesign.vue')
         },
