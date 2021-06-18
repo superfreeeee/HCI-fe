@@ -21,13 +21,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'HomeProjects',
   computed: {
     ...mapGetters(['ownProjects', 'ownListCount', 'ownPageNo'])
   },
   methods: {
+    ...mapMutations(['setOwnPageNo']),
+    ...mapActions(['getOwnListByPageNo']),
     gotoProject(id) {
       this.$router.push(`/graph/${id}`)
     },

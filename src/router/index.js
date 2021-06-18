@@ -31,7 +31,34 @@ const router = new Router({
       component: Home,
       meta: {
         requireLogin: true
-      }
+      },
+      children: [
+        {
+          path: '',
+          name: 'HomeProjects',
+          component: () => import('@/modules/home/components/HomeProjects.vue')
+        },
+        {
+          path: 'square',
+          name: 'HomeSquare',
+          component: () => import('@/modules/home/components/HomeSquare.vue')
+        },
+        {
+          path: 'chat',
+          name: 'Chat',
+          component: () => import('@/modules/home/components/Chat.vue')
+        },
+        {
+          path: 'tutorial',
+          name: 'Tutorial',
+          component: () => import('@/modules/home/components/Tutorial.vue')
+        },
+        {
+          path: 'system-design',
+          name: 'SystemDesign',
+          component: () => import('@/modules/home/components/SystemDesign.vue')
+        },
+      ]
     },
     {
       path: '/graph/:projectId',

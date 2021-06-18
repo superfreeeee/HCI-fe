@@ -1,13 +1,15 @@
 <template>
-  <div class="chatbox">
-    <JwChat
-      :taleList="taleList"
-      @enter="bindEnter"
-      v-model="text"
-      :toolConfig="tool"
-      class="jwchat"
-    />
-  </div>
+  <keep-alive>
+    <div class="chatbox">
+      <JwChat
+        :taleList="taleList"
+        @enter="bindEnter"
+        v-model="text"
+        :toolConfig="tool"
+        class="jwchat"
+      />
+    </div>
+  </keep-alive>
 </template>
 
 <script>
@@ -20,12 +22,12 @@ export default {
       height: '80vh',
       text: '',
       tool: {
-        callback: this.toolEvent,
-      },
+        callback: this.toolEvent
+      }
     }
   },
   computed: {
-    ...mapGetters(['taleList', 'userInfo']),
+    ...mapGetters(['taleList', 'userInfo'])
   },
   methods: {
     ...mapMutations(['pushTaleList']),
@@ -36,7 +38,7 @@ export default {
     async bindEnter() {
       const data = {
         text: this.text,
-        username: this.userInfo.username,
+        username: this.userInfo.username
       }
       const { reqTale, resTale } = await this.sendQuestionChat(data)
       this.pushTaleList(reqTale)
@@ -45,8 +47,8 @@ export default {
           this.pushTaleList(resTale)
         }, 1000)
       })
-    },
-  },
+    }
+  }
 }
 </script>
 

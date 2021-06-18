@@ -1,7 +1,9 @@
 <template>
-  <div class="document">
-    <iframe :src="src" frameborder="0" class="iframeSystemDesign"></iframe>
-  </div>
+  <keep-alive>
+    <div class="document">
+      <iframe :src="src" frameborder="0" class="iframeSystemDesign"></iframe>
+    </div>
+  </keep-alive>
 </template>
 
 <script>

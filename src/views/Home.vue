@@ -38,32 +38,18 @@
         ></el-button>
       </el-popover>
     </div>
-    <HomeProjects v-if="activeIndex === '1'" />
-    <HomeSquare v-else-if="activeIndex === '2'" />
-    <Chat v-else-if="activeIndex === '3'" />
-    <Tutorial v-else-if="activeIndex === '4'" />
-    <SystemDesign v-else-if="activeIndex === '5'" />
+    <router-view></router-view>
     <NewProjectPanel />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex'
-import HomeProjects from '../modules/home/components/HomeProjects'
-import HomeSquare from '../modules/home/components/HomeSquare'
-import Tutorial from '../modules/home/components/Tutorial'
-import Chat from '../modules/home/components/Chat'
-import SystemDesign from '../modules/home/components/SystemDesign'
 import NewProjectPanel from '../modules/home/components/NewProjectPanel'
 
 export default {
   name: 'Home',
   components: {
-    HomeProjects,
-    HomeSquare,
-    Tutorial,
-    Chat,
-    SystemDesign,
     NewProjectPanel
   },
   data() {
@@ -73,25 +59,10 @@ export default {
     }
   },
   computed: {
-    ...mapGetters([
-      'ownProjects',
-      'projectId',
-      'userInfo',
-      'showCreatePanel',
-      'allProjects',
-      'allPageNo',
-      'allListCount',
-      'ownPageNo',
-      'ownListCount'
-    ])
+    ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo'])
   },
   methods: {
-    ...mapMutations([
-      'setGraphProjectId',
-      'setShowCreatePanel',
-      'setAllPageNo',
-      'setOwnPageNo'
-    ]),
+    ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
     ...mapActions([
       // 'getListByUserId',
       'userLogout',
@@ -110,9 +81,24 @@ export default {
     },
     handleSelect(key) {
       this.activeIndex = key
+      const path = [, '/', '/square', '/chat', '/tutorial', '/system-design'][
+        key
+      ]
+      this.$router.push(path)
     }
   },
   mounted() {
+    console.log(`path: ${this.$route.path}`)
+    this.activeIndex = [
+      ,
+      '/',
+      '/square',
+      '/chat',
+      '/tutorial',
+      '/system-design'
+    ]
+      .indexOf(this.$route.path)
+      .toString()
     this.getUserInfo().then(success => {
       if (success) {
         this.userId = this.userInfo.id

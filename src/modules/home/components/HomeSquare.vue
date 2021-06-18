@@ -21,13 +21,15 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapActions, mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'HomeSquare',
   computed: {
     ...mapGetters(['allProjects', 'allPageNo', 'allListCount'])
   },
   methods: {
+    ...mapMutations(['setAllPageNo']),
+    ...mapActions(['getAllListByPageNo']),
     gotoSmarthelper(id) {
       this.$router.push(`/smarthelper/${id}`)
     },
