@@ -3,6 +3,8 @@ import { $notify } from '@/common/utils'
 
 import { svgToPng, download, xmlDownload } from './utils/saving'
 import { transformProperties, typeMapper, itemTransformer } from './utils/item'
+import { deepCopy } from '../../common/utils'
+import { _graphData } from './utils/data'
 
 const graph = {
   state: {
@@ -32,6 +34,7 @@ const graph = {
     // },
     async getProjectGraphData(_, projectId) {
       const res = await api.getGraphByProjectId(projectId)
+      // const res = { data: _graphData, status: 200 }
       return res.status === 200 ? res.data : null
     },
     /********** new **********/
