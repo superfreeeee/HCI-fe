@@ -466,7 +466,6 @@ export default {
     updateLinksWithText() {
       if (!this.flags.loaded) return
       const {
-        $d3,
         config: { fontSize, font, opacity },
         nodes,
         links,
@@ -494,8 +493,6 @@ export default {
       _svgLinks = _svgLinks.merge(svgLinks)
       this.svgElements.svgLinks = _svgLinks
 
-      setLinksPositionRaio()
-
       // update links text
       const _svgLinksText = root
         .select('g.links_text')
@@ -517,6 +514,8 @@ export default {
       simulation.nodes(nodes)
       simulation.force('link').links(links)
       simulation.alpha(1).restart()
+
+      setLinksPositionRaio()
     },
     setLinksPositionRaio() {
       const {
@@ -550,7 +549,7 @@ export default {
     },
     /********** 外部节点操作 **********/
     createNode(node) {
-      // console.log('[GraphBoard] createNode', node)
+      console.log('[GraphBoard] createNode', node)
       const {
         nodes,
         updateNodesWithText,
@@ -566,13 +565,13 @@ export default {
       layoutMode === 'GRID' && restoreLayout(true)
     },
     createLink(link) {
-      // console.log('[GraphBoard] createLink', link)
+      console.log('[GraphBoard] createLink', link)
       const { links, updateLinksWithText } = this
       links.push(link)
       updateLinksWithText()
     },
     updateNode(node) {
-      // console.log('[GraphBoard]', node)
+      console.log('[GraphBoard]', node)
       const {
         nodes,
         updateNodesWithText,

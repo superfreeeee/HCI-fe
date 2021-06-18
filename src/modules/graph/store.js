@@ -59,8 +59,8 @@ const graph = {
             : {
                 ...item,
                 id: res.data.relationId,
-                source: item.from,
-                target: item.to,
+                source: data.source,
+                target: data.target,
                 properties: transformProperties(item.properties)
               }
         } else {
@@ -90,8 +90,8 @@ const graph = {
               }
             : {
                 ...item,
-                source: item.from,
-                target: item.to,
+                source: data.source,
+                target: data.target,
                 properties: transformProperties(item.properties)
               }
         } else {
