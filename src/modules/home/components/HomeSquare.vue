@@ -25,7 +25,7 @@ import { mapActions, mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'HomeSquare',
   computed: {
-    ...mapGetters(['allProjects', 'allPageNo', 'allListCount'])
+    ...mapGetters(['allProjects', 'allPageNo', 'allListCount']),
   },
   methods: {
     ...mapMutations(['setAllPageNo']),
@@ -37,9 +37,17 @@ export default {
       // console.log('switchPage', currPageNo)
       this.setAllPageNo(currPageNo)
       this.getAllListByPageNo(currPageNo)
-    }
-  }
+    },
+  },
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 500px;
+}
+</style>

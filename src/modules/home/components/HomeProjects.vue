@@ -50,6 +50,6 @@ export default {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 400px;
+  width: 500px;
 }
 </style>
