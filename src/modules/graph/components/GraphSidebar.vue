@@ -147,15 +147,25 @@ export default {
       // console.log(key, keyPath)
     },
     gotoSmarthelper(path) {
-      this.initiateGraph()
       const projectId = Number(this.$route.params.projectId)
+      this.initiateGraph(projectId)
       this.verifyInitiate(projectId).then((res) => {
-        // console.log('res', res)
         if (res) {
           this.$router.push(`${path}/${projectId}`)
         } else {
           this.$router.push(`/graph/${projectId}`)
           this.$message.error('请先初始化图谱!')
+        }
+      })
+    },
+    initGraph() {
+      const projectId = Number(this.$route.params.projectId)
+      this.initiateGraph(projectId).then((res) => {
+        const { success, msg } = res.data
+        if (success) {
+          this.$message.success(msg)
+        } else {
+          this.$message.error(msg)
         }
       })
     },
@@ -171,17 +181,6 @@ export default {
     },
     changeStatus() {
       this.setShowModifyStatusModal(true)
-    },
-    initGraph() {
-      const projectId = Number(this.$route.params.projectId)
-      this.initiateGraph(projectId).then((res) => {
-        const { success, msg } = res.data
-        if (success) {
-          this.$message.success(msg)
-        } else {
-          this.$message.error(msg)
-        }
-      })
     },
   },
 }
