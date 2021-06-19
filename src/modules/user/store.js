@@ -27,7 +27,7 @@ const user = {
         status,
         data: { msg }
       } = await api.login(objectToHttpQuery(data))
-      
+
       const token = headers['coin-token']
       localStorage.setItem('coin-token', token)
 
@@ -35,6 +35,10 @@ const user = {
       return status === 200
     },
     userRegister: async (_, data) => {
+      const res = await api.getPublicKey()
+      const publicKey =
+        res.status === 200 ? res.data.msg : 'get public key error'
+      data['password'] = encrypt(data['password'], publicKey)
       const {
         status,
         data: { msg }
