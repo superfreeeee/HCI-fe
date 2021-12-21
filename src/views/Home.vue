@@ -6,23 +6,29 @@
         mode="horizontal"
         @select="handleSelect"
       >
-        <el-menu-item index="1">我的项目</el-menu-item>
-        <el-menu-item index="2">广场</el-menu-item>
+        <el-menu-item index="1">广场</el-menu-item>
+        <el-menu-item index="2">我的项目</el-menu-item>
         <el-menu-item index="3">Helper</el-menu-item>
         <el-menu-item index="4">文档</el-menu-item>
         <el-menu-item index="5">系统设计</el-menu-item>
       </el-menu>
-      <h1 v-if="activeIndex === '1' || activeIndex === '2'">欢迎使用 co$in</h1>
-      <h1 v-if="activeIndex === '4'">co$in 文档</h1>
-      <h1 v-if="activeIndex === '5'">co$in 系统设计</h1>
+      <!-- header -->
+      <div v-if="activeIndex === '1'" class="square-banner">
+        <Logo @click="backToSearch" />
+        <Input ref="search_input" />
+      </div>
+      <h1 v-else-if="activeIndex === '2'">欢迎使用 co$in</h1>
+      <h1 v-else-if="activeIndex === '4'">co$in 文档</h1>
+      <h1 v-else-if="activeIndex === '5'">co$in 系统设计</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
         @click="createNewGraph()"
-        v-if="activeIndex === '1'"
+        v-if="activeIndex === '2'"
       >
         新建项目
       </el-button>
+      <!-- avatar -->
       <el-popover placement="bottom" trigger="click" class="user">
         <div style="font-size: 20px">{{ userInfo.username }}</div>
         <div class="userinfo-email">{{ userInfo.email }}</div>
@@ -36,26 +42,40 @@
         ></el-button>
       </el-popover>
     </div>
+    <!-- main page -->
     <router-view></router-view>
     <NewProjectPanel />
   </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations, mapActions } from 'vuex'
-import NewProjectPanel from '../modules/home/components/NewProjectPanel'
+import { mapGetters, mapMutations, mapActions } from 'vuex';
+import Input from '../components/Input.vue';
+import Logo from '../components/Logo.vue';
+import NewProjectPanel from '../modules/home/components/NewProjectPanel';
+import { ROUTE_PATH } from '../router/config';
 
 export default {
   name: 'Home',
   components: {
     NewProjectPanel,
+    Logo,
+    Input,
   },
   data() {
     return {
+      ROUTE_PATH,
       activeIndex: '1',
       userId: null,
-      childRouteList: [, '/', '/square', '/chat', '/tutorial', '/systemdesign'],
-    }
+      childRouteList: [
+        ,
+        ROUTE_PATH.HomeSquare,
+        ROUTE_PATH.Home,
+        ROUTE_PATH.Chat,
+        ROUTE_PATH.Tutorial,
+        ROUTE_PATH.SystemDesign,
+      ],
+    };
   },
   computed: {
     ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo']),
@@ -72,38 +92,54 @@ export default {
       'getOwnListAmount',
     ]),
     createNewGraph() {
-      this.setShowCreatePanel(true)
+      this.setShowCreatePanel(true);
     },
     logout() {
-      localStorage.removeItem('coin-token')
-      this.$router.push('/user')
+      localStorage.removeItem('coin-token');
+      this.$router.push('/user');
     },
     handleSelect(key) {
-      this.activeIndex = key
-      const path = this.childRouteList[key]
-      this.$router.push(path)
+      this.activeIndex = key;
+      const path = this.childRouteList[key];
+      if (path) {
+        this.$router.push(path);
+      }
+    },
+    backToSearch() {
+      const searhInput = this.$refs.search_input.value;
+      this.$router.push(`${ROUTE_PATH.Search}?q=${searhInput}`);
     },
   },
   mounted() {
     // console.log(`path: ${this.$route.path}`)
-    this.activeIndex = this.childRouteList.indexOf(this.$route.path).toString()
-    this.getUserInfo().then((success) => {
+    const activeIndex = (this.activeIndex = this.childRouteList
+      .indexOf(this.$route.path)
+      .toString());
+    this.getUserInfo().then(success => {
       if (success) {
-        this.userId = this.userInfo.id
-        this.getOwnListAmount(this.userId)
-        this.getAllListAmount()
+        this.userId = this.userInfo.id;
+        this.getOwnListAmount(this.userId);
+        this.getAllListAmount();
         this.getOwnListByPageNo({
           userId: this.userId,
           pageNo: this.ownPageNo,
-        })
-        this.getAllListByPageNo(this.allPageNo)
+        });
+        this.getAllListByPageNo(this.allPageNo);
       }
-    })
+    });
+    if (activeIndex === '1') {
+      console.log(`home square`);
+      const query = this.$route.query;
+      const initSearch = query.q;
+      if (initSearch) {
+        this.$refs.search_input.value = initSearch;
+      }
+    }
   },
-}
+};
 </script>
 
-<style>
+<style scoped>
 .box {
   display: flex;
   flex-direction: column;
@@ -141,5 +177,15 @@ export default {
   border-bottom: 1px solid black;
   padding-bottom: 5px;
   margin-bottom: 5px;
+}
+
+.square-banner {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+}
+.square-banner img {
+  cursor: pointer;
+  margin-right: 12px;
 }
 </style>
