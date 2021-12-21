@@ -2,12 +2,13 @@
   <div class="list">
     <div class="cards">
       <HomeSquareCard
-        v-for="project in allProjects"
+        v-for="project in filteredAllProjects"
         :key="project.projectId"
         :project="project"
         @click="gotoSmarthelper(project.projectId)"
       />
     </div>
+    <!-- 换页选择器 -->
     <el-pagination
       layout="prev, pager, next"
       :total="allListCount"
@@ -16,7 +17,7 @@
     >
     </el-pagination>
     <!-- invisible snapshot builder -->
-    <SnapshotLoader ref="snapshot_loader" />
+    <SnapshotLoader ref="square_snapshot_loader" />
   </div>
 </template>
 
@@ -27,11 +28,25 @@ import HomeSquareCard from './HomeSquareCard.vue';
 import SnapshotLoader from './SnapshotLoader.vue';
 import { SnapshotCache } from '../utils/snapshot';
 
+let loadingLock = false;
+let hasDestroyed = false;
+
 export default {
   components: { HomeSquareCard, SnapshotLoader },
   name: 'HomeSquare',
   computed: {
     ...mapGetters(['allProjects', 'allPageNo', 'allListCount']),
+    filteredAllProjects() {
+      const q = this.$route.query.q;
+      console.log(`[filteredAllProjects] query`, this.$route.query);
+      if (q) {
+        return this.allProjects.filter(({ name, description }) => {
+          return `${name}_${description}`.includes(q);
+        });
+      } else {
+        return this.allProjects;
+      }
+    },
   },
   methods: {
     ...mapMutations(['setAllPageNo', 'setAllProjectsSnapshot']),
@@ -45,23 +60,36 @@ export default {
       this.setAllPageNo(currPageNo);
       this.getAllListByPageNo(currPageNo);
     },
-  },
-  watch: {
-    async allProjects(projects) {
+    async loadSnapshots(projects) {
+      if (loadingLock) {
+        console.warn('[HomeSquare] loadSnapshots duplicate');
+        return;
+      }
+      loadingLock = true;
+
       console.log('watch projects', projects);
-      const loader = this.$refs.snapshot_loader;
+      const loader = this.$refs.square_snapshot_loader;
 
       for (const project of projects) {
-        if (project.snapshot) {
+        if (hasDestroyed) {
+          // 组件卸载
+          console.warn('[HomeSquare] stop loadSnapshots for early unmounted');
+          loadingLock = false;
           return;
+        }
+        if (project.snapshot) {
+          continue;
         }
         const projectId = project.projectId;
         let snapshot;
         // 加载缓存快照
         snapshot = SnapshotCache.get(projectId);
         if (snapshot) {
-          project.snapshot = snapshot;
-          return;
+          this.setAllProjectsSnapshot({
+            ...project,
+            snapshot,
+          });
+          continue;
         }
 
         // 生成快照
@@ -80,7 +108,21 @@ export default {
           console.log('[watch.allProjects] load snapshot fail', e);
         }
       }
+      loadingLock = false;
     },
+  },
+  watch: {
+    allProjects(projects) {
+      this.loadSnapshots(projects);
+    },
+  },
+  mounted() {
+    hasDestroyed = false;
+    console.log('[HomeSquare] mounted', this.allProjects);
+    this.loadSnapshots(this.allProjects);
+  },
+  destroyed() {
+    hasDestroyed = true;
   },
 };
 </script>
@@ -95,6 +137,7 @@ export default {
 }
 .cards {
   display: flex;
+  align-self: flex-start;
   flex-wrap: wrap;
   gap: 40px;
 }

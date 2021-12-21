@@ -8,16 +8,20 @@
       >
         <el-menu-item index="1">广场</el-menu-item>
         <el-menu-item index="2">我的项目</el-menu-item>
-        <el-menu-item index="3">文档</el-menu-item>
+        <el-menu-item index="3">用户手册</el-menu-item>
         <el-menu-item index="4">系统设计</el-menu-item>
       </el-menu>
       <!-- header -->
       <div v-if="activeIndex === '1'" class="square-banner">
         <Logo @click="backToSearch" />
-        <Input ref="search_input" v-model="searchInput" />
+        <Input
+          ref="search_input"
+          v-model="searchInput"
+          :submitSearch="setSearchFilter"
+        />
       </div>
-      <h1 v-else-if="activeIndex === '2'">欢迎使用 co$in</h1>
-      <h1 v-else-if="activeIndex === '3'">co$in 文档</h1>
+      <h1 v-else-if="activeIndex === '2'">co$in 我的项目</h1>
+      <h1 v-else-if="activeIndex === '3'">co$in 用户手册</h1>
       <h1 v-else-if="activeIndex === '4'">co$in 系统设计</h1>
       <el-button
         icon="el-icon-plus"
@@ -114,13 +118,23 @@ export default {
       }
       this.$router.push(path);
     },
+    setSearchFilter(input) {
+      console.log(`[setSearchFilter] input = ${input}`);
+      this.$router.push({ query: { q: input } });
+    },
   },
   watch: {
     activeIndex(index) {
       if (index === '1') {
         this.$nextTick(() => {
+          console.log(`[watch.activeIndex] searchInput = ${this.searchInput}`);
           this.$refs.search_input.value = this.searchInput;
         });
+      }
+    },
+    searchInput(input) {
+      if (!input) {
+        this.setSearchFilter(input);
       }
     },
   },
@@ -141,12 +155,13 @@ export default {
         this.getAllListByPageNo(this.allPageNo);
       }
     });
+    // 挂载页面时载入 querySearch
     if (activeIndex === '1') {
-      console.log(`home square`);
       const query = this.$route.query;
       const initSearch = query.q;
       if (initSearch) {
-        this.$refs.search_input.value = initSearch;
+        console.log(`[Home] mounted with search = ${initSearch}`);
+        this.searchInput = this.$refs.search_input.value = initSearch;
       }
     }
   },

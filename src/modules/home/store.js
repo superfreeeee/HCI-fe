@@ -29,6 +29,26 @@ const home = {
     setOwnProjects(state, data) {
       state.ownProjects = fillSnapShot(data);
     },
+    setOwnProjectsSnapshot(state, project) {
+      let targetIndex = -1;
+      state.ownProjects.forEach((_project, index) => {
+        if (_project.projectId === project.projectId) {
+          targetIndex = index;
+        }
+      });
+      if (targetIndex < 0) {
+        console.log('[setAllProjectsSnapshot] update not exist project');
+        console.log('[setAllProjectsSnapshot] allProjects', state.allProjects);
+        console.log('[setAllProjectsSnapshot] project', project);
+      } else {
+        const projects = state.ownProjects;
+        state.ownProjects = [
+          ...projects.slice(0, targetIndex),
+          project,
+          ...projects.slice(targetIndex + 1),
+        ];
+      }
+    },
     setAllProjects(state, data) {
       state.allProjects = fillSnapShot(data);
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="loader-container">
-    <GraphBoard ref="graph_board" />
+    <GraphBoard ref="loader_graph_board" />
   </div>
 </template>
 
@@ -24,11 +24,21 @@ export default {
       );
 
       if (graphData) {
-        const board = this.$refs.graph_board;
+        const board = this.$refs.loader_graph_board;
+        if (!board) {
+          console.error(`[SnapshotLoader] loader_graph_board unmounted`);
+          return;
+        }
         await board.mountGraphData(graphData, projectInfo);
-        console.log(
-          `[SnapshotLoader] board.flags.loaded = ${board.flags.loaded}`,
-        );
+        const graphLoaded = board.flags.loaded;
+        console.log(`[SnapshotLoader] board.flags.loaded = ${graphLoaded}`);
+
+        if (!graphLoaded) {
+          console.warn(
+            `[SnapshotLoader] try catch snapshot when board unloaded`,
+          );
+        }
+
         const snapshot = await board.getSnapshot();
         console.log(`[SnapshotLoader] snapshot.length = ${snapshot.length}`);
         return snapshot;
@@ -41,7 +51,7 @@ export default {
 <style scoped>
 .loader-container {
   position: absolute;
-  left: 100vw;
+  top: -100vh;
   width: 600px;
   height: 400px;
 }
