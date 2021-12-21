@@ -8,18 +8,17 @@
       >
         <el-menu-item index="1">广场</el-menu-item>
         <el-menu-item index="2">我的项目</el-menu-item>
-        <el-menu-item index="3">Helper</el-menu-item>
-        <el-menu-item index="4">文档</el-menu-item>
-        <el-menu-item index="5">系统设计</el-menu-item>
+        <el-menu-item index="3">文档</el-menu-item>
+        <el-menu-item index="4">系统设计</el-menu-item>
       </el-menu>
       <!-- header -->
       <div v-if="activeIndex === '1'" class="square-banner">
         <Logo @click="backToSearch" />
-        <Input ref="search_input" />
+        <Input ref="search_input" v-model="searchInput" />
       </div>
       <h1 v-else-if="activeIndex === '2'">欢迎使用 co$in</h1>
-      <h1 v-else-if="activeIndex === '4'">co$in 文档</h1>
-      <h1 v-else-if="activeIndex === '5'">co$in 系统设计</h1>
+      <h1 v-else-if="activeIndex === '3'">co$in 文档</h1>
+      <h1 v-else-if="activeIndex === '4'">co$in 系统设计</h1>
       <el-button
         icon="el-icon-plus"
         class="add"
@@ -65,13 +64,16 @@ export default {
   data() {
     return {
       ROUTE_PATH,
+      // tabs
       activeIndex: '1',
+      // 广场搜索
+      searchInput: '',
       userId: null,
       childRouteList: [
         ,
         ROUTE_PATH.HomeSquare,
         ROUTE_PATH.Home,
-        ROUTE_PATH.Chat,
+        // ROUTE_PATH.Chat,
         ROUTE_PATH.Tutorial,
         ROUTE_PATH.SystemDesign,
       ],
@@ -106,8 +108,20 @@ export default {
       }
     },
     backToSearch() {
-      const searhInput = this.$refs.search_input.value;
-      this.$router.push(`${ROUTE_PATH.Search}?q=${searhInput}`);
+      let path = ROUTE_PATH.Search;
+      if (activeIndex === '1') {
+        path += `?q=${searhInput}`;
+      }
+      this.$router.push(path);
+    },
+  },
+  watch: {
+    activeIndex(index) {
+      if (index === '1') {
+        this.$nextTick(() => {
+          this.$refs.search_input.value = this.searchInput;
+        });
+      }
     },
   },
   mounted() {
