@@ -1,16 +1,5 @@
 <template>
   <div class="list">
-    <!-- <el-button
-      v-for="project in ownProjects"
-      :key="project.projectId"
-      type="primary"
-      style="width: 100%; margin: 0 0 15px 0"
-      round
-      @click="gotoProject(project.projectId)"
-    >
-      项目：{{ project.name }}
-    </el-button> -->
-
     <div class="cards">
       <HomeSquareCard
         v-for="project in ownProjects"

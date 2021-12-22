@@ -3,10 +3,15 @@
     <div slot="header" class="project-card-header" @click="clickCard">
       <span>{{ project.name }}</span>
     </div>
-    <div @click="clickCard">
-      <img v-if="project.snapshot" :src="project.snapshot" alt="" />
-      <span v-else>
-        {{ project }}
+    <div class="project-card-body" @click="clickCard">
+      <img v-if="project.snapshot != null" :src="project.snapshot" alt="" />
+      <span v-else-if="project.snapshot === undefined">
+        <!-- {{ project }} -->
+        缩略图加载中
+        <span class="loading"></span>
+      </span>
+      <span v-else-if="project.snapshot === false">
+        预览加载失败
       </span>
     </div>
   </el-card>
@@ -41,5 +46,38 @@ export default {
 
 .project-card >>> .el-card__body {
   height: 400px;
+}
+
+.project-card-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+.loading::after {
+  content: '';
+  display: inline-block;
+  width: 25px;
+  text-align: left;
+  animation: loading infinite 2s;
+}
+
+@keyframes loading {
+  0% {
+    content: '.';
+  }
+  20% {
+    content: '..';
+  }
+  40% {
+    content: '...';
+  }
+  60% {
+    content: '....';
+  }
+  80% {
+    content: '.....';
+  }
 }
 </style>
