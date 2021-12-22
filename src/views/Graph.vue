@@ -20,6 +20,7 @@
         @layout-action="dispatchGraphAction"
         @graph-action="dispatchGraphAction"
         @editor-action="dispatchEditorAction"
+        @check-document="checkDocument"
       ></graph-sidebar>
       <!-- 图谱中心 -->
       <graph-board
@@ -44,6 +45,7 @@
       @click="showEditor = !showEditor"
       :icon="`el-icon-arrow-${showEditor ? 'right' : 'left'}`"
     ></el-button>
+    <GraphDocumentDrawer ref="graph_document_drawer" />
     <graph-modify-name-modal />
     <graph-modify-desc-modal />
     <graph-modify-status-modal />
@@ -58,6 +60,7 @@ import GraphSidebar from '../modules/graph/components/GraphSidebar';
 import GraphModifyNameModal from '../modules/graph/components/GraphModifyNameModal';
 import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescModal';
 import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal';
+import GraphDocumentDrawer from '../modules/graph/components/GraphDocumentDrawer.vue';
 
 // import { _projectInfo, _graphData } from '../modules/graph/utils/data'
 
@@ -70,6 +73,7 @@ export default {
     GraphModifyNameModal,
     GraphModifyDescModal,
     GraphModifyStatusModal,
+    GraphDocumentDrawer,
   },
   data() {
     return {
@@ -173,6 +177,9 @@ export default {
         position: 'bottom-left',
       });
     },
+    checkDocument(id) {
+      this.$refs.graph_document_drawer.check(id);
+    },
   },
   async mounted() {
     const projectId = Number(this.$route.params.projectId);
@@ -228,6 +235,7 @@ export default {
   font-weight: 600;
   display: flex;
   align-items: center;
+  z-index: 2000;
 }
 .graph > .editor {
   display: flex;

@@ -50,7 +50,7 @@ export default {
 
 <style scoped>
 .loader-container {
-  position: absolute;
+  position: fixed;
   top: -100vh;
   width: 600px;
   height: 400px;

@@ -1,5 +1,8 @@
 <template>
-  <svg id="graph"></svg>
+  <div class="graph-board-container">
+    <svg ref="graph_board_svg" id="graph"></svg>
+    <div v-if="!flags.loaded" class="graph-board-loading">图谱加载中</div>
+  </div>
 </template>
 
 <script>
@@ -73,7 +76,6 @@ export default {
       // })
 
       await this.init();
-      this.flags.loaded = true;
     },
     /***** 图谱绘制 *****/
     // 初始化图谱
@@ -81,7 +83,6 @@ export default {
       const {
         // 全局变量 & 配置
         $d3,
-        $el,
         config: { width, height },
         // 子例程
         reset,
@@ -109,6 +110,7 @@ export default {
 
       const simulation = setSimulation();
 
+      const $el = this.$refs.graph_board_svg;
       const svg = $d3
         .select($el)
         .attr('viewBox', [-width / 2, -height / 2, width, height]);
@@ -149,14 +151,14 @@ export default {
       setEnableFocus(true);
       restoreLayout();
 
+      this.flags.loaded = true;
+
       return new Promise(resolve => {
         setTimeout(() => {
           resetZoom();
-          const delayNone = 0;
-          const waitForZoom = 2000;
           setTimeout(() => {
             resolve();
-          }, delayNone);
+          });
         }, 600);
       });
     },
@@ -1047,5 +1049,40 @@ export default {
 #graph {
   width: 100%;
   height: 100%;
+}
+.graph-board-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.graph-board-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.graph-board-loading::after {
+  content: '';
+  display: inline-block;
+  width: 25px;
+  text-align: left;
+  animation: loading infinite 2s;
+}
+@keyframes loading {
+  0% {
+    content: '.';
+  }
+  20% {
+    content: '..';
+  }
+  40% {
+    content: '...';
+  }
+  60% {
+    content: '....';
+  }
+  80% {
+    content: '.....';
+  }
 }
 </style>

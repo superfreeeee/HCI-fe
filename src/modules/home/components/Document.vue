@@ -1,6 +1,6 @@
 <template>
   <div class="document">
-    <DocumentSidebar :headers="headers" :setAnchor="setAnchor" />
+    <DocumentSidebar v-if="toc" :headers="headers" :setAnchor="setAnchor" />
     <iframe
       ref="document_iframe_ref"
       :src="src"
@@ -20,6 +20,7 @@ const DOCUMENT_PREFIX = '../../static/';
 const srcMap = {
   [ROUTE_PATH.Tutorial]: 'guide.html',
   [ROUTE_PATH.SystemDesign]: 'systemdesign.html',
+  [ROUTE_PATH.Graph]: 'guide.html',
 };
 
 const headersCache = {
@@ -30,23 +31,45 @@ const headersCache = {
 export default {
   components: { DocumentSidebar },
   name: 'Document',
+  props: {
+    toc: {
+      default: true,
+    },
+  },
   data() {
     return {
       src: '',
       headers: [],
       innerLink: null,
+      loaded: false,
+      Q: [],
     };
   },
   methods: {
-    setAnchor(e) {
-      e.preventDefault();
-      const targetH = e.target;
-      const id = targetH.id;
+    onReady(cb) {
+      if (this.loaded) {
+        cb();
+      } else {
+        this.Q.push(cb);
+      }
+    },
+    async flushQueue() {
+      const tasks = this.Q;
+      this.Q = [];
+      for (const task of tasks) {
+        await task();
+      }
+    },
+    checkId(id) {
       if (id) {
         const a = this.innerLink;
         a.href = `#${id}`;
         a.click();
       }
+    },
+    setAnchor(e) {
+      e.preventDefault();
+      this.checkId(e.target.id);
     },
     initAnchor(_document) {
       if (this.innerLink) {
@@ -55,7 +78,7 @@ export default {
       const a = _document.createElement('a');
       a.style.display = 'none';
       this.innerLink = a;
-      _document.appendChild(a);
+      _document.body.appendChild(a);
     },
     loadHeaders(_document, path) {
       if (!this.headers) {
@@ -64,8 +87,10 @@ export default {
       }
     },
     onRouteChange() {
+      this.loaded = false;
       const path = this.$route.path;
-      const newSrc = `${DOCUMENT_PREFIX}${srcMap[path]}`;
+      const file = srcMap[path] || 'guide.html';
+      const newSrc = `${DOCUMENT_PREFIX}${file}`;
 
       if (this.src !== newSrc) {
         this.headers = headersCache[path];
@@ -75,8 +100,13 @@ export default {
           this.loadHeaders(_document, path);
           this.initAnchor(_document);
           frame.onload = null;
+          this.loaded = true;
+          this.flushQueue();
         };
         this.src = newSrc;
+      } else {
+        this.loaded = true;
+        this.flushQueue();
       }
     },
   },
