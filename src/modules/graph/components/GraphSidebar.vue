@@ -71,10 +71,10 @@
 </template>
 
 <script>
-import { buttonAutoBlur } from '@/common/utils'
-import { mapGetters, mapActions, mapMutations } from 'vuex'
-import GraphLayout from './GraphLayout'
-import GraphActions from './GraphActions'
+import { buttonAutoBlur } from '@/common/utils';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
+import GraphLayout from './GraphLayout';
+import GraphActions from './GraphActions';
 
 export default {
   name: 'GraphSideBar',
@@ -92,10 +92,10 @@ export default {
     return {
       // flag: true, // mock verifyInitiate
       smartOptions: [
-        {
-          label: '初始化图谱',
-          handler: () => this.initGraph(),
-        },
+        // {
+        //   label: '初始化图谱',
+        //   handler: () => this.initGraph(),
+        // },
         // {
         //   label: '智能小助手 PC 端',
         //   handler: () => this.gotoSmarthelper('/chat'),
@@ -103,6 +103,10 @@ export default {
         {
           label: '智能小助手',
           handler: () => this.gotoSmarthelper('/smarthelper'),
+        },
+        {
+          label: '实体类型统计',
+          handler: () => this.$emit('editor-action', 'mode', 'showStatistics'),
         },
       ],
       settingOptions: [
@@ -119,7 +123,7 @@ export default {
           handler: () => this.changeStatus(),
         },
       ],
-    }
+    };
   },
   computed: {
     ...mapGetters(['graphBoardMode', 'projectId']),
@@ -132,13 +136,13 @@ export default {
     ]),
     ...mapActions(['switchLayoutMode', 'verifyInitiate', 'initiateGraph']),
     passingGraphAction(...args) {
-      this.passingEmit('graph-action', ...args)
+      this.passingEmit('graph-action', ...args);
     },
     passingEditorAction(...args) {
-      this.passingEmit('editor-action', ...args)
+      this.passingEmit('editor-action', ...args);
     },
     passingEmit(eventName, ...args) {
-      this.$emit(eventName, ...args)
+      this.$emit(eventName, ...args);
     },
     handleOpen(key, keyPath) {
       // console.log(key, keyPath)
@@ -147,43 +151,43 @@ export default {
       // console.log(key, keyPath)
     },
     gotoSmarthelper(path) {
-      const projectId = Number(this.$route.params.projectId)
-      this.initiateGraph(projectId)
-      this.verifyInitiate(projectId).then((res) => {
+      const projectId = Number(this.$route.params.projectId);
+      this.initiateGraph(projectId);
+      this.verifyInitiate(projectId).then(res => {
         if (res) {
-          this.$router.push(`${path}/${projectId}`)
+          this.$router.push(`${path}/${projectId}`);
         } else {
-          this.$router.push(`/graph/${projectId}`)
-          this.$message.error('请先初始化图谱!')
+          this.$router.push(`/graph/${projectId}`);
+          this.$message.error('请先初始化图谱!');
         }
-      })
+      });
     },
     initGraph() {
-      const projectId = Number(this.$route.params.projectId)
-      this.initiateGraph(projectId).then((res) => {
-        const { success, msg } = res.data
+      const projectId = Number(this.$route.params.projectId);
+      this.initiateGraph(projectId).then(res => {
+        const { success, msg } = res.data;
         if (success) {
-          this.$message.success(msg)
+          this.$message.success(msg);
         } else {
-          this.$message.error(msg)
+          this.$message.error(msg);
         }
-      })
+      });
     },
     handlerDispatcher(e, handler) {
-      buttonAutoBlur(e)
-      handler()
+      buttonAutoBlur(e);
+      handler();
     },
     changeName() {
-      this.setShowModifyNameModal(true)
+      this.setShowModifyNameModal(true);
     },
     changeDesc() {
-      this.setShowModifyDescModal(true)
+      this.setShowModifyDescModal(true);
     },
     changeStatus() {
-      this.setShowModifyStatusModal(true)
+      this.setShowModifyStatusModal(true);
     },
   },
-}
+};
 </script>
 
 <style scoped>
