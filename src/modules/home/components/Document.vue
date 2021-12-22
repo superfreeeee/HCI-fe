@@ -22,6 +22,11 @@ const srcMap = {
   [ROUTE_PATH.SystemDesign]: 'systemdesign.html',
 };
 
+const headersCache = {
+  [ROUTE_PATH.Tutorial]: null,
+  [ROUTE_PATH.SystemDesign]: null,
+};
+
 export default {
   components: { DocumentSidebar },
   name: 'Document',
@@ -35,9 +40,6 @@ export default {
   methods: {
     setAnchor(e) {
       e.preventDefault();
-      console.log(`setAnchor(${id})`);
-      console.log(`setAnchor(${id}) e`, e);
-      console.log(`setAnchor(${id}) target`, e.target);
       const targetH = e.target;
       const id = targetH.id;
       if (id) {
@@ -47,25 +49,30 @@ export default {
       }
     },
     initAnchor(_document) {
+      if (this.innerLink) {
+        this.innerLink.remove();
+      }
       const a = _document.createElement('a');
       a.style.display = 'none';
       this.innerLink = a;
+      _document.appendChild(a);
     },
-    loadHeaders(_document) {
-      const headers = getInnerFrameHeaders(_document);
-      this.headers = headers;
+    loadHeaders(_document, path) {
+      if (!this.headers) {
+        const headers = getInnerFrameHeaders(_document);
+        headersCache[path] = this.headers = headers;
+      }
     },
     onRouteChange() {
       const path = this.$route.path;
       const newSrc = `${DOCUMENT_PREFIX}${srcMap[path]}`;
 
       if (this.src !== newSrc) {
-        console.log(`update src = ${this.src}, newSrc =  ${newSrc}`);
+        this.headers = headersCache[path];
         const frame = this.$refs.document_iframe_ref;
         frame.onload = () => {
-          console.log('innerWindow onload');
           const _document = frame.contentWindow.document;
-          this.loadHeaders(_document);
+          this.loadHeaders(_document, path);
           this.initAnchor(_document);
           frame.onload = null;
         };
