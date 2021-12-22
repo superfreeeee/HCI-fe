@@ -40,6 +40,7 @@
       ></graph-editor>
     </div>
     <el-button
+      class="editor-btn"
       @click="showEditor = !showEditor"
       :icon="`el-icon-arrow-${showEditor ? 'right' : 'left'}`"
     ></el-button>
@@ -50,13 +51,13 @@
 </template>
 
 <script>
-import GraphBoard from '../modules/graph/components/GraphBoard'
-import GraphEditor from '../modules/graph/components/GraphEditor'
-import GraphSidebar from '../modules/graph/components/GraphSidebar'
-import GraphModifyNameModal from '../modules/graph/components/GraphModifyNameModal'
-import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescModal'
-import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal'
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from 'vuex';
+import GraphBoard from '../modules/graph/components/GraphBoard';
+import GraphEditor from '../modules/graph/components/GraphEditor';
+import GraphSidebar from '../modules/graph/components/GraphSidebar';
+import GraphModifyNameModal from '../modules/graph/components/GraphModifyNameModal';
+import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescModal';
+import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal';
 
 // import { _projectInfo, _graphData } from '../modules/graph/utils/data'
 
@@ -68,7 +69,7 @@ export default {
     GraphSidebar,
     GraphModifyNameModal,
     GraphModifyDescModal,
-    GraphModifyStatusModal
+    GraphModifyStatusModal,
   },
   data() {
     return {
@@ -76,10 +77,10 @@ export default {
       graphData: null,
       graphProperty: {
         layoutMode: 'FORCE',
-        nodeScale: null
+        nodeScale: null,
       },
-      showEditor: false
-    }
+      showEditor: false,
+    };
   },
   computed: {
     ...mapGetters([
@@ -87,26 +88,26 @@ export default {
       // 'projectInfo',
     ]),
     nodeOptions() {
-      const data = this.graphData
-      return data ? data.nodes.map(({ id, name }) => ({ id, name })) : []
+      const data = this.graphData;
+      return data ? data.nodes.map(({ id, name }) => ({ id, name })) : [];
     },
     nodeGroups() {
-      if (!this.graphData) return []
-      return [...new Set(this.graphData.nodes.map(node => node.group))]
-    }
+      if (!this.graphData) return [];
+      return [...new Set(this.graphData.nodes.map(node => node.group))];
+    },
   },
   methods: {
     ...mapActions({
       getProjectInfoAct: 'getProjectInfo',
-      getProjectGraphDataAct: 'getProjectGraphData'
+      getProjectGraphDataAct: 'getProjectGraphData',
     }),
     back() {
-      this.$router.push('/')
+      this.$router.push('/');
     },
     dispatchGraphAction(name, ...args) {
       // console.log(`[GraphAction] ${name}`, args)
       if (name === 'switchLayout') {
-        this.graphProperty.layoutMode = args[0]
+        this.graphProperty.layoutMode = args[0];
       }
       if (
         [
@@ -115,53 +116,53 @@ export default {
           'updateNode',
           'updateLink',
           'deleteNode',
-          'deleteLink'
+          'deleteLink',
         ].includes(name)
       ) {
-        const item = args[0]
-        const { nodes, links } = this.graphData
-        ;({
+        const item = args[0];
+        const { nodes, links } = this.graphData;
+        ({
           createNode: () => {
-            nodes.push(item)
+            nodes.push(item);
           },
           createLink: () => {
-            links.push(item)
+            links.push(item);
           },
           updateNode: () => {
-            const node = nodes.filter(node => node.id === item.id)[0]
+            const node = nodes.filter(node => node.id === item.id)[0];
             node &&
-              Reflect.ownKeys(item).forEach(prop => (node[prop] = item[prop]))
+              Reflect.ownKeys(item).forEach(prop => (node[prop] = item[prop]));
           },
           updateLink: () => {
-            const link = links.filter(link => link.id === item.id)[0]
+            const link = links.filter(link => link.id === item.id)[0];
             link &&
-              Reflect.ownKeys(item).forEach(prop => (link[prop] = item[prop]))
+              Reflect.ownKeys(item).forEach(prop => (link[prop] = item[prop]));
           },
           deleteNode: () => {
-            const node = nodes.filter(node => node.id === item.id)[0]
+            const node = nodes.filter(node => node.id === item.id)[0];
             if (node) {
-              nodes.splice(nodes.indexOf(node), 1)
+              nodes.splice(nodes.indexOf(node), 1);
               this.graphData.links = links.filter(
-                ({ from, to }) => from !== node.id && to !== node.id
-              )
+                ({ from, to }) => from !== node.id && to !== node.id,
+              );
             }
           },
           deleteLink: () => {
-            const target = links.filter(link => link.id === item.id)[0]
-            target && links.splice(links.indexOf(target), 1)
-          }
-        }[name]())
+            const target = links.filter(link => link.id === item.id)[0];
+            target && links.splice(links.indexOf(target), 1);
+          },
+        }[name]());
       }
-      this.$refs.board[name](...args)
+      this.$refs.board[name](...args);
     },
     dispatchEditorAction(name, ...args) {
       // console.log(`[EditorAction] ${name}`, args)
-      this.showEditor = true
-      this.$refs.editor.dispatchEditorAction(name, ...args)
+      this.showEditor = true;
+      this.$refs.editor.dispatchEditorAction(name, ...args);
     },
     initPropertyHandler(name, value) {
       // console.log(`[InitProperty] ${name}`)
-      this.graphProperty[name] = value
+      this.graphProperty[name] = value;
     },
     showDescription() {
       this.$notify({
@@ -169,39 +170,39 @@ export default {
         message: this.projectInfo.description,
         duration: 5000,
         type: 'info',
-        position: 'bottom-left'
-      })
-    }
+        position: 'bottom-left',
+      });
+    },
   },
   async mounted() {
-    const projectId = Number(this.$route.params.projectId)
-    const projectInfo = await this.getProjectInfoAct(projectId)
+    const projectId = Number(this.$route.params.projectId);
+    const projectInfo = await this.getProjectInfoAct(projectId);
 
     // const projectInfo = deepCopy(_projectInfo)
     if (!projectInfo) {
       // warning
-      return
+      return;
     }
-    this.projectInfo = projectInfo
+    this.projectInfo = projectInfo;
 
-    const graphData = await this.getProjectGraphDataAct(projectId)
+    const graphData = await this.getProjectGraphDataAct(projectId);
     // const graphData = deepCopy(_graphData)
     if (!graphData) {
       // warning
-      return
+      return;
     }
-    this.graphData = graphData
+    this.graphData = graphData;
 
-    const graphBoard = this.$refs.board
-    graphBoard.mountGraphData(graphData, this.projectInfo)
+    const graphBoard = this.$refs.board;
+    graphBoard.mountGraphData(graphData, this.projectInfo);
 
-    console.group('[Graph] mounted success')
-    console.log('projectId:', projectId)
-    console.log('projectInfo:', projectInfo)
-    console.log('graphData:', graphData)
-    console.groupEnd()
-  }
-}
+    console.group('[Graph] mounted success');
+    console.log('projectId:', projectId);
+    console.log('projectInfo:', projectInfo);
+    console.log('graphData:', graphData);
+    console.groupEnd();
+  },
+};
 </script>
 
 <style scoped>
@@ -229,12 +230,16 @@ export default {
   align-items: center;
 }
 .graph > .editor {
-  border-left: 1px solid #bbbbbb;
-  box-sizing: border-box;
-  transition: width 1s ease-out;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  padding: 16px 24px;
+  border-left: 1px solid #bbbbbb;
+  border-bottom: 1px solid #bbbbbb;
+  border-top: 1px solid #bbbbbb;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  transition: all 1s ease-out;
   overflow: auto;
 }
 .graph > .editor.open {
@@ -242,5 +247,6 @@ export default {
 }
 .graph > .editor.close {
   width: 0;
+  padding: 0;
 }
 </style>

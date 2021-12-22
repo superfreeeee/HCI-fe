@@ -56,12 +56,12 @@ const router = new Router({
         {
           path: 'tutorial',
           name: 'Tutorial',
-          component: () => import('@/modules/home/components/Tutorial.vue'),
+          component: () => import('@/modules/home/components/Document.vue'),
         },
         {
           path: 'systemdesign',
           name: 'SystemDesign',
-          component: () => import('@/modules/home/components/SystemDesign.vue'),
+          component: () => import('@/modules/home/components/Document.vue'),
         },
       ],
     },
