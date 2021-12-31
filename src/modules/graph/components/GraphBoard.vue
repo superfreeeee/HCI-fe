@@ -1,7 +1,9 @@
 <template>
   <div class="graph-board-container">
     <svg ref="graph_board_svg" id="graph"></svg>
-    <div v-if="flags.loading" class="graph-board-loading">图谱加载中</div>
+    <div v-if="flags.loading" class="graph-board-loading">
+      图谱加载中 {{ progress.cur }}%
+    </div>
   </div>
 </template>
 
@@ -57,6 +59,10 @@ export default {
         pinned: false,
         locked: false,
         selectingMode: false,
+      },
+      progress: {
+        cur: 0,
+        timer: null,
       },
     };
   },
@@ -116,6 +122,8 @@ export default {
       reset();
       setEnableFocus(false);
 
+      this.setProgress(80); // ............................................. 70%
+
       const simulation = setSimulation();
 
       const $el = this.$refs.graph_board_svg;
@@ -141,6 +149,8 @@ export default {
       setLinks(root);
       setLinksText(root);
 
+      this.setProgress(90); // ............................................. 90%
+
       const boundDrag = setDrag(simulation);
       const scale = $d3.scaleOrdinal($d3.schemeCategory10);
       this.svgElements.scale = scale;
@@ -152,23 +162,20 @@ export default {
 
       simulation.on('tick', tick);
 
-      // setTimeout(() => {
-      //   resetZoom()
-      // }, 300)
-
       setEnableFocus(true);
       restoreLayout();
 
+      this.clearProgressTimer();
+      this.progress.cur = 100;
       this.flags.loading = false;
       this.flags.loaded = true;
 
       return new Promise(resolve => {
+        // wait for d3 load
         setTimeout(() => {
           resetZoom();
-          setTimeout(() => {
-            resolve();
-          });
-        }, 600);
+          resolve();
+        }, 500);
       });
     },
     // 重置图谱节点
@@ -1050,11 +1057,45 @@ export default {
       const dataUrl = await svgToPng(svg, width, height);
       return dataUrl;
     },
+    setProgress(cur) {
+      if (cur > this.progress.cur) {
+        this.progress.cur = cur;
+      }
+    },
+    // timer
+    setProgressTimer(t) {
+      this.progress.timer = setTimeout(() => {
+        const cur = ++this.progress.cur;
+
+        // terminate when meet 99
+        if (cur >= 99) {
+          return;
+        }
+
+        const rest = (100 - this.progress.cur) / 100;
+        const a = 2 - rest;
+        let nextT = Math.pow(a, 2) * 50; // next wait = a^2 * 50ms
+        [80, 90, 93, 96].forEach(stage => {
+          if (cur > stage) {
+            nextT *= a;
+          }
+        });
+        this.setProgressTimer(nextT);
+      }, t);
+    },
+    clearProgressTimer() {
+      clearTimeout(this.progress.timer);
+      this.progress.timer = null;
+    },
   },
   mounted() {
     if (this.preLoading) {
       this.flags.loading = true;
+      this.setProgressTimer(0);
     }
+  },
+  destroyed() {
+    this.clearProgressTimer();
   },
 };
 </script>
@@ -1074,6 +1115,8 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  font-size: 40px;
+  font-weight: 500;
 }
 .graph-board-loading::after {
   content: '';
