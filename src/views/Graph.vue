@@ -15,30 +15,31 @@
         >
       </div>
       <!-- 侧边操作导航栏 -->
-      <graph-sidebar
+      <GraphSidebar
         :layoutMode="graphProperty.layoutMode"
         @layout-action="dispatchGraphAction"
         @graph-action="dispatchGraphAction"
         @editor-action="dispatchEditorAction"
         @check-document="checkDocument"
-      ></graph-sidebar>
+      ></GraphSidebar>
       <!-- 图谱中心 -->
-      <graph-board
+      <GraphBoard
         ref="board"
+        :preLoading="true"
         @init-property="initPropertyHandler"
         @editor-action="dispatchEditorAction"
-      ></graph-board>
+      ></GraphBoard>
     </div>
     <div :class="['editor', showEditor ? 'open' : 'close']">
       <!-- 图谱修改面板 -->
-      <graph-editor
+      <GraphEditor
         ref="editor"
         :graphData="graphData"
         :nodesScale="graphProperty.nodeScale"
         :nodeOptions="nodeOptions"
         :nodeGroups="nodeGroups"
         @graph-action="dispatchGraphAction"
-      ></graph-editor>
+      ></GraphEditor>
     </div>
     <el-button
       class="editor-btn"
@@ -46,9 +47,9 @@
       :icon="`el-icon-arrow-${showEditor ? 'right' : 'left'}`"
     ></el-button>
     <GraphDocumentDrawer ref="graph_document_drawer" />
-    <graph-modify-name-modal />
-    <graph-modify-desc-modal />
-    <graph-modify-status-modal />
+    <GraphModifyNameModal />
+    <GraphModifyDescModal />
+    <GraphModifyStatusModal />
   </div>
 </template>
 

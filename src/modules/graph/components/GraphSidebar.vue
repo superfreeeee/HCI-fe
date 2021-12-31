@@ -43,6 +43,7 @@
         <el-button
           v-for="smartOption in smartOptions"
           :key="smartOption.label"
+          class="option"
           type="success"
           style="margin-bottom: 10px; width: 100%"
           @click="smartOption.handler"
@@ -79,6 +80,7 @@
         <el-button
           v-for="settingOption in settingOptions"
           :key="settingOption.label"
+          class="option"
           type="info"
           style="margin-bottom: 10px; width: 100%"
           @click="settingOption.handler"
@@ -268,6 +270,13 @@ export default {
   z-index: 1000;
 }
 .el-button + .el-button[style] {
+  margin: 0;
+}
+.option >>> span {
+  display: flex;
+  justify-content: space-between;
+}
+.option >>> span i {
   margin: 0;
 }
 </style>

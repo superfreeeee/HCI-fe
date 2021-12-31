@@ -4,7 +4,7 @@
       <div>
         <Logo :width="350" />
       </div>
-      <Input ref="search_input" :submitSearch="submitSearch" />
+      <Input ref="search_input" :submitSearch="submitSearch" placeholder="想找什么菜?" />
       <div>
         <el-button @click="go(ROUTE_PATH.HomeSquare)">随便逛逛</el-button>
         <el-button type="primary" @click="go(ROUTE_PATH.HomeProjects)">

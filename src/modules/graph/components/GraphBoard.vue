@@ -1,7 +1,7 @@
 <template>
   <div class="graph-board-container">
     <svg ref="graph_board_svg" id="graph"></svg>
-    <div v-if="!flags.loaded" class="graph-board-loading">图谱加载中</div>
+    <div v-if="flags.loading" class="graph-board-loading">图谱加载中</div>
   </div>
 </template>
 
@@ -17,6 +17,9 @@ export default {
   props: {
     data: {
       type: Object,
+    },
+    preLoading: {
+      type: Boolean,
     },
   },
   data() {
@@ -47,6 +50,7 @@ export default {
         scale: null,
       },
       flags: {
+        loading: false,
         loaded: false,
         singleFocus: true,
         enableFocus: true,
@@ -60,6 +64,10 @@ export default {
     ...mapActions(['updateLayout', 'saveAsPng', 'saveAsXml']),
     /***** 重新挂载图谱 *****/
     async mountGraphData(data, projectInfo) {
+      this.flags.loading = true;
+      console.log(
+        `start loading ... this.flags.loading = ${this.flags.loading}`,
+      );
       console.log(`[mountGraphData] projectId = ${projectInfo.projectId}`);
       this.origin = deepCopy(data);
       this.projectInfo = deepCopy(projectInfo);
@@ -151,6 +159,7 @@ export default {
       setEnableFocus(true);
       restoreLayout();
 
+      this.flags.loading = false;
       this.flags.loaded = true;
 
       return new Promise(resolve => {
@@ -1041,6 +1050,11 @@ export default {
       const dataUrl = await svgToPng(svg, width, height);
       return dataUrl;
     },
+  },
+  mounted() {
+    if (this.preLoading) {
+      this.flags.loading = true;
+    }
   },
 };
 </script>

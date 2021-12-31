@@ -2,6 +2,7 @@
   <div class="container">
     <div class="layout-option" v-for="action in actions" :key="action.label">
       <el-button
+        class="option"
         :type="action.type"
         :plain="action.mode && layoutMode !== action.mode"
         size="medium"
@@ -131,5 +132,9 @@ export default {
   /* color: #e3e3e3; */
   color: #fff;
   cursor: pointer;
+}
+.option >>> span {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

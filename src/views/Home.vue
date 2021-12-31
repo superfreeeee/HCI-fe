@@ -16,6 +16,7 @@
         <Logo @click="backToSearch" />
         <Input
           ref="search_input"
+          placeholder="想找什么菜?"
           v-model="searchInput"
           :submitSearch="setSearchFilter"
         />
@@ -113,8 +114,8 @@ export default {
     },
     backToSearch() {
       let path = ROUTE_PATH.Search;
-      if (activeIndex === '1') {
-        path += `?q=${searhInput}`;
+      if (this.activeIndex === '1' && this.searhInput) {
+        path += `?q=${this.searhInput}`;
       }
       this.$router.push(path);
     },

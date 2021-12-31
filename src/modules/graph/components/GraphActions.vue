@@ -2,6 +2,7 @@
   <div class="container">
     <el-button
       v-for="option in options"
+      class="option"
       size="medium"
       :key="option.label"
       :type="option.type"
@@ -131,5 +132,9 @@ export default {
 } */
 .el-button + .el-button[style] {
   margin: 0;
+}
+.option >>> span {
+  display: flex;
+  justify-content: space-between;
 }
 </style>

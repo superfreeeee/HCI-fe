@@ -2,6 +2,7 @@
   <el-input
     class="search-input"
     ref="search_input"
+    :placeholder="placeholder"
     :style="{ width }"
     @focus="onInputFocus"
     @blur="onInputBlur"
@@ -20,7 +21,7 @@
 <script>
 export default {
   name: 'Input',
-  props: ['width', 'submitSearch'],
+  props: ['width', 'submitSearch', 'placeholder'],
   data() {
     return {
       value: '',

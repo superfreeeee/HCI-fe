@@ -51,12 +51,12 @@ instance.interceptors.response.use(
         console.log(response)
       }
     )
-    // if (response.status === 403) {
-    //   // 未登入 or token 过期
-    //   setRecentRoute()
-    //   $message('登入已过期，请重新登入', 'error')
-    //   router.push('/user')
-    // }
+    if (response.status === 403) {
+      // 未登入 or token 过期
+      setRecentRoute()
+      $message('登入已过期，请重新登入', 'error')
+      router.push('/user')
+    }
     return response
   }
 )

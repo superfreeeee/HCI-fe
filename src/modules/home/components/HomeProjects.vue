@@ -126,8 +126,8 @@ export default {
 }
 .cards {
   display: flex;
-  align-self: flex-start;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 40px;
 }
 </style>
