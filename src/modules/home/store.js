@@ -111,7 +111,6 @@ const home = {
         const projects = res.data;
         console.log(`[getAllListByPageNo] projects`, projects);
         commit('setAllProjects', projects);
-        allProjectsByPage = projects;
       } else {
         console.error('getAllListByPageNo error');
       }

@@ -34,10 +34,10 @@ export default {
     getOwnListCount(userId) {
       return { path: `/countByUserId/${userId}` };
     },
-    updateProjectImage(image) {
-      // TODO waiting for api form
+    updateProjectImage(image, projectid) {
       const data = new FormData();
       data.append('image', image);
+      data.append('projectId', projectid);
       return { path: `/updateProjectImage`, method: 'POST', data };
     },
   },

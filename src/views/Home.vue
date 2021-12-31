@@ -10,7 +10,7 @@
         <el-menu-item index="2">我的项目</el-menu-item>
         <el-menu-item index="3">用户手册</el-menu-item>
         <el-menu-item index="4">系统设计</el-menu-item>
-        <el-menu-item index="5">智能助手</el-menu-item>
+        <!-- <el-menu-item index="5">智能助手</el-menu-item> -->
       </el-menu>
       <!-- header -->
       <div v-if="activeIndex === '1'" class="square-banner">
@@ -20,6 +20,7 @@
           placeholder="想找什么菜?"
           v-model="searchInput"
           :submitSearch="setSearchFilter"
+          @blur="checkSearchOnBlur"
         />
       </div>
       <h1 v-else-if="activeIndex === '2'">co$in 我的项目</h1>
@@ -56,13 +57,10 @@
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 
-import api from '@/api/dispatcher';
-
 import Input from '../components/Input.vue';
 import Logo from '../components/Logo.vue';
 import NewProjectPanel from '../modules/home/components/NewProjectPanel';
 import { ROUTE_PATH } from '../router/config';
-import { getAllProjectsById } from '../modules/home/utils/request';
 
 export default {
   name: 'Home',
@@ -90,7 +88,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo']),
+    ...mapGetters(['userInfo', 'allPageNo', 'ownPageNo', 'searchProjects']),
   },
   methods: {
     ...mapMutations(['setGraphProjectId', 'setShowCreatePanel']),
@@ -127,9 +125,12 @@ export default {
     },
     setSearchFilter(input) {
       console.log(`[setSearchFilter] input = ${input}`);
-      // TODO api 500
       this.getAllListBySearchInput(input);
-      // this.$router.push({ query: { q: input } });
+    },
+    checkSearchOnBlur() {
+      if (!this.searchInput && typeof this.searchProjects === 'string') {
+        this.setSearchFilter(this.searchInput);
+      }
     },
   },
   watch: {
@@ -141,11 +142,11 @@ export default {
         });
       }
     },
-    searchInput(input) {
-      if (!input) {
-        this.setSearchFilter(input);
-      }
-    },
+    // searchInput(input) {
+    //   if (!input) {
+    //     this.setSearchFilter(input);
+    //   }
+    // },
   },
   mounted() {
     // console.log(`path: ${this.$route.path}`)

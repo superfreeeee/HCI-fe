@@ -31,11 +31,14 @@ export default {
     focusInput() {
       this.$refs.search_input.focus();
     },
-    onInputFocus() {
+    onInputFocus(e) {
       document.addEventListener('keydown', this.keydownSubmit);
+      this.$emit('focus', e);
     },
-    onInputBlur() {
+    onInputBlur(e) {
       document.removeEventListener('keydown', this.keydownSubmit);
+      // 向外抛出 blur 事件
+      this.$emit('blur', e);
     },
     keydownSubmit(e) {
       if (e.key === 'Enter' && !e.isComposing) {

@@ -20,7 +20,7 @@ yarn build
 yarn test
 ```
 
-## 代码规范 & TODO
+## 代码规范
 
 <a href="https://www.yuque.com/dqs1qe/frt906">https://www.yuque.com/dqs1qe/frt906</a>
 
