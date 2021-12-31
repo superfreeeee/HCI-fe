@@ -356,9 +356,3 @@
     // ...
 ]
 ```
-
-# 疑问
-
-- project.fixed 属性归属？状态保存？
-- project 保存 xml?
-- project 细节？

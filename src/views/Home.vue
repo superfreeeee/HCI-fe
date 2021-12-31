@@ -54,6 +54,8 @@
 
 <script>
 import { mapGetters, mapMutations, mapActions } from 'vuex';
+
+import api from '@/api/dispatcher';
 import Input from '../components/Input.vue';
 import Logo from '../components/Logo.vue';
 import NewProjectPanel from '../modules/home/components/NewProjectPanel';
@@ -121,7 +123,11 @@ export default {
     },
     setSearchFilter(input) {
       console.log(`[setSearchFilter] input = ${input}`);
-      this.$router.push({ query: { q: input } });
+      // TODO api 500
+      api.getProjectQuery({ text: input }).then(res => {
+        console.log(`[setSearchFilter] getProjectQuery res`, res);
+      });
+      // this.$router.push({ query: { q: input } });
     },
   },
   watch: {
