@@ -1,7 +1,7 @@
 <template>
   <div class="list">
     <div class="cards">
-      <HomeSquareCard
+      <HomeProjectCard
         v-for="project in filteredAllProjects"
         :key="project.projectId"
         :project="project"
@@ -24,7 +24,7 @@
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import { ROUTE_PATH } from '../../../router/config';
-import HomeSquareCard from './HomeSquareCard.vue';
+import HomeProjectCard from './HomeProjectCard.vue';
 import SnapshotLoader from './SnapshotLoader.vue';
 import { SnapshotCache } from '../utils/snapshot';
 
@@ -32,7 +32,7 @@ let loadingLock = false;
 let hasDestroyed = false;
 
 export default {
-  components: { HomeSquareCard, SnapshotLoader },
+  components: { HomeProjectCard, SnapshotLoader },
   name: 'HomeSquare',
   computed: {
     ...mapGetters(['allProjects', 'allPageNo', 'allListCount']),

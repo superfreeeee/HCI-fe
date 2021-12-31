@@ -1,7 +1,7 @@
 <template>
   <div class="list">
     <div class="cards">
-      <HomeSquareCard
+      <HomeProjectCard
         v-for="project in ownProjects"
         :key="project.projectId"
         :project="project"
@@ -24,14 +24,14 @@
 <script>
 import { mapActions, mapGetters, mapMutations } from 'vuex';
 import { SnapshotCache } from '../utils/snapshot';
-import HomeSquareCard from './HomeSquareCard.vue';
+import HomeProjectCard from './HomeProjectCard.vue';
 import SnapshotLoader from './SnapshotLoader.vue';
 
 let loadingLock = false;
 let hasDestroyed = false;
 
 export default {
-  components: { HomeSquareCard, SnapshotLoader },
+  components: { HomeProjectCard, SnapshotLoader },
   name: 'HomeProjects',
   computed: {
     ...mapGetters(['ownProjects', 'ownListCount', 'ownPageNo']),

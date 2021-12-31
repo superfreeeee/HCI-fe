@@ -1,4 +1,3 @@
-// import { fakeAllProjects } from '@/common/entity'
 import api from '@/api/dispatcher';
 import { SnapshotCache } from './utils/snapshot';
 
