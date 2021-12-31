@@ -78,8 +78,7 @@ export default {
               console.log(`[HomeProjectCard] updateProjectImage res`, res);
 
               // TODO add real image url
-              // const url = res.data.url;
-              const url = '';
+              const url = res.data.msg;
               this.loadImageSrc(url);
             } else {
               this.$message.error('封面更新失败');

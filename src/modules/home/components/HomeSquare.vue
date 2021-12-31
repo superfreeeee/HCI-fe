@@ -73,6 +73,9 @@ export default {
       this.getAllListByPageNo(currPageNo);
     },
     async loadSnapshots(projects) {
+      // no need to loadSnapshots
+      return;
+
       if (loadingLock) {
         console.warn('[HomeSquare] loadSnapshots duplicate');
         return;

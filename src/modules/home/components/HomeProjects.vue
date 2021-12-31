@@ -50,6 +50,9 @@ export default {
       });
     },
     async loadSnapshots(projects) {
+      // no need to loadSnapshots
+      return;
+
       if (loadingLock) {
         console.warn('[HomeProjects] loadSnapshots duplicate');
         return;

@@ -31,10 +31,8 @@ yarn test
 - [x] 3. project cards margin center
 - [ ] 4. 创建图谱 Input 不对齐
   - [ ] 无法复现
-- [ ] 5. 主图接口
-  - [ ] 等待 updateProjectImage 形式
-- [ ] 6. 搜索接口
-  - [ ] 500 啦，咋搞
+- [x] 5. 主图接口
+- [x] 6. 搜索接口
 - [ ] 7. 加载进度条
 - [x] 8. 左侧操作 button 文字对齐
 - [x] 9. Logo 导航

@@ -3,6 +3,10 @@ import { SnapshotCache } from './utils/snapshot';
 import { getAllProjectsById } from './utils/request';
 
 const fillSnapShot = projects => {
+  // no need to load snapshots
+  return projects;
+
+  // TODO clear old codes
   return projects.map(project => {
     if (!project.snapshot) {
       const snapshot = SnapshotCache.get(project.projectId);
