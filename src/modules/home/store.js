@@ -1,5 +1,6 @@
 import api from '@/api/dispatcher';
 import { SnapshotCache } from './utils/snapshot';
+import { getAllProjectsById } from './utils/request';
 
 const fillSnapShot = projects => {
   return projects.map(project => {
@@ -17,6 +18,7 @@ const home = {
   state: {
     ownProjects: [],
     allProjects: [],
+    searchProjects: null,
     projectInfo: {},
     showCreatePanel: false,
     allPageNo: 1,
@@ -71,6 +73,9 @@ const home = {
         ];
       }
     },
+    setSearchProjects(state, projects) {
+      state.searchProjects = projects;
+    },
     setProjectInfo(state, data) {
       state.projectInfo = data;
     },
@@ -104,9 +109,59 @@ const home = {
       const res = await api.getAllListByPageNo(pageNo);
       if (res.status === 200) {
         const projects = res.data;
+        console.log(`[getAllListByPageNo] projects`, projects);
         commit('setAllProjects', projects);
+        allProjectsByPage = projects;
       } else {
         console.error('getAllListByPageNo error');
+      }
+    },
+    /**
+     * 使用搜索结果查询项目列表
+     * @param {*} param0
+     * @param {*} text
+     * @returns
+     */
+    getAllListBySearchInput: async ({ commit }, text) => {
+      // 搜索输入为 '' 时置空
+      if (!text) {
+        commit('setSearchProjects', null);
+        return true;
+      }
+
+      let res = await api.getProjectQueryNew({ text });
+      if (res.status !== 200) {
+        console.error('[getAllListBySearchInput] getProjectQueryNew fail', res);
+        return false;
+      }
+
+      // getProjectQueryNew success
+      const projectIds = res.data;
+      console.log(
+        `[getAllListBySearchInput] getProjectQueryNew projectIds`,
+        projectIds,
+      );
+
+      res = await getAllProjectsById(projectIds);
+      console.log(`[setSearchFilter] getAllProjectsById res`, res);
+      const projectInfos = res
+        .map(response => {
+          if (response.status !== 200) {
+            return null;
+          }
+          return response.data;
+        })
+        .filter(info => !!info);
+      console.log(
+        `[setSearchFilter] getAllProjectsById projectInfos`,
+        projectInfos,
+      );
+      if (projectInfos.length) {
+        // 有结果返回结果
+        commit('setSearchProjects', projectInfos);
+      } else {
+        // 空数组设为搜索 text
+        commit('setSearchProjects', text);
       }
     },
     getOwnListByPageNo: async ({ commit }, data) => {
@@ -156,6 +211,7 @@ const home = {
     projectInfo: state => state.projectInfo,
     showCreatePanel: state => state.showCreatePanel,
     allProjects: state => state.allProjects,
+    searchProjects: state => state.searchProjects,
     allPageNo: state => state.allPageNo,
     allListCount: state => state.allListCount,
     ownProjects: state => state.ownProjects,

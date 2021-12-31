@@ -10,6 +10,7 @@
         <el-menu-item index="2">我的项目</el-menu-item>
         <el-menu-item index="3">用户手册</el-menu-item>
         <el-menu-item index="4">系统设计</el-menu-item>
+        <el-menu-item index="5">智能助手</el-menu-item>
       </el-menu>
       <!-- header -->
       <div v-if="activeIndex === '1'" class="square-banner">
@@ -56,10 +57,12 @@
 import { mapGetters, mapMutations, mapActions } from 'vuex';
 
 import api from '@/api/dispatcher';
+
 import Input from '../components/Input.vue';
 import Logo from '../components/Logo.vue';
 import NewProjectPanel from '../modules/home/components/NewProjectPanel';
 import { ROUTE_PATH } from '../router/config';
+import { getAllProjectsById } from '../modules/home/utils/request';
 
 export default {
   name: 'Home',
@@ -80,9 +83,9 @@ export default {
         ,
         ROUTE_PATH.HomeSquare,
         ROUTE_PATH.Home,
-        // ROUTE_PATH.Chat,
         ROUTE_PATH.Tutorial,
         ROUTE_PATH.SystemDesign,
+        ROUTE_PATH.Chat,
       ],
     };
   },
@@ -96,6 +99,7 @@ export default {
       'userLogout',
       'getUserInfo',
       'getAllListByPageNo',
+      'getAllListBySearchInput',
       'getOwnListByPageNo',
       'getAllListAmount',
       'getOwnListAmount',
@@ -124,9 +128,7 @@ export default {
     setSearchFilter(input) {
       console.log(`[setSearchFilter] input = ${input}`);
       // TODO api 500
-      api.getProjectQuery({ text: input }).then(res => {
-        console.log(`[setSearchFilter] getProjectQuery res`, res);
-      });
+      this.getAllListBySearchInput(input);
       // this.$router.push({ query: { q: input } });
     },
   },
