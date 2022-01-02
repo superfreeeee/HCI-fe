@@ -167,29 +167,37 @@ export default {
       ],
       settingOptions: [
         {
-          label: '修改项目名称',
-          handler: () => this.changeName(),
+          label: '修改项目信息',
+          handler: () => this.changeProjectInfo(),
           desc: {
-            title: '修改项目名称',
+            title: '修改项目信息',
             id: '12-编辑项目',
           },
         },
-        {
-          label: '修改项目描述',
-          handler: () => this.changeDesc(),
-          desc: {
-            title: '修改项目描述',
-            id: '12-编辑项目',
-          },
-        },
-        {
-          label: '修改项目权限',
-          handler: () => this.changeStatus(),
-          desc: {
-            title: '修改项目权限',
-            id: '12-编辑项目',
-          },
-        },
+        // {
+        //   label: '修改项目名称',
+        //   handler: () => this.changeName(),
+        //   desc: {
+        //     title: '修改项目名称',
+        //     id: '12-编辑项目',
+        //   },
+        // },
+        // {
+        //   label: '修改项目描述',
+        //   handler: () => this.changeDesc(),
+        //   desc: {
+        //     title: '修改项目描述',
+        //     id: '12-编辑项目',
+        //   },
+        // },
+        // {
+        //   label: '修改项目权限',
+        //   handler: () => this.changeStatus(),
+        //   desc: {
+        //     title: '修改项目权限',
+        //     id: '12-编辑项目',
+        //   },
+        // },
       ],
     };
   },
@@ -201,6 +209,7 @@ export default {
       'setShowModifyNameModal',
       'setShowModifyDescModal',
       'setShowModifyStatusModal',
+      'setShowModifyProjectInfoModal',
     ]),
     ...mapActions(['switchLayoutMode', 'verifyInitiate', 'initiateGraph']),
     passingGraphAction(...args) {
@@ -224,7 +233,7 @@ export default {
     gotoSmarthelper(path) {
       const projectId = Number(this.$route.params.projectId);
       this.initiateGraph(projectId);
-      this.verifyInitiate(projectId).then(res => {
+      this.verifyInitiate(projectId).then((res) => {
         if (res) {
           this.$router.push(`${path}/${projectId}`);
         } else {
@@ -235,7 +244,7 @@ export default {
     },
     initGraph() {
       const projectId = Number(this.$route.params.projectId);
-      this.initiateGraph(projectId).then(res => {
+      this.initiateGraph(projectId).then((res) => {
         const { success, msg } = res.data;
         if (success) {
           this.$message.success(msg);
@@ -256,6 +265,9 @@ export default {
     },
     changeStatus() {
       this.setShowModifyStatusModal(true);
+    },
+    changeProjectInfo() {
+      this.setShowModifyProjectInfoModal(true);
     },
   },
 };

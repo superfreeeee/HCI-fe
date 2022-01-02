@@ -50,6 +50,7 @@
     <GraphModifyNameModal />
     <GraphModifyDescModal />
     <GraphModifyStatusModal />
+    <GraphModifyProjectInfoModal />
   </div>
 </template>
 
@@ -61,7 +62,8 @@ import GraphSidebar from '../modules/graph/components/GraphSidebar';
 import GraphModifyNameModal from '../modules/graph/components/GraphModifyNameModal';
 import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescModal';
 import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal';
-import GraphDocumentDrawer from '../modules/graph/components/GraphDocumentDrawer.vue';
+import GraphDocumentDrawer from '../modules/graph/components/GraphDocumentDrawer';
+import GraphModifyProjectInfoModal from '../modules/graph/components/GraphModifyProjectInfoModal';
 
 // import { _projectInfo, _graphData } from '../modules/graph/utils/data'
 
@@ -75,6 +77,7 @@ export default {
     GraphModifyDescModal,
     GraphModifyStatusModal,
     GraphDocumentDrawer,
+    GraphModifyProjectInfoModal,
   },
   data() {
     return {
@@ -98,7 +101,7 @@ export default {
     },
     nodeGroups() {
       if (!this.graphData) return [];
-      return [...new Set(this.graphData.nodes.map(node => node.group))];
+      return [...new Set(this.graphData.nodes.map((node) => node.group))];
     },
   },
   methods: {
@@ -134,17 +137,21 @@ export default {
             links.push(item);
           },
           updateNode: () => {
-            const node = nodes.filter(node => node.id === item.id)[0];
+            const node = nodes.filter((node) => node.id === item.id)[0];
             node &&
-              Reflect.ownKeys(item).forEach(prop => (node[prop] = item[prop]));
+              Reflect.ownKeys(item).forEach(
+                (prop) => (node[prop] = item[prop]),
+              );
           },
           updateLink: () => {
-            const link = links.filter(link => link.id === item.id)[0];
+            const link = links.filter((link) => link.id === item.id)[0];
             link &&
-              Reflect.ownKeys(item).forEach(prop => (link[prop] = item[prop]));
+              Reflect.ownKeys(item).forEach(
+                (prop) => (link[prop] = item[prop]),
+              );
           },
           deleteNode: () => {
-            const node = nodes.filter(node => node.id === item.id)[0];
+            const node = nodes.filter((node) => node.id === item.id)[0];
             if (node) {
               nodes.splice(nodes.indexOf(node), 1);
               this.graphData.links = links.filter(
@@ -153,7 +160,7 @@ export default {
             }
           },
           deleteLink: () => {
-            const target = links.filter(link => link.id === item.id)[0];
+            const target = links.filter((link) => link.id === item.id)[0];
             target && links.splice(links.indexOf(target), 1);
           },
         }[name]());
