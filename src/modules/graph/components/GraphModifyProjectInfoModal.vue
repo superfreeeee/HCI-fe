@@ -128,7 +128,6 @@ export default {
         statusData,
       };
       this.$refs[formName].validate((valid) => {
-        console.log('valid here', valid);
         if (valid) {
           console.log(
             'commitUpdateProjectInfo',
@@ -138,7 +137,6 @@ export default {
           );
           this.updateProjectInfo(data)
             .then((res) => {
-              console.log('submit success 1111111111', res);
               const { success, message } = res;
               if (success) {
                 this.disablePanel();

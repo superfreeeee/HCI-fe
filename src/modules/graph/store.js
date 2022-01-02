@@ -175,7 +175,6 @@ const graph = {
       return res.data;
     },
     updateProjectInfo: async ({ dispatch, commit }, data) => {
-      console.log('here updateProjectInfo', data);
       const { nameData, descData, statusData } = data;
       const res1 = await dispatch('updateProjectName', nameData);
       const res2 = await dispatch('updateProjectDesc', descData);
