@@ -1,5 +1,11 @@
 <template>
   <div class="list">
+    <div
+      v-if="searchProjects && typeof searchProjects === 'string'"
+      class="no-search-result"
+    >
+      搜索 "{{ searchProjects }}" 无结果，请重新输入
+    </div>
     <div class="cards">
       <HomeProjectCard
         v-for="project in filteredAllProjects"
@@ -35,17 +41,23 @@ export default {
   components: { HomeProjectCard, SnapshotLoader },
   name: 'HomeSquare',
   computed: {
-    ...mapGetters(['allProjects', 'allPageNo', 'allListCount']),
+    ...mapGetters([
+      'allProjects',
+      'searchProjects',
+      'allPageNo',
+      'allListCount',
+    ]),
     filteredAllProjects() {
-      const q = this.$route.query.q;
-      console.log(`[filteredAllProjects] query`, this.$route.query);
-      if (q) {
-        return this.allProjects.filter(({ name, description }) => {
-          return `${name}_${description}`.includes(q);
-        });
-      } else {
-        return this.allProjects;
+      let projects = this.searchProjects;
+      // 1. 优先返回搜索结果
+      //      input 为 '' 时  => null
+      //      结果为空时       => input
+      if (projects && Array.isArray(projects)) {
+        return projects;
       }
+
+      // 2. 否则返回全部
+      return this.allProjects;
     },
   },
   methods: {
@@ -61,6 +73,10 @@ export default {
       this.getAllListByPageNo(currPageNo);
     },
     async loadSnapshots(projects) {
+      // no need to loadSnapshots
+      return;
+
+      // TODO clear old codes & redundant dependencies
       if (loadingLock) {
         console.warn('[HomeSquare] loadSnapshots duplicate');
         return;
@@ -134,6 +150,9 @@ export default {
   align-items: center;
   justify-content: center;
   width: 100%;
+}
+.no-search-result {
+  margin-bottom: 24px;
 }
 .cards {
   display: flex;

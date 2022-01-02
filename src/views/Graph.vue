@@ -56,6 +56,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+
 import GraphBoard from '../modules/graph/components/GraphBoard';
 import GraphEditor from '../modules/graph/components/GraphEditor';
 import GraphSidebar from '../modules/graph/components/GraphSidebar';
@@ -64,8 +65,6 @@ import GraphModifyDescModal from '../modules/graph/components/GraphModifyDescMod
 import GraphModifyStatusModal from '../modules/graph/components/GraphModifyStatusModal';
 import GraphDocumentDrawer from '../modules/graph/components/GraphDocumentDrawer';
 import GraphModifyProjectInfoModal from '../modules/graph/components/GraphModifyProjectInfoModal';
-
-// import { _projectInfo, _graphData } from '../modules/graph/utils/data'
 
 export default {
   name: 'Graph',

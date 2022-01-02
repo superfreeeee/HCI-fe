@@ -8,7 +8,7 @@
         项目封面加载失败
         <el-link type="primary" @click="reloadImage">点击重试</el-link>
       </span>
-      <img v-else-if="project.image" :src="src" @error="loadImageError" />
+      <img v-else-if="src" :src="src" @error="loadImageError" />
       <!-- <span v-else-if="project.snapshot === undefined">
         缩略图加载中
         <span class="loading"></span>
@@ -61,28 +61,38 @@ export default {
       this.error = false;
       this.loadImageSrc();
     },
-    loadImageSrc() {
-      this.src = this.project.image;
+    loadImageSrc(url) {
+      this.src = url || this.project.image;
     },
     trySetImage(e) {
       e.stopPropagation();
-      console.log(`[HomeProjectCard] trySetImage`);
       chooseFile().then(async file => {
-        console.log(`[HomeProjectCard] file`, file);
+        const projectId = this.project.projectId;
+
+        console.log(`[HomeProjectCard] projectId=${projectId} , file`, file);
         api
-          .updateProjectImage(file)
+          .updateProjectImage(file, projectId)
           .then(res => {
-            console.log(`[HomeProjectCard] updateProjectImage res`, res);
+            if (res.status === 200) {
+              this.$message.success('封面更新成功');
+              console.log(`[HomeProjectCard] updateProjectImage res`, res);
+
+              // TODO add real image url
+              const url = res.data.msg;
+              this.loadImageSrc(url);
+            } else {
+              this.$message.error('封面更新失败');
+              console.log(`[HomeProjectCard] updateProjectImage fail`, res);
+            }
           })
           .catch(e => {
-            console.log(`[HomeProjectCard] updateProjectImage e`, e);
+            this.$message.error('封面更新失败');
+            console.log(`[HomeProjectCard] updateProjectImage error`, e);
           });
       });
     },
   },
   mounted() {
-    // TODO clear mock
-    // this.project.image = '';
     this.loadImageSrc();
   },
 };
@@ -113,6 +123,7 @@ export default {
   align-items: center;
   width: 100%;
   height: 100%;
+  overflow: hidden;
 }
 .loading::after {
   content: '';

@@ -50,6 +50,10 @@ export default {
       });
     },
     async loadSnapshots(projects) {
+      // no need to loadSnapshots
+      return;
+
+      // TODO clear old codes & redundant dependencies
       if (loadingLock) {
         console.warn('[HomeProjects] loadSnapshots duplicate');
         return;
