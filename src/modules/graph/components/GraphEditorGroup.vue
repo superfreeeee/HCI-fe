@@ -1,5 +1,5 @@
 <template>
-  <div style="display: none">
+  <div>
     <h4>查看实体类型</h4>
     <el-checkbox
       :indeterminate="isIndeterminate"
