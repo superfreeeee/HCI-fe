@@ -4,7 +4,7 @@
     <!-- <graph-editor-search></graph-editor-search> -->
 
     <!-- 选取查看组别 -->
-    <!-- <GraphEditorGroup :groups="nodeGroups" @graph-action="passingGraphAction" /> -->
+    <GraphEditorGroup :groups="nodeGroups" @graph-action="passingGraphAction" />
 
     <!-- <el-divider></el-divider> -->
     <!-- 图谱内容查看/修改 -->

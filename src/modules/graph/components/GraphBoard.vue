@@ -69,7 +69,7 @@ export default {
   methods: {
     ...mapActions(['updateLayout', 'saveAsPng', 'saveAsXml']),
     /***** 重新挂载图谱 *****/
-    async mountGraphData(data, projectInfo) {
+    async mountGraphData(data, projectInfo = {}) {
       this.flags.loading = true;
       console.log(
         `start loading ... this.flags.loading = ${this.flags.loading}`,
