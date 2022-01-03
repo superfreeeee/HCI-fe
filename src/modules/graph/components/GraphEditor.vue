@@ -1,12 +1,5 @@
 <template>
   <div class="editor">
-    <!-- 图谱搜索框 -->
-    <!-- <graph-editor-search></graph-editor-search> -->
-
-    <!-- 选取查看组别 -->
-    <GraphEditorGroup :groups="nodeGroups" @graph-action="passingGraphAction" />
-
-    <!-- <el-divider></el-divider> -->
     <!-- 图谱内容查看/修改 -->
     <GraphEditorItem
       v-if="mode === EDITOR_MODE.Item"
@@ -16,13 +9,22 @@
       :nodeGroups="nodeGroups"
       @graph-action="passingGraphAction"
     >
-      <GraphEditorSearch
-        :projectId="graphData && graphData.projectId"
-        :nodes="safeNodes"
-        :links="safeLinks"
-        @editor-action="dispatchEditorAction"
-        @graph-action="passingGraphAction"
-      />
+      <div>
+        <!-- 选取查看组别 -->
+        <GraphEditorGroup
+          :groups="nodeGroups"
+          @graph-action="passingGraphAction"
+        />
+
+        <el-divider></el-divider>
+        <GraphEditorSearch
+          :projectId="graphData && graphData.projectId"
+          :nodes="safeNodes"
+          :links="safeLinks"
+          @editor-action="dispatchEditorAction"
+          @graph-action="passingGraphAction"
+        />
+      </div>
     </GraphEditorItem>
 
     <!-- <el-divider></el-divider> -->
