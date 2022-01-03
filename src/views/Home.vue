@@ -172,6 +172,7 @@ export default {
       if (initSearch) {
         console.log(`[Home] mounted with search = ${initSearch}`);
         this.searchInput = this.$refs.search_input.value = initSearch;
+        this.setSearchFilter(initSearch);
       }
     }
   },
